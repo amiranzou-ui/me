@@ -1,0 +1,182 @@
+/* ── Cooking section ── */
+.ck-section {
+  display: none;
+  padding: 32px 20px 60px;
+  opacity: 0;
+  filter: blur(10px);
+  transition: opacity 1.1s ease, filter 1.4s ease;
+}
+
+.ck-section.ck-revealed {
+  opacity: 1;
+  filter: blur(0px);
+}
+
+@media (pointer: coarse) {
+  .ck-section         { filter: none; transition: opacity 0.6s ease; }
+  .ck-section.ck-revealed { filter: none; }
+}
+
+/* ── Loose imperfect grid ── */
+.ck-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px 14px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .ck-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ── Moment card ── */
+.ck-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+  cursor: pointer;
+  transform: rotate(var(--rot, 0deg)) translateY(var(--nudge, 0px));
+  transition: transform 0.6s cubic-bezier(0.2,0,0.4,1);
+}
+
+.ck-card.ck-wide {
+  grid-column: span 2;
+}
+
+/* Image: dimmed by default */
+.ck-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+  opacity: 0.52;
+  filter: saturate(0.75) brightness(0.85);
+  transition: opacity 0.7s ease, filter 0.7s ease;
+}
+
+/* Hover: image clears */
+.ck-card:hover img {
+  opacity: 0.88;
+  filter: saturate(0.95) brightness(1.0);
+}
+
+/* Label — always faintly visible, fully revealed on hover */
+.ck-label {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 32px 12px 10px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(12px, 1.4vw, 15px);
+  color: rgba(235, 230, 224, 1);
+  text-align: center;
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+  direction: rtl;
+  background: linear-gradient(to top, rgba(4,3,2,0.88) 0%, rgba(4,3,2,0.55) 55%, transparent 100%);
+  text-shadow: 0 1px 6px rgba(0,0,0,0.85);
+  opacity: 0.72;
+  transform: translateY(0);
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+
+.ck-card:hover .ck-label {
+  opacity: 1;
+}
+
+/* Hint dot — pulses once to signal interactivity */
+.ck-hint {
+  position: absolute;
+  top: 9px; right: 10px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: rgba(212, 207, 201, 0.55);
+  animation: ck-pulse 2.4s ease-out 0.8s 2 forwards;
+  pointer-events: none;
+}
+
+@keyframes ck-pulse {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  50%  { transform: scale(2.2); opacity: 0.20; }
+  100% { transform: scale(1);   opacity: 0.55; }
+}
+
+.ck-card:hover .ck-hint { opacity: 0; transition: opacity 0.3s; }
+
+/* Active card (expanded): slightly highlighted */
+.ck-card.ck-active {
+  box-shadow: 0 0 0 1px rgba(196,180,154,0.22);
+}
+.ck-card.ck-active img {
+  opacity: 0.96;
+  filter: saturate(1) brightness(1);
+}
+
+/* ── Expanded overlay ── */
+#ck-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 8000;
+  background: rgba(6, 4, 2, 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: background 0.7s ease;
+}
+
+#ck-overlay.open {
+  background: rgba(6, 4, 2, 0.78);
+  pointer-events: auto;
+}
+
+.ck-exp-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2,0,0.2,1);
+  max-width: min(480px, 86vw);
+  pointer-events: none;
+}
+
+#ck-overlay.open .ck-exp-inner {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.ck-exp-img {
+  width: 100%;
+  border-radius: 2px;
+  object-fit: cover;
+  max-height: 58vh;
+  filter: saturate(0.88) brightness(0.95);
+  box-shadow: 0 12px 48px rgba(0,0,0,0.55);
+}
+
+.ck-exp-text {
+  text-align: center;
+  direction: rtl;
+}
+
+.ck-exp-text p {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(14px, 1.8vw, 20px);
+  color: rgba(212, 207, 201, 0.68);
+  letter-spacing: 0.3px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.ck-exp-text p + p {
+  margin-top: 6px;
+  color: rgba(212, 207, 201, 0.38);
+  font-size: clamp(12px, 1.3vw, 15px);
+}

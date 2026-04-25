@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ameer Al-Butaihi</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/matrix.css">
+</head>
+<body>
+
+  <!-- Nav -->
+  <nav class="mx-nav" id="mx-nav">
+    <a href="index.html" class="mx-nav-back">← Home</a>
+    <div class="mx-level-pills" id="mx-level-pills">
+      <button class="mx-pill active" data-level="1">Overview</button>
+      <button class="mx-pill" data-level="2">Full CV</button>
+      <button class="mx-pill" data-level="3">System</button>
+    </div>
+  </nav>
+
+  <!-- L1: Fast CV (default) -->
+  <div class="mx-layer" id="mx-l1"></div>
+
+  <!-- L2: Full CV (drawer) -->
+  <div class="mx-layer mx-drawer" id="mx-l2">
+    <div class="mx-drawer-inner" id="mx-l2-inner"></div>
+  </div>
+
+  <!-- L3: Node System (overlay) -->
+  <div class="mx-layer mx-overlay" id="mx-l3">
+    <div class="mx-graph-wrap">
+      <svg class="mx-graph-svg" id="mx-graph-svg"></svg>
+      <div class="mx-graph" id="mx-graph"></div>
+    </div>
+    <div class="mx-node-panel" id="mx-node-panel">
+      <button class="mx-panel-close" id="mx-panel-close">×</button>
+      <div class="mx-panel-body" id="mx-panel-body"></div>
+    </div>
+  </div>
+
+  <script src="js/protect.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/matrix.js"></script>
+</body>
+</html>

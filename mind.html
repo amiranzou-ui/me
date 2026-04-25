@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>III</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <script>
+    if (window.matchMedia('(pointer: coarse)').matches || window.innerWidth <= 768) {
+      location.replace('index.html');
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/mind.css">
+  <link rel="stylesheet" href="css/mind-nodes.css">
+  <link rel="stylesheet" href="css/mind-journal.css">
+</head>
+<body>
+  <div class="mind-surface" id="surface"></div>
+  <a class="mind-exit" id="mind-exit" href="index.html">← surface</a>
+  <div class="mind-cursor" id="mind-cursor"></div>
+  <script src="js/protect.js"></script>
+  <script src="js/mind-system.js"></script>
+  <script src="js/mind.js"></script>
+  <script src="js/mind-nodes.js"></script>
+  <script src="js/mind-author.js"></script>
+  <script src="js/mind-journal.js"></script>
+</body>
+</html>

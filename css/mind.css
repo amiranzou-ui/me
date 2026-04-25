@@ -1,0 +1,238 @@
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --sys-emotion:   0.3;
+  --grain-opacity: 0.06;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  background: #080808;
+  color: #d4cfc9;
+  font-family: 'Cormorant Garamond', serif;
+  overflow: hidden;
+  cursor: none;
+  user-select: none;
+}
+
+/* grain — responds to emotion weight via CSS variable */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  pointer-events: none; z-index: 9990;
+  opacity: var(--grain-opacity, 0.06);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+  transition: opacity 4s ease;
+}
+
+/* ── Silence state ── */
+/* When body.sys-silence: everything exhales slightly */
+body.sys-silence .fragment,
+body.sys-silence .mind-node,
+body.sys-silence .thought-child {
+  opacity: 0.72 !important;
+  transition: opacity 2.2s cubic-bezier(0.4,0,0.6,1) !important;
+}
+
+body:not(.sys-silence) .fragment,
+body:not(.sys-silence) .mind-node,
+body:not(.sys-silence) .thought-child {
+  opacity: 1;
+  transition: opacity 2.8s cubic-bezier(0.2,0,0.6,1);
+}
+
+/* ── Attention modulation ── */
+/* Suppressed elements dim via opacity — doesn't touch the color system */
+.attention-modulated {
+  opacity: calc(0.4 + var(--attention, 0.5) * 0.6);
+  transition: opacity 2s cubic-bezier(0,0,0.4,1) !important;
+}
+
+/* ── Surface ── */
+.mind-surface {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* ── Fragment ── */
+.fragment {
+  position: absolute;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(13px, 1.5vw, 22px);
+  color: rgba(212, 207, 201, 0.38);
+  max-width: min(28vw, 320px);
+  line-height: 1.55;
+  letter-spacing: 0.2px;
+  transition: color 0.7s ease;
+  opacity: 0;
+  animation: f-in var(--dur, 1.4s) ease forwards;
+  animation-delay: var(--delay, 0s);
+  transform-origin: center;
+}
+
+@media (max-width: 768px) {
+  .fragment { max-width: 70vw; font-size: clamp(14px, 4vw, 20px); }
+}
+
+/* hover color controlled via JS for asymmetric in/out timing */
+
+.fragment.has-path { cursor: none; }
+
+.fragment.opened {
+  color: rgba(212, 207, 201, 0.18);
+  transition: color 1s ease;
+}
+
+.fragment.ephemeral.seen {
+  animation: f-out 2.5s ease forwards !important;
+}
+
+@keyframes f-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes f-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ── Thought child ── */
+.thought-child {
+  position: absolute;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(11px, 1.1vw, 15px);
+  color: rgba(212, 207, 201, 0.22);
+  max-width: min(22vw, 240px);
+  line-height: 1.65;
+  letter-spacing: 0.3px;
+  opacity: 0;
+  animation: f-in 1s ease forwards;
+  animation-delay: var(--delay, 0s);
+  transition: color 0.5s;
+}
+
+.thought-child:hover { color: rgba(212, 207, 201, 0.65); }
+
+/* ── Connector line ── */
+.thought-line {
+  position: absolute;
+  height: 1px;
+  background: rgba(212, 207, 201, 0.05);
+  pointer-events: none;
+  transform-origin: left center;
+  opacity: 0;
+  animation: f-in 1.2s ease forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+/* ── Typed echo — individual drifting characters ── */
+.typed-echo {
+  position: fixed;
+  font-style: italic;
+  font-size: 11px;
+  color: rgba(212, 207, 201, 0.15);
+  pointer-events: none;
+  letter-spacing: 1px;
+  z-index: 50;
+  animation: echo-drift 4.2s cubic-bezier(0.4,0,1,1) forwards;
+}
+
+@keyframes echo-drift {
+  0%   { opacity: 0.45; transform: translateY(0) scale(1); }
+  15%  { opacity: 0.35; }
+  100% { opacity: 0;    transform: translateY(-32px) scale(0.88); }
+}
+
+/* ── Still here ── */
+.still-here {
+  position: fixed;
+  bottom: 38px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-style: italic;
+  font-size: clamp(10px, 1vw, 13px);
+  color: rgba(212, 207, 201, 0.18);
+  letter-spacing: 2px;
+  pointer-events: none;
+  white-space: nowrap;
+  /* opacity controlled via JS for 2.5s fade-in */
+}
+
+/* ── Visit dots ── */
+.visit-marks {
+  position: fixed;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 7px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.v-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: rgba(212, 207, 201, 0.12);
+  transition: background 0.6s;
+}
+
+.v-dot.lit { background: rgba(212, 207, 201, 0.35); }
+
+/* ── Rule (returns only once) ── */
+.mind-rule {
+  position: fixed;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(10px, 1vw, 13px);
+  color: rgba(212, 207, 201, 0.14);
+  letter-spacing: 1px;
+  max-width: min(20vw, 200px);
+  line-height: 1.7;
+  opacity: 0;
+  animation: f-in 1.4s ease forwards;
+  animation-delay: var(--delay, 0s);
+  pointer-events: none;
+}
+
+/* ── Exit ── */
+.mind-exit {
+  position: fixed;
+  bottom: 30px;
+  right: 38px;
+  font-family: 'Inter', sans-serif;
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(212, 207, 201, 0.22);
+  text-decoration: none;
+  cursor: none;
+  transition: color 0.5s;
+  z-index: 100;
+}
+
+.mind-exit:hover { color: rgba(212, 207, 201, 0.6); }
+
+/* ── Custom cursor ── */
+.mind-cursor {
+  position: fixed;
+  width: 4px; height: 4px;
+  background: rgba(212, 207, 201, 0.35);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: width 0.45s ease, height 0.45s ease, background 0.45s ease;
+}
+
+.mind-cursor.hover {
+  width: 18px; height: 18px;
+  background: transparent;
+  border: 1px solid rgba(212, 207, 201, 0.2);
+}
+
