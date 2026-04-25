@@ -129,7 +129,7 @@ function buildOverlay(sorted, owner) {
       <div class="jnl-header">
         <span class="jnl-title">journal</span>
         ${owner ? '<button class="jnl-owner-add" id="jnl-add" title="new entry">+</button>' : ''}
-        ${owner ? '<a class="jnl-view-public" href="Human.html#journal" target="_blank" title="see public view">↗ public</a>' : ''}
+        ${owner ? '<a class="jnl-view-public" href="human.html#journal" target="_blank" title="see public view">↗ public</a>' : ''}
         <button class="jnl-close-btn" id="jnl-close">×</button>
       </div>
       <div id="jnl-entry-list">${list}</div>

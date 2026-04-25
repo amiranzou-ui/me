@@ -37,12 +37,12 @@
     if (isMobile()) {
       if (container.classList.contains('touch-right')) {
         clearTimeout(collapseTimer);
-        portal('Human.html', '#141008', e.clientX, e.clientY);
+        portal('human.html', '#141008', e.clientX, e.clientY);
       } else {
         expandSide('touch-right', 'touch-left');
       }
     } else {
-      portal('Human.html', '#141008', e.clientX, e.clientY);
+      portal('human.html', '#141008', e.clientX, e.clientY);
     }
   });
 
