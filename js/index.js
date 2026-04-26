@@ -25,9 +25,12 @@
 
   left.addEventListener('click', e => {
     if (isMobile()) {
-      container.classList.contains('touch-left')
-        ? clearTimeout(collapseTimer)
-        : expandSide('touch-left', 'touch-right');
+      if (container.classList.contains('touch-left')) {
+        clearTimeout(collapseTimer);
+        portal('matrix.html', '#f2ece0', e.clientX, e.clientY);
+      } else {
+        expandSide('touch-left', 'touch-right');
+      }
     } else {
       portal('matrix.html', '#f2ece0', e.clientX, e.clientY);
     }

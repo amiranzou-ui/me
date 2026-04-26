@@ -15,10 +15,14 @@
   <meta name="twitter:description" content="Medical Physicist · AI Researcher · Designer">
   <meta name="twitter:image" content="https://amiranzou-ui.github.io/me/images/profile.JPG">
   <script>
-    if (!localStorage.getItem('seen_intro')) {
-      localStorage.setItem('seen_intro', '1');
-      location.replace('intro.html');
-    }
+    (function () {
+      var seen = false;
+      try { seen = !!localStorage.getItem('seen_intro'); } catch(e) {}
+      if (!seen) {
+        try { localStorage.setItem('seen_intro', '1'); } catch(e) {}
+        location.replace('intro.html');
+      }
+    })();
   </script>
   <link rel="stylesheet" href="css/style.css">
 
