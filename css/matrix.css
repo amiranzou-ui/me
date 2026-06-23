@@ -131,6 +131,71 @@ body {
   to   { transform: translateY(-50%) rotate(360deg) translateX(calc(35vh)) rotate(-360deg); }
 }
 
+/* Grain texture — film print overlay */
+.mx-poster-grain {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.055; mix-blend-mode: screen;
+}
+
+/* Third outer ring — slow dashed spin */
+.mx-poster-ring-3 {
+  width: 92vh; height: 92vh; right: -18vw; top: 50%;
+  transform: translateY(-50%);
+  border-color: rgba(196,98,45,0.025);
+  border-style: dashed;
+  animation: mx-ring-slow 100s linear infinite;
+}
+@keyframes mx-ring-slow {
+  from { transform: translateY(-50%) rotate(0deg); }
+  to   { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Second orbiting dot on ring-2 */
+.mx-poster-ring-dot2 {
+  position: absolute; width: 3px; height: 3px; border-radius: 50%;
+  background: rgba(200,185,160,0.18);
+  top: 50%; left: -1.5px; transform: translateY(-50%);
+  animation: mx-orbit2 28s linear infinite;
+}
+@keyframes mx-orbit2 {
+  from { transform: translateY(-50%) rotate(90deg) translateX(calc(25vh)) rotate(-90deg); }
+  to   { transform: translateY(-50%) rotate(450deg) translateX(calc(25vh)) rotate(-450deg); }
+}
+
+/* Stats column — fills the right void of the poster */
+.mx-poster-stat-col {
+  position: absolute; right: 56px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 32px; align-items: flex-end;
+  animation: mx-fade 1.4s ease 0.9s both; z-index: 2;
+}
+.mx-poster-stat {
+  display: flex; align-items: flex-start; gap: 12px; flex-direction: row-reverse;
+  border-right: 1px solid rgba(200,185,160,0.07); padding-right: 18px;
+}
+.mx-stat-n {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: clamp(38px, 4vw, 62px); line-height: 0.88;
+  color: rgba(200,185,160,0.58); letter-spacing: -1px;
+}
+.mx-stat-l {
+  font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(200,185,160,0.18); line-height: 2.2;
+  padding-top: 6px; text-align: right;
+}
+
+/* Print registration / crop marks */
+.mx-poster-reg {
+  position: absolute; width: 20px; height: 20px; pointer-events: none; z-index: 2;
+}
+.mx-poster-reg-tl { top: 28px; left: 28px; }
+.mx-poster-reg-tr { top: 28px; right: 28px; }
+.mx-poster-reg::before, .mx-poster-reg::after {
+  content: ''; position: absolute; background: rgba(200,185,160,0.1);
+}
+.mx-poster-reg::before { width: 20px; height: 1px; top: 50%; left: 0; transform: translateY(-50%); }
+.mx-poster-reg::after  { width: 1px; height: 20px; top: 0; left: 50%; transform: translateX(-50%); }
+
 /* Top row */
 .mx-poster-top {
   display: flex; justify-content: space-between; align-items: flex-start;

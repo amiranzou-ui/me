@@ -301,8 +301,12 @@ function buildL1() {
   const header = document.createElement('div');
   header.className = 'mx-l1-poster';
   header.innerHTML = `
+    <div class="mx-poster-grain"></div>
+    <div class="mx-poster-reg mx-poster-reg-tl"></div>
+    <div class="mx-poster-reg mx-poster-reg-tr"></div>
+    <div class="mx-poster-ring mx-poster-ring-3"></div>
     <div class="mx-poster-ring mx-poster-ring-1"><div class="mx-poster-ring-dot"></div></div>
-    <div class="mx-poster-ring mx-poster-ring-2"></div>
+    <div class="mx-poster-ring mx-poster-ring-2"><div class="mx-poster-ring-dot2"></div></div>
     <div class="mx-poster-top">
       <span class="mx-poster-tag">${DATA.tag}</span>
       <span class="mx-poster-meta">${DATA.contact.location} · ${new Date().getFullYear()}</span>
@@ -310,6 +314,20 @@ function buildL1() {
     <div class="mx-poster-name-block">
       <span class="mx-poster-name-line">${firstName}</span>
       <span class="mx-poster-name-line">${lastName}</span>
+    </div>
+    <div class="mx-poster-stat-col" aria-hidden="true">
+      <div class="mx-poster-stat">
+        <span class="mx-stat-n">4+</span>
+        <span class="mx-stat-l">YRS<br>DESIGN</span>
+      </div>
+      <div class="mx-poster-stat">
+        <span class="mx-stat-n">3</span>
+        <span class="mx-stat-l">BRANDS<br>BUILT</span>
+      </div>
+      <div class="mx-poster-stat">
+        <span class="mx-stat-n">50+</span>
+        <span class="mx-stat-l">PROJECTS<br>DONE</span>
+      </div>
     </div>
     <div class="mx-poster-rule"></div>
     <div class="mx-poster-bottom">
