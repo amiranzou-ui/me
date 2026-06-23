@@ -1084,10 +1084,13 @@
     pickPanel.addEventListener('click', openOnClick, true);
   }
 
-  // Auto-open when arriving from home page card
-  if (new URLSearchParams(location.search).get('music') === 'open') {
+  // Auto-open when arriving from home page card (sessionStorage flag)
+  const _autoOpen = (() => {
+    try { const v = sessionStorage.getItem('mc_autoopen'); sessionStorage.removeItem('mc_autoopen'); return v === '1'; } catch(_) { return false; }
+  })();
+  if (_autoOpen) {
     hasInteracted = true;
-    setTimeout(openCapsule, 700);
+    setTimeout(openCapsule, 900);
   }
 
   // ── Helpers ───────────────────────────────────────────

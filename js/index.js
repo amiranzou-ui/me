@@ -77,7 +77,8 @@
   if (musicLink) {
     musicLink.addEventListener('click', e => {
       e.stopPropagation();
-      portal('human.html?music=open', '#141008', e.clientX, e.clientY);
+      try { sessionStorage.setItem('mc_autoopen', '1'); } catch(_) {}
+      portal('human.html', '#141008', e.clientX, e.clientY);
     });
   }
 
