@@ -336,7 +336,10 @@ function buildL1() {
     </div>
     <div class="mx-poster-rule"></div>
     <div class="mx-poster-bottom">
-      <p class="mx-poster-bio">${DATA.bio}</p>
+      <div class="mx-poster-quote">
+        <span class="mx-quote-mark">"</span>
+        <p class="mx-poster-bio">${DATA.bio.split('.')[0]}.</p>
+      </div>
       <div class="mx-poster-actions">
         <div class="mx-poster-btns">
           <button class="mx-btn mx-btn-primary" id="mx-cv-btn">Full CV</button>
