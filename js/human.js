@@ -387,15 +387,27 @@
     }
     hlLeft.addEventListener('click', e => {
       if (window.innerWidth <= 768) {
-        if (homeLoop.classList.contains('hl-touch-left')) { clearTimeout(hlTimer); portal('index.html', '#f0ebe0', e.clientX, e.clientY); }
+        if (homeLoop.classList.contains('hl-touch-left')) { clearTimeout(hlTimer); portal('matrix.html', '#f0ebe0', e.clientX, e.clientY); }
         else expandHl('hl-touch-left', 'hl-touch-right');
       } else {
-        portal('index.html', '#f0ebe0', e.clientX, e.clientY);
+        portal('matrix.html', '#f0ebe0', e.clientX, e.clientY);
       }
     });
     hlRight.addEventListener('click', () => {
-      const top = dom.qs('#page-top');
-      if (top) top.scrollIntoView({ behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => {
+        // Reset closing state on panels
+        dom.qsa('.pick-panel').forEach(p => p.classList.remove('closing'));
+        // Re-show pick screen
+        if (pickScreen) {
+          pickScreen.style.display = '';
+          pickScreen.classList.remove('visible');
+          void pickScreen.offsetHeight; // force reflow so animation re-triggers
+          pickScreen.classList.add('visible');
+        }
+        // Hide layout until they pick again
+        if (layout) layout.style.opacity = '0';
+      }, 350);
     });
   }
 
