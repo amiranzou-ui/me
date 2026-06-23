@@ -382,7 +382,7 @@ function buildL2() {
   sb.className = 'mx-l2-sb';
   sb.innerHTML = `
     <div class="mx-l2-sb-name">${DATA.name}</div>
-    <div class="mx-l2-sb-role">${DATA.tag}</div>
+    <div class="mx-l2-sb-role">${DATA.tag.replace(' · ', '<br>')}</div>
     <div class="mx-l2-sb-block">
       <span>${DATA.contact.location}</span>
       <a href="tel:${DATA.contact.phone}">${DATA.contact.phone}</a>

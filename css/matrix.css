@@ -318,10 +318,10 @@ body {
   white-space: nowrap;
 }
 .mx-l2-sb-role {
-  font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+  font-size: 8px; letter-spacing: 1.5px; text-transform: uppercase;
   color: var(--ink3); padding-bottom: 22px; margin-bottom: 22px;
   border-bottom: 1px solid var(--border);
-  line-height: 1.6;
+  line-height: 1.8;
 }
 .mx-l2-sb-block {
   display: flex; flex-direction: column; gap: 8px;
