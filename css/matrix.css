@@ -330,7 +330,10 @@ body {
   border-bottom: 1px solid var(--border);
   position: relative; overflow: hidden;
   transition: background 0.35s;
+  text-decoration: none; color: inherit; display: block;
+  cursor: default;
 }
+a.mx-l1-card { cursor: pointer; }
 .mx-l1-card:nth-child(even) { border-right: none; }
 .mx-l1-card:nth-last-child(-n+2) { border-bottom: none; }
 .mx-l1-card::before {
@@ -358,9 +361,9 @@ body {
 .mx-l1-card-link {
   display: inline-block; margin-top: 22px;
   font-family: 'Cormorant Garamond', serif; font-style: italic;
-  font-size: 14px; color: var(--ink3); text-decoration: none; transition: color 0.3s;
+  font-size: 14px; color: var(--ink3); transition: color 0.3s;
 }
-.mx-l1-card-link:hover { color: var(--accent); }
+a.mx-l1-card:hover .mx-l1-card-link { color: var(--accent); }
 
 /* Bottom bar */
 .mx-l1-bar {

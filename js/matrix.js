@@ -50,36 +50,40 @@ const DATA = {
 
   projects: [
     {
-      title:  'I.G.F.I.C Medical Center',
-      role:   'Social Media Manager & Graphic Designer',
-      desc:   'Full visual identity and social media management for a medical imaging center.',
-      impact: 'Manages all digital content, campaigns, and print materials — from billboards to daily posts — with a unified brand direction.',
-      stack:  ['Photoshop', 'Illustrator', 'InDesign', 'Social Media'],
-      link:   null,
+      title:   'I.G.F.I.C Medical Center',
+      role:    'Social Media Manager & Graphic Designer',
+      desc:    'Full visual identity and social media management for a medical imaging center.',
+      impact:  'Manages all digital content, campaigns, and print materials — from billboards to daily posts — with a unified brand direction.',
+      stack:   ['Photoshop', 'Illustrator', 'InDesign', 'Social Media'],
+      behance: 'https://www.behance.net/amiranzou',
+      link:    null,
     },
     {
-      title:  'Bershka',
-      role:   'Graphic Designer',
-      desc:   'Visual content for one of the world\'s largest fast-fashion retail brands.',
-      impact: 'Produced marketing and promotional materials aligned with global brand aesthetic across seasonal campaigns.',
-      stack:  ['Photoshop', 'Illustrator', 'InDesign'],
-      link:   null,
+      title:   'Bershka',
+      role:    'Graphic Designer',
+      desc:    'Visual content for one of the world\'s largest fast-fashion retail brands.',
+      impact:  'Produced marketing and promotional materials aligned with global brand aesthetic across seasonal campaigns.',
+      stack:   ['Photoshop', 'Illustrator', 'InDesign'],
+      behance: 'https://www.behance.net/amiranzou',
+      link:    null,
     },
     {
-      title:  'Personal Portfolio',
-      role:   'Designer & Developer',
-      desc:   'This site — a two-sided identity system with ambient sound and an interactive CV.',
-      impact: 'Built entirely from scratch: spatial layout, node graph, living sound state, and cinematic transitions.',
-      stack:  ['HTML', 'CSS', 'JavaScript', 'Web Audio API'],
-      link:   'index.html',
+      title:   'Personal Portfolio',
+      role:    'Designer & Developer',
+      desc:    'This site — a two-sided identity system with ambient sound and an interactive CV.',
+      impact:  'Built entirely from scratch: spatial layout, node graph, living sound state, and cinematic transitions.',
+      stack:   ['HTML', 'CSS', 'JavaScript', 'Web Audio API'],
+      behance: null,
+      link:    'index.html',
     },
     {
-      title:  'Data Ship',
-      role:   'Graphic Design Intern',
-      desc:   'Early career work across digital and print — building the foundations of visual identity systems.',
-      impact: 'Contributed to branded materials and social assets while developing a consistent, cross-project visual language.',
-      stack:  ['Photoshop', 'Illustrator', 'Figma'],
-      link:   null,
+      title:   'Data Ship',
+      role:    'Graphic Design Intern',
+      desc:    'Early career work across digital and print — building the foundations of visual identity systems.',
+      impact:  'Contributed to branded materials and social assets while developing a consistent, cross-project visual language.',
+      stack:   ['Photoshop', 'Illustrator', 'Figma'],
+      behance: 'https://www.behance.net/amiranzou',
+      link:    null,
     },
   ],
 
@@ -364,14 +368,21 @@ function buildL1() {
   const grid = document.createElement('div');
   grid.className = 'mx-l1-grid';
   DATA.projects.forEach((p, i) => {
-    const card = document.createElement('div');
+    const href    = p.behance || p.link;
+    const external = !!p.behance;
+    const card = href ? document.createElement('a') : document.createElement('div');
     card.className = 'mx-l1-card';
+    if (href) {
+      card.href = href;
+      if (external) { card.target = '_blank'; card.rel = 'noopener'; }
+    }
+    const linkLabel = p.behance ? 'View on Behance →' : 'View →';
     card.innerHTML = `
       <div class="mx-l1-card-num">0${i + 1}</div>
       <div class="mx-l1-card-title">${p.title}</div>
       <div class="mx-l1-card-role">${p.role}</div>
       <div class="mx-l1-card-desc">${p.desc}</div>
-      ${p.link ? `<a class="mx-l1-card-link" href="${p.link}">view →</a>` : ''}`;
+      ${href ? `<span class="mx-l1-card-link">${linkLabel}</span>` : ''}`;
     grid.appendChild(card);
   });
   wrap.appendChild(grid);
