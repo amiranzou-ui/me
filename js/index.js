@@ -1,5 +1,5 @@
 /**
- * Index page — split-screen landing.
+ * Index page — archive landing.
  * Depends on: js/core.js, js/secret.js
  */
 (function () {
@@ -7,49 +7,20 @@
 
   const { portal, dom } = window.Core;
 
-  const container = dom.qs('#container');
-  const left      = dom.qs('#left');
-  const right     = dom.qs('#right');
+  const arcMatrix = dom.qs('#arc-matrix');
+  const arcHuman  = dom.qs('#arc-human');
 
-  if (!container || !left || !right) return;
+  if (!arcMatrix || !arcHuman) return;
 
-  const isMobile = () => window.innerWidth <= 768;
-  let collapseTimer = null;
-
-  function expandSide(add, remove) {
-    clearTimeout(collapseTimer);
-    container.classList.remove(remove);
-    container.classList.add(add);
-    collapseTimer = setTimeout(() => container.classList.remove(add), 5000);
-  }
-
-  left.addEventListener('click', e => {
-    if (isMobile()) {
-      if (container.classList.contains('touch-left')) {
-        clearTimeout(collapseTimer);
-        portal('matrix.html', '#f2ece0', e.clientX, e.clientY);
-      } else {
-        expandSide('touch-left', 'touch-right');
-      }
-    } else {
-      portal('matrix.html', '#f2ece0', e.clientX, e.clientY);
-    }
+  arcMatrix.addEventListener('click', e => {
+    portal('matrix.html', '#f2ece0', e.clientX, e.clientY);
   });
 
-  right.addEventListener('click', e => {
-    if (isMobile()) {
-      if (container.classList.contains('touch-right')) {
-        clearTimeout(collapseTimer);
-        portal('human.html', '#141008', e.clientX, e.clientY);
-      } else {
-        expandSide('touch-right', 'touch-left');
-      }
-    } else {
-      portal('human.html', '#141008', e.clientX, e.clientY);
-    }
+  arcHuman.addEventListener('click', e => {
+    portal('human.html', '#141008', e.clientX, e.clientY);
   });
 
-  // ── Profile panel ─────────────────────────────────────────
+  // ── Profile panel ──────────────────────────────────────────
   const pnToggle   = dom.qs('#pn-toggle');
   const pnPanel    = dom.qs('#pn-panel');
   const pnBackdrop = dom.qs('#pn-backdrop');
@@ -66,11 +37,10 @@
   if (pnToggle)   pnToggle.addEventListener('click', () => pnPanel.classList.contains('open') ? closePanel() : openPanel());
   if (pnBackdrop) pnBackdrop.addEventListener('click', closePanel);
 
-  // ── Music link on card ────────────────────────────────────
-  const musicLink = dom.qs('#pnp-music-link');
+  // ── Music link on card ─────────────────────────────────────
+  const musicLink    = dom.qs('#pnp-music-link');
   const listeningVal = dom.qs('#pnp-listening-val');
 
-  // Show saved track title (set by music.js on human page)
   const savedTitle = (() => { try { return localStorage.getItem('music_title_v1') || ''; } catch(e) { return ''; } })();
   if (listeningVal) listeningVal.textContent = savedTitle ? '♫ ' + savedTitle : '♫ Open the room';
 
@@ -82,6 +52,6 @@
     });
   }
 
-  // ── Secret word ───────────────────────────────────────────
+  // ── Secret word ────────────────────────────────────────────
   window.SecretWord.init();
 })();
