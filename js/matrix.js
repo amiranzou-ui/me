@@ -297,14 +297,36 @@ function buildL1() {
   wrap.className = 'mx-l1-wrap';
 
   // Asymmetric header
+  const toolsList = DATA.skills.slice(0, 2).flatMap(g => g.tags);
   const header = document.createElement('div');
   header.className = 'mx-l1-header';
   header.innerHTML = `
     <div class="mx-l1-hd-left">
       <div class="mx-hero-tag">${DATA.tag}</div>
+      <div class="mx-l1-tools">
+        ${toolsList.map(t => `<div class="mx-l1-tool">${t}</div>`).join('')}
+      </div>
       <div class="mx-name">${DATA.name.replace(' ', '<br>')}</div>
     </div>
     <div class="mx-l1-hd-right">
+      <div class="mx-l1-mark">
+        <div class="mx-mark-outer">
+          <svg class="mx-mark-ring" viewBox="0 0 160 160" fill="none" stroke="currentColor">
+            <circle cx="80" cy="80" r="68" stroke-width="0.7" opacity="0.28"/>
+            <circle cx="80" cy="80" r="50" stroke-width="0.4" opacity="0.16"/>
+            <line x1="80" y1="12" x2="80" y2="26" stroke-width="1.2" opacity="0.5"/>
+            <line x1="148" y1="80" x2="134" y2="80" stroke-width="1.2" opacity="0.5"/>
+            <line x1="80" y1="148" x2="80" y2="134" stroke-width="1.2" opacity="0.5"/>
+            <line x1="12" y1="80" x2="26" y2="80" stroke-width="1.2" opacity="0.5"/>
+            <circle cx="80" cy="12" r="3" fill="currentColor" opacity="0.55"/>
+          </svg>
+          <div class="mx-mark-center">
+            <span class="mx-mark-initials">AA</span>
+            <span class="mx-mark-year">2025</span>
+          </div>
+        </div>
+        <div class="mx-mark-label">Baghdad · Iraq</div>
+      </div>
       <p class="mx-bio">${DATA.bio}</p>
       <div class="mx-hero-btns">
         <button class="mx-btn mx-btn-primary" id="mx-cv-btn">Full CV</button>

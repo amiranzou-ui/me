@@ -116,7 +116,7 @@ body {
 }
 .mx-l1-hd-right {
   padding: 52px 56px;
-  display: flex; flex-direction: column; justify-content: flex-end;
+  display: flex; flex-direction: column;
 }
 .mx-hero-tag {
   font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ink3);
@@ -154,6 +154,55 @@ body {
 .mx-btn-primary:hover { background: var(--accent); border-color: var(--accent); }
 .mx-btn-ghost    { background: transparent; color: var(--ink); border-color: var(--border); }
 .mx-btn-ghost:hover { border-color: var(--ink); }
+
+/* Left column — tools list */
+.mx-l1-tools {
+  flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 44px 0;
+}
+.mx-l1-tool {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: clamp(14px, 1.6vw, 19px); color: var(--ink3);
+  padding: 12px 0; border-bottom: 1px solid var(--border);
+  transition: color 0.3s, padding-left 0.35s;
+  cursor: default;
+}
+.mx-l1-tool:first-child { border-top: 1px solid var(--border); }
+.mx-l1-tool:hover { color: var(--ink); padding-left: 10px; }
+
+/* Right column — rotating mark */
+.mx-l1-mark {
+  flex: 1;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  color: var(--ink3); padding-bottom: 20px;
+}
+.mx-mark-outer {
+  position: relative; width: 200px; height: 200px;
+}
+.mx-mark-ring {
+  width: 100%; height: 100%;
+  color: var(--ink3);
+  animation: mx-spin 28s linear infinite;
+}
+@keyframes mx-spin { to { transform: rotate(360deg); } }
+.mx-mark-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 4px;
+}
+.mx-mark-initials {
+  font-family: 'Cormorant Garamond', serif; font-weight: 300;
+  font-size: 38px; color: var(--ink2); letter-spacing: 6px;
+}
+.mx-mark-year {
+  font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--ink3);
+}
+.mx-mark-label {
+  font-size: 8px; letter-spacing: 3.5px; text-transform: uppercase;
+  color: var(--ink3); margin-top: 22px; opacity: 0.55;
+}
 
 /* Skills marquee */
 .mx-marquee {
