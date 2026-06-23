@@ -750,16 +750,23 @@ nav {
 .page-bridge {
   height: 120px;
   background: linear-gradient(to bottom, #141008, #0e0e0e);
+  display: none;
 }
+.page-bridge.revealed { display: block; }
+
+/* ── Closing ── */
+.closing { display: none; }
+.closing.revealed { display: flex; }
 
 /* ── Home loop ── */
 .home-loop {
-  display: flex;
   width: 100%;
   height: 100vh;
   position: relative;
   background: #f0ebe0;
+  display: none;
 }
+.home-loop.revealed { display: flex; }
 
 .hl-side {
   flex: 1;

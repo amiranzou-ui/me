@@ -124,6 +124,13 @@
             layout.style.opacity    = '1';
           }
           showSection(target, true);
+
+          // Reveal bottom sections now that a category has been chosen
+          ['.home-loop', '.page-bridge', '.closing'].forEach(sel => {
+            const el = dom.qs(sel);
+            if (el) el.classList.add('revealed');
+          });
+
           setTimeout(() => layout && layout.classList.remove('entering'), 1200);
         });
       }, 500);
