@@ -1108,8 +1108,9 @@
     font-size: 6px;
     letter-spacing: 2px;
   }
-  .mc-mood-row { gap: 6px; }
+  .mc-mood-row { gap: 6px; flex-wrap: wrap; }
   .mc-mood-btn { padding: 6px 12px; font-size: 7px; letter-spacing: 2px; }
+  .mc-controls { opacity: 1; pointer-events: auto; }
   .mc-room-panel {
     padding: 34px 0 0;
     border-left: none;

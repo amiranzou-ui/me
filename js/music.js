@@ -14,7 +14,7 @@
   const PLAYLIST = [
     {
       src: 'music/in the mood to love.mp3',
-      mood: 'quiet',
+      mood: ['arabic', 'quiet', 'jazz'],
       fragment: 'your memory here',
       title: 'In the Mood to Love',
       artist: 'Unknown Artist',
@@ -25,7 +25,7 @@
     },
     {
       src: 'music/what-falling-in-love-feels-like.mp3',
-      mood: 'quiet',
+      mood: ['quiet', 'english'],
       fragment: 'what falling in love feels like',
       title: 'What Falling in Love Feels Like',
       artist: 'Unknown Artist',
@@ -588,7 +588,7 @@
     fragmentsEl.innerHTML = '';
 
     const filtered = PLAYLIST.map((t, i) => ({ t, i }))
-      .filter(({ t }) => !activeMood || t.mood === activeMood);
+      .filter(({ t }) => !activeMood || (Array.isArray(t.mood) ? t.mood.includes(activeMood) : t.mood === activeMood));
 
     if (moodCountEl) {
       moodCountEl.textContent = filtered.length === 1 ? '1 recording' : filtered.length + ' recordings';
@@ -609,7 +609,8 @@
     }
 
     filtered.forEach(({ t, i }) => {
-      const moodData = (t.mood && MOODS[t.mood]) ? MOODS[t.mood] : { color: '#c4b49a' };
+      const primaryMood = Array.isArray(t.mood) ? t.mood[0] : t.mood;
+      const moodData = (primaryMood && MOODS[primaryMood]) ? MOODS[primaryMood] : { color: '#c4b49a' };
       const item = document.createElement('div');
       item.className = 'mc-frag-item mc-pl-item';
       item.dataset.idx = i;

@@ -651,6 +651,8 @@ a.mx-l1-card:hover .mx-l1-card-link { color: var(--accent); }
 
 /* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 900px) {
+  .mx-drawer { overflow-y: auto; }
+  .mx-drawer-inner { height: auto; min-height: 100%; }
   .mx-l1-poster { padding: 32px 32px 44px; }
   .mx-poster-ring-1, .mx-poster-ring-2, .mx-poster-ring-3 { display: none; }
   .mx-poster-stat-col { display: none; }
