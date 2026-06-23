@@ -115,7 +115,10 @@
   }
 
   function saveTrackIndex() {
-    localStorage.setItem(TRACK_KEY, String(trackIdx));
+    try {
+      localStorage.setItem(TRACK_KEY, String(trackIdx));
+      localStorage.setItem('music_title_v1', PLAYLIST[trackIdx]?.title || '');
+    } catch(e) {}
   }
 
   function initAnalyser() {
@@ -1079,6 +1082,12 @@
   const pickPanel = document.querySelector('.pick-music');
   if (pickPanel) {
     pickPanel.addEventListener('click', openOnClick, true);
+  }
+
+  // Auto-open when arriving from home page card
+  if (new URLSearchParams(location.search).get('music') === 'open') {
+    hasInteracted = true;
+    setTimeout(openCapsule, 700);
   }
 
   // ── Helpers ───────────────────────────────────────────
