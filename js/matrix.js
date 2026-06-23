@@ -7,20 +7,19 @@
 // ─────────────────────────────────────────────────────────
 const DATA = {
   name:    'Ameer Al-Butaihi',
-  tag:     'Medical Physicist · AI Researcher · Designer',
+  tag:     'Designer · Medical Physicist · AI Researcher',
   bio:     'I sit at the intersection of physics, intelligence, and form — building systems that are precise, felt, and sometimes beautiful.',
 
   contact: {
     email:    'amiranzou@outlook.com',
-    location: 'Saudi Arabia',
+    location: 'Iraq',
   },
 
   coreSkills: [
-    'Medical Physics',
-    'AI / Machine Learning',
     'Graphic Design',
-    'Research',
-    'Web Development',
+    'AI / Machine Learning',
+    'Medical Physics',
+    'Vibe Coding',
   ],
 
   projects: [
@@ -66,10 +65,10 @@ const DATA = {
   ],
 
   experience: [
-    { role: 'Medical Physicist',        company: 'Clinical Practice',     date: '2022 — present' },
-    { role: 'AI Research',              company: 'Independent / Academic', date: '2021 — present' },
-    { role: 'Graphic Designer',         company: 'Freelance',              date: '2018 — present' },
-    { role: 'B.Sc. Medical Physics',    company: 'University',             date: '2017 — 2022' },
+    { role: 'Medical Physicist',        company: 'Clinical Practice',     date: '2025' },
+    { role: 'AI Research',              company: 'Independent / Academic', date: '2020 — present' },
+    { role: 'Graphic Designer',         company: 'Freelance',              date: '2020 — present' },
+    { role: 'Medical Physics',    company: 'University of Technology',     date: '2020 — 2024' },
   ],
 
   signals: [

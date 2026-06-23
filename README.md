@@ -10,7 +10,7 @@ A personal portfolio built as a pure HTML/CSS/JS site — no frameworks, no buil
 |---|---|---|
 | Landing | `index.html` | Two-sided split — Matrix (CV) and Human (everything else) |
 | Intro | `intro.html` | First-visit entrance sequence |
-| Human | `human.html` | Photography, posters, patterns, cooking, music, journal |
+| Human | `human.html` | Photography, posters, patterns, cooking, music |
 | Matrix | `matrix.html` | Full CV — overview, detailed timeline, skill graph |
 | Mind | `mind.html` | Hidden. Desktop only. You'll find it if you're curious enough. |
 
