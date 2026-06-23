@@ -20,7 +20,7 @@ const DATA = {
     {
       label: 'Behance',
       url:   'https://www.behance.net/amiranzou',
-      icon:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 1.202.836 1.72 1.887 1.72.consolidate.668.062 1.14-.18 1.309h4.069zm-7.917-3.958h3.818c-.118-1.061-.671-1.591-1.838-1.591-1.148 0-1.806.535-1.98 1.591zM10.073 8c1.265 0 2.2.388 2.8 1.164.6.776.9 1.931.9 3.464 0 1.588-.293 2.777-.88 3.567C12.306 17.065 11.32 17.5 10.073 17.5H2V8h8.073zm-.457 2H5v2h4.616c.77 0 1.152-.394 1.152-1.181 0-.734-.382-1.098-1.152-1.098l-.001.279zM5 14.5v2.5h4.927c.871 0 1.307-.434 1.307-1.302 0-.832-.436-1.198-1.307-1.198H5z"/></svg>`,
+      icon:  `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22 7h-7V5h7v2zm1.726 10c-.442 1.297-2.029 3-5.101 3-3.074 0-5.564-1.729-5.564-5.675 0-3.91 2.325-5.92 5.466-5.92 3.082 0 4.964 1.782 5.375 4.426.078.506.109 1.188.095 2.14H15.97c.13 1.202.836 1.72 1.887 1.72.668 0 1.402-.337 1.59-1.309h4.069zm-7.917-3.958h3.818c-.118-1.061-.671-1.591-1.838-1.591-1.148 0-1.806.535-1.98 1.591zM10.073 8c1.265 0 2.2.388 2.8 1.164.6.776.9 1.931.9 3.464 0 1.588-.293 2.777-.88 3.567-.587.79-1.574 1.225-2.82 1.225H2V8h8.073zm-.457 2H5v2h4.616c.77 0 1.152-.394 1.152-1.181 0-.734-.382-1.098-1.152-1.098v.279zM5 14.5v2.5h4.927c.871 0 1.307-.434 1.307-1.302 0-.832-.436-1.198-1.307-1.198H5z"/></svg>`,
     },
     {
       label: 'Instagram',
@@ -291,102 +291,113 @@ pills.forEach(p => {
   p.addEventListener('click', () => goLevel(+p.dataset.level));
 });
 
-// ── Build L1 — Fast CV ────────────────────────────────────
+// ── Build L1 — Overview (editorial grid) ─────────────────
 function buildL1() {
   const wrap = document.createElement('div');
   wrap.className = 'mx-l1-wrap';
 
-  // Hero
-  const hero = document.createElement('div');
-  hero.className = 'mx-hero';
-  hero.innerHTML = `
-    <div class="mx-hero-tag">${DATA.tag}</div>
-    <div class="mx-name">${DATA.name}</div>
-    <p class="mx-bio">${DATA.bio}</p>
-    <div class="mx-hero-btns">
-      <button class="mx-btn mx-btn-primary" id="mx-cv-btn">Full CV</button>
-      <button class="mx-btn mx-btn-ghost"   id="mx-sys-btn">System View</button>
+  // Asymmetric header
+  const header = document.createElement('div');
+  header.className = 'mx-l1-header';
+  header.innerHTML = `
+    <div class="mx-l1-hd-left">
+      <div class="mx-hero-tag">${DATA.tag}</div>
+      <div class="mx-name">${DATA.name.replace(' ', '<br>')}</div>
     </div>
-    <div class="mx-social-links">
-      ${DATA.links.map(l => `<a class="mx-social-link" href="${l.url}" target="_blank" rel="noopener">${l.icon}<span>${l.label}</span></a>`).join('')}
+    <div class="mx-l1-hd-right">
+      <p class="mx-bio">${DATA.bio}</p>
+      <div class="mx-hero-btns">
+        <button class="mx-btn mx-btn-primary" id="mx-cv-btn">Full CV</button>
+        <button class="mx-btn mx-btn-ghost"   id="mx-sys-btn">System View</button>
+      </div>
+      <div class="mx-social-links">
+        ${DATA.links.map(l => `<a class="mx-social-link" href="${l.url}" target="_blank" rel="noopener">${l.icon}<span>${l.label}</span></a>`).join('')}
+      </div>
     </div>`;
-  wrap.appendChild(hero);
+  wrap.appendChild(header);
 
-  // Core skills
-  const skills = document.createElement('div');
-  skills.className = 'mx-quick';
-  skills.innerHTML = `<div class="mx-quick-label">Core</div>
-    <div class="mx-core-skills">${DATA.coreSkills.map(s =>
-      `<span class="mx-core-skill">${s}</span>`).join('')}</div>`;
-  wrap.appendChild(skills);
+  // Skills marquee
+  const allSkills = DATA.skills.flatMap(g => g.tags);
+  const items = allSkills.map(s => `<span>${s}</span><span class="mx-marquee-dot">·</span>`).join('');
+  const marquee = document.createElement('div');
+  marquee.className = 'mx-marquee';
+  marquee.innerHTML = `<div class="mx-marquee-track">${items.repeat(4)}</div>`;
+  wrap.appendChild(marquee);
 
-  // Projects compact
-  const projWrap = document.createElement('div');
-  projWrap.className = 'mx-quick';
-  projWrap.innerHTML = `<div class="mx-quick-label">Selected Work</div>`;
-  const projList = document.createElement('div');
-  projList.className = 'mx-l1-projects';
-  DATA.projects.forEach(p => {
-    const row = document.createElement('div');
-    row.className = 'mx-l1-proj';
-    row.innerHTML = `
-      <span class="mx-l1-proj-title">${p.title}</span>
-      <span class="mx-l1-proj-desc">${p.desc}</span>
-      ${p.link ? `<a class="mx-l1-proj-link" href="${p.link}">view →</a>` : '<span class="mx-l1-proj-link"></span>'}`;
-    projList.appendChild(row);
+  // Project cards grid
+  const grid = document.createElement('div');
+  grid.className = 'mx-l1-grid';
+  DATA.projects.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'mx-l1-card';
+    card.innerHTML = `
+      <div class="mx-l1-card-num">0${i + 1}</div>
+      <div class="mx-l1-card-title">${p.title}</div>
+      <div class="mx-l1-card-role">${p.role}</div>
+      <div class="mx-l1-card-desc">${p.desc}</div>
+      ${p.link ? `<a class="mx-l1-card-link" href="${p.link}">view →</a>` : ''}`;
+    grid.appendChild(card);
   });
-  projWrap.appendChild(projList);
-  wrap.appendChild(projWrap);
+  wrap.appendChild(grid);
 
-  // Bottom CTA
-  const cta = document.createElement('div');
-  cta.className = 'mx-l1-explore';
-  cta.innerHTML = `
-    <p class="mx-l1-explore-text">There's more structure underneath — and a graph of how it all connects.</p>
+  // Bottom bar
+  const bar = document.createElement('div');
+  bar.className = 'mx-l1-bar';
+  bar.innerHTML = `
+    <p class="mx-l1-bar-text">More structure underneath — and a graph of how it all connects.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button class="mx-btn mx-btn-ghost" id="mx-cv-btn2">Full CV</button>
       <button class="mx-btn mx-btn-ghost" id="mx-sys-btn2">System →</button>
       <a class="mx-btn mx-btn-ghost" href="Abdulameer_Albutaihi_CV.pdf" download>↓ CV PDF</a>
     </div>`;
-  wrap.appendChild(cta);
+  wrap.appendChild(bar);
 
   l1.appendChild(wrap);
 
-  // Wire buttons
   document.getElementById('mx-cv-btn').addEventListener('click',  () => goLevel(2));
   document.getElementById('mx-sys-btn').addEventListener('click', () => goLevel(3));
   document.getElementById('mx-cv-btn2').addEventListener('click', () => goLevel(2));
   document.getElementById('mx-sys-btn2').addEventListener('click', () => goLevel(3));
 }
 
-// ── Build L2 — Full CV ────────────────────────────────────
+// ── Build L2 — Full CV (sidebar layout) ──────────────────
 function buildL2() {
   const inner = document.getElementById('mx-l2-inner');
 
-  // Top bar
-  const topbar = document.createElement('div');
-  topbar.className = 'mx-l2-topbar';
-  topbar.innerHTML = `
-    <div>
-      <div class="mx-l2-topbar-name">${DATA.name}</div>
-      <div class="mx-l2-topbar-role">${DATA.tag}</div>
-    </div>
-    <div class="mx-l2-topbar-contact">
+  const layout = document.createElement('div');
+  layout.className = 'mx-l2-layout';
+
+  // Sidebar
+  const sb = document.createElement('div');
+  sb.className = 'mx-l2-sb';
+  sb.innerHTML = `
+    <div class="mx-l2-sb-name">${DATA.name}</div>
+    <div class="mx-l2-sb-role">${DATA.tag}</div>
+    <div class="mx-l2-sb-block">
       <span>${DATA.contact.location}</span>
       <a href="tel:${DATA.contact.phone}">${DATA.contact.phone}</a>
       <a href="mailto:${DATA.contact.email}">${DATA.contact.email}</a>
+    </div>
+    <div class="mx-l2-sb-block mx-social-links" style="flex-direction:column;gap:14px;">
+      ${DATA.links.map(l => `<a class="mx-social-link" href="${l.url}" target="_blank" rel="noopener">${l.icon}<span>${l.label}</span></a>`).join('')}
+    </div>
+    <div class="mx-l2-sb-dl">
+      <a class="mx-btn mx-btn-primary" href="Abdulameer_Albutaihi_CV.pdf" download>Download CV</a>
+      <a class="mx-btn mx-btn-ghost"   href="Abdulameer_Albutaihi_CV.pdf" target="_blank" rel="noopener">View PDF</a>
     </div>`;
-  inner.appendChild(topbar);
+  layout.appendChild(sb);
 
-  // Summary section
+  // Main content
+  const main = document.createElement('div');
+  main.className = 'mx-l2-main';
+
   const sumSec = createSection('00', 'Summary');
   const sumEl = document.createElement('p');
   sumEl.className = 'mx-summary';
   sumEl.textContent = DATA.summary;
   sumSec.appendChild(sumEl);
-  inner.appendChild(sumSec);
+  main.appendChild(sumSec);
 
-  // Experience section
   const expSec = createSection('01', 'Experience');
   DATA.experience.forEach(e => {
     const item = document.createElement('div');
@@ -402,22 +413,20 @@ function buildL2() {
       ${e.points ? `<ul class="mx-exp-points">${e.points.map(pt => `<li>${pt}</li>`).join('')}</ul>` : ''}`;
     expSec.appendChild(item);
   });
-  inner.appendChild(expSec);
+  main.appendChild(expSec);
 
-  // Skills section
   const skillSec = createSection('02', 'Skills');
-  const grid = document.createElement('div');
-  grid.className = 'mx-skills-grid';
+  const skillGrid = document.createElement('div');
+  skillGrid.className = 'mx-skills-grid';
   DATA.skills.forEach(g => {
     const col = document.createElement('div');
     col.innerHTML = `<div class="mx-skill-group-label">${g.group}</div>
       <div class="mx-tags">${g.tags.map(t => `<span>${t}</span>`).join('')}</div>`;
-    grid.appendChild(col);
+    skillGrid.appendChild(col);
   });
-  skillSec.appendChild(grid);
-  inner.appendChild(skillSec);
+  skillSec.appendChild(skillGrid);
+  main.appendChild(skillSec);
 
-  // Education section
   const eduSec = createSection('03', 'Education');
   DATA.education.forEach(e => {
     const item = document.createElement('div');
@@ -432,9 +441,8 @@ function buildL2() {
       </div>`;
     eduSec.appendChild(item);
   });
-  inner.appendChild(eduSec);
+  main.appendChild(eduSec);
 
-  // Languages section
   const langSec = createSection('04', 'Languages');
   const langRow = document.createElement('div');
   langRow.className = 'mx-lang-row';
@@ -445,9 +453,8 @@ function buildL2() {
     langRow.appendChild(el);
   });
   langSec.appendChild(langRow);
-  inner.appendChild(langSec);
+  main.appendChild(langSec);
 
-  // Signals section
   const sigSec = createSection('05', 'Signals');
   const sigList = document.createElement('div');
   sigList.className = 'mx-signals';
@@ -458,18 +465,10 @@ function buildL2() {
     sigList.appendChild(el);
   });
   sigSec.appendChild(sigList);
-  inner.appendChild(sigSec);
+  main.appendChild(sigSec);
 
-  // Footer / export
-  const footer = document.createElement('div');
-  footer.className = 'mx-l2-footer';
-  footer.innerHTML = `
-    <a class="mx-btn mx-btn-primary" href="Abdulameer_Albutaihi_CV.pdf" download>Download CV</a>
-    <a class="mx-btn mx-btn-ghost"   href="Abdulameer_Albutaihi_CV.pdf" target="_blank" rel="noopener">View PDF</a>
-    <div class="mx-social-links" style="margin-left:auto;">
-      ${DATA.links.map(l => `<a class="mx-social-link" href="${l.url}" target="_blank" rel="noopener">${l.icon}<span>${l.label}</span></a>`).join('')}
-    </div>`;
-  inner.appendChild(footer);
+  layout.appendChild(main);
+  inner.appendChild(layout);
 }
 
 function createSection(num, title) {
