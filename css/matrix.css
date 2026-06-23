@@ -125,6 +125,17 @@ body {
 }
 .mx-hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
 
+.mx-social-links { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 28px; }
+.mx-social-link {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--ink3); text-decoration: none;
+  transition: color 0.3s;
+}
+.mx-social-link svg { opacity: 0.5; transition: opacity 0.3s; flex-shrink: 0; }
+.mx-social-link:hover { color: var(--accent); }
+.mx-social-link:hover svg { opacity: 1; }
+
 .mx-btn {
   font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
   text-decoration: none; padding: 10px 22px; border-radius: 1px;
