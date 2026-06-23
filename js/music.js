@@ -715,6 +715,10 @@
     `;
     capsule.appendChild(archiveHead);
 
+    const playerCol = document.createElement('div');
+    playerCol.className = 'mc-player-col';
+    capsule.appendChild(playerCol);
+
     // 3D scene
     const scene = document.createElement('div');
     scene.className = 'mc-scene';
@@ -758,12 +762,12 @@
     `;
     scene.appendChild(sceneMeta);
 
-    capsule.appendChild(scene);
+    playerCol.appendChild(scene);
 
     // Memory fragment (track label)
     fragmentEl = document.createElement('p');
     fragmentEl.className = 'mc-fragment-text';
-    capsule.appendChild(fragmentEl);
+    playerCol.appendChild(fragmentEl);
 
     // Presence text (rare emotional moments)
     presenceEl = document.createElement('p');
@@ -835,7 +839,7 @@
     prog.addEventListener('click', e => {
       if (audio.duration) audio.currentTime = (e.offsetX / prog.offsetWidth) * audio.duration;
     });
-    capsule.appendChild(prog);
+    playerCol.appendChild(prog);
 
     const timeRow = document.createElement('div');
     timeRow.className = 'mc-time-row';
@@ -846,7 +850,7 @@
     durationEl.className = 'mc-time';
     durationEl.textContent = '0:00';
     timeRow.append(currentTimeEl, durationEl);
-    capsule.appendChild(timeRow);
+    playerCol.appendChild(timeRow);
 
     // Controls (hidden until hover)
     controlsEl = document.createElement('div');
@@ -878,7 +882,7 @@
     next.addEventListener('click', () => seekBy(10));
 
     controlsEl.append(prev, playBtn, next);
-    capsule.appendChild(controlsEl);
+    playerCol.appendChild(controlsEl);
 
     fragmentsEl = document.createElement('div');
     fragmentsEl.id = 'mc-playlist';
