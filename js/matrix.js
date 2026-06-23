@@ -282,6 +282,7 @@ function buildL1() {
     <div style="display:flex;gap:10px;flex-wrap:wrap;">
       <button class="mx-btn mx-btn-ghost" id="mx-cv-btn2">Full CV</button>
       <button class="mx-btn mx-btn-ghost" id="mx-sys-btn2">System →</button>
+      <a class="mx-btn mx-btn-ghost" href="Abdulameer_Albutaihi_CV.pdf" download>↓ CV PDF</a>
     </div>`;
   wrap.appendChild(cta);
 
@@ -374,11 +375,10 @@ function buildL2() {
   const footer = document.createElement('div');
   footer.className = 'mx-l2-footer';
   footer.innerHTML = `
-    <button class="mx-btn mx-btn-ghost" id="mx-print-btn">Export PDF</button>
-    <span style="font-size:10px;color:var(--ink3);">${DATA.contact.email}</span>`;
+    <a class="mx-btn mx-btn-primary" href="Abdulameer_Albutaihi_CV.pdf" download>Download CV</a>
+    <a class="mx-btn mx-btn-ghost"   href="Abdulameer_Albutaihi_CV.pdf" target="_blank" rel="noopener">View PDF</a>
+    <span style="font-size:10px;color:var(--ink3);margin-left:auto;">${DATA.contact.email}</span>`;
   inner.appendChild(footer);
-
-  document.getElementById('mx-print-btn').addEventListener('click', () => window.print());
 }
 
 function createSection(num, title) {
