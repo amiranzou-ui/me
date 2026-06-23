@@ -14,6 +14,7 @@
   const PLAYLIST = [
     {
       src: 'music/in the mood to love.mp3',
+      mood: 'quiet',
       fragment: 'your memory here',
       title: 'In the Mood to Love',
       artist: 'Unknown Artist',
@@ -24,6 +25,7 @@
     },
     {
       src: 'music/what-falling-in-love-feels-like.mp3',
+      mood: 'quiet',
       fragment: 'what falling in love feels like',
       title: 'What Falling in Love Feels Like',
       artist: 'Unknown Artist',
@@ -49,6 +51,15 @@
 
   const TRACK_KEY = 'music_track_v1';
 
+  const MOODS = {
+    arabic:  { label: 'Arabic',  color: '#c4a06a', room: 'The Sharqi Room',   desc: 'When the oud speaks, the heart answers.' },
+    quiet:   { label: 'Quiet',   color: '#8baab8', room: 'After Midnight',    desc: 'The hour when rooms remember themselves.' },
+    english: { label: 'English', color: '#c4b49a', room: 'The Archive',       desc: 'Songs kept in a box under the bed.' },
+    dancing: { label: 'Dancing', color: '#c4622d', room: 'Moving Alone',      desc: 'When the body knows before the mind does.' },
+    jazz:    { label: 'Jazz',    color: '#7a8fc4', room: 'The Blue Hour',     desc: 'Smoke and brass and something unfinished.' },
+    turkish: { label: 'Turkish', color: '#c4806a', room: 'The Bosphorus',     desc: "Melodies that cross water and don't come back." },
+  };
+
   // ── State ─────────────────────────────────────────────
   let trackIdx      = loadSavedTrackIndex();
   let isPlaying     = false;
@@ -62,6 +73,8 @@
   let presencePool  = shuffle([...PRESENCE]);
   let presenceActive = false;
   let presenceNextAt = 10000 + rand(7000);
+  let activeMood = null;
+  let moodDescEl = null, moodWatermarkEl = null, moodCountEl = null;
 
   // Vinyl — realistic spin with momentum
   let spinAngle   = 0;
@@ -550,8 +563,8 @@
     } else {
       fragmentEl.textContent = frag;
     }
-    if (fragmentsEl) fragmentsEl.querySelectorAll('.mc-frag-item').forEach((el, i) =>
-      el.classList.toggle('active', i === trackIdx));
+    if (fragmentsEl) fragmentsEl.querySelectorAll('.mc-frag-item[data-idx]').forEach(el =>
+      el.classList.toggle('active', parseInt(el.dataset.idx, 10) === trackIdx));
     refreshRoomCard();
     syncCatBtn();
     syncMediaSession();
@@ -565,6 +578,88 @@
     if (roomYearEl) roomYearEl.textContent = track.year || `Archive ${String(trackIdx + 1).padStart(2, '0')}`;
     if (roomSideEl) roomSideEl.textContent = track.side || 'Side A';
     if (roomRoomEl) roomRoomEl.textContent = track.room || 'Listening Room';
+  }
+
+  function buildTrackList() {
+    if (!fragmentsEl) return;
+    fragmentsEl.innerHTML = '';
+
+    const filtered = PLAYLIST.map((t, i) => ({ t, i }))
+      .filter(({ t }) => !activeMood || t.mood === activeMood);
+
+    if (moodCountEl) {
+      moodCountEl.textContent = filtered.length === 1 ? '1 recording' : filtered.length + ' recordings';
+    }
+
+    if (filtered.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'mc-empty-state';
+      const line = document.createElement('span');
+      line.className = 'mc-empty-line';
+      line.textContent = 'No recordings in this archive yet.';
+      const sub = document.createElement('span');
+      sub.className = 'mc-empty-sub';
+      sub.textContent = 'Add tracks with mood: "' + activeMood + '"';
+      empty.append(line, sub);
+      fragmentsEl.appendChild(empty);
+      return;
+    }
+
+    filtered.forEach(({ t, i }) => {
+      const moodData = (t.mood && MOODS[t.mood]) ? MOODS[t.mood] : { color: '#c4b49a' };
+      const item = document.createElement('div');
+      item.className = 'mc-frag-item mc-pl-item';
+      item.dataset.idx = i;
+
+      const dot = document.createElement('span');
+      dot.className = 'mc-frag-dot';
+      dot.style.setProperty('--mc-dot-c', moodData.color);
+
+      const body = document.createElement('span');
+      body.className = 'mc-frag-body';
+      const titleSpan = document.createElement('span');
+      titleSpan.className = 'mc-frag-title';
+      titleSpan.textContent = t.title || 'Untitled';
+      const subSpan = document.createElement('span');
+      subSpan.className = 'mc-frag-sub';
+      subSpan.textContent = t.fragment || '';
+      body.append(titleSpan, subSpan);
+
+      const yearSpan = document.createElement('span');
+      yearSpan.className = 'mc-frag-year';
+      yearSpan.textContent = t.year || '';
+
+      item.append(dot, body, yearSpan);
+      item.classList.toggle('active', i === trackIdx);
+      item.addEventListener('click', () => {
+        doPause();
+        selectTrack(i, true, false);
+      });
+      fragmentsEl.appendChild(item);
+    });
+  }
+
+  function setMood(key) {
+    activeMood = key || null;
+    const mood = activeMood ? MOODS[activeMood] : null;
+    const color = mood ? mood.color : '#c4b49a';
+
+    if (capsule) capsule.style.setProperty('--mc-mood-color', color);
+    if (moodWatermarkEl) moodWatermarkEl.textContent = mood ? mood.room : 'Listening Room';
+
+    if (moodDescEl) {
+      moodDescEl.classList.add('mc-mood-desc-fade');
+      setTimeout(() => {
+        moodDescEl.textContent = mood ? mood.desc : 'Every song is a room. You choose which one to enter.';
+        moodDescEl.classList.remove('mc-mood-desc-fade');
+      }, 240);
+    }
+
+    document.querySelectorAll('.mc-mood-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mood === activeMood);
+    });
+
+    buildTrackList();
   }
 
   function syncCatBtn() {
@@ -677,31 +772,59 @@
 
     const roomPanel = document.createElement('div');
     roomPanel.className = 'mc-room-panel';
-    roomPanel.innerHTML = `
-      <div class="mc-room-watermark">Listening Room</div>
-      <div class="mc-room-ledger">
-        <span class="mc-room-ledger-item">Needle Warm</span>
-        <span class="mc-room-ledger-item" id="mc-room-side">Side A</span>
-        <span class="mc-room-ledger-item" id="mc-room-year">Archive 01</span>
-      </div>
-      <div class="mc-room-card">
-        <span class="mc-room-card-label">Archive Note</span>
-        <span class="mc-room-card-stamp" id="mc-room-name">Listening Room</span>
-        <h3 class="mc-room-title" id="mc-room-title">Untitled Recording</h3>
-        <p class="mc-room-artist" id="mc-room-artist">Unknown Artist</p>
-        <p class="mc-room-note" id="mc-room-note">A memory left on the turntable.</p>
-      </div>
-      <div class="mc-room-rule"></div>
-      <div class="mc-room-caption">Fragments / surviving lines</div>
-    `;
     capsule.appendChild(roomPanel);
 
-    roomTitleEl = roomPanel.querySelector('#mc-room-title');
-    roomArtistEl = roomPanel.querySelector('#mc-room-artist');
-    roomNoteEl = roomPanel.querySelector('#mc-room-note');
-    roomYearEl = roomPanel.querySelector('#mc-room-year');
-    roomSideEl = roomPanel.querySelector('#mc-room-side');
-    roomRoomEl = roomPanel.querySelector('#mc-room-name');
+    moodWatermarkEl = document.createElement('div');
+    moodWatermarkEl.className = 'mc-room-watermark';
+    moodWatermarkEl.textContent = 'Listening Room';
+    roomPanel.appendChild(moodWatermarkEl);
+
+    const moodRow = document.createElement('div');
+    moodRow.className = 'mc-mood-row';
+    Object.entries(MOODS).forEach(([key, m]) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mc-mood-btn';
+      btn.dataset.mood = key;
+      btn.textContent = m.label;
+      btn.style.setProperty('--mc-btn-c', m.color);
+      btn.addEventListener('click', () => setMood(activeMood === key ? null : key));
+      moodRow.appendChild(btn);
+    });
+    roomPanel.appendChild(moodRow);
+
+    moodDescEl = document.createElement('p');
+    moodDescEl.className = 'mc-mood-desc';
+    moodDescEl.textContent = 'Every song is a room. You choose which one to enter.';
+    roomPanel.appendChild(moodDescEl);
+
+    const roomCard = document.createElement('div');
+    roomCard.className = 'mc-room-card';
+    roomCard.innerHTML = `
+      <span class="mc-room-card-label">Now Playing</span>
+      <span class="mc-room-card-stamp" id="mc-room-name">Listening Room</span>
+      <h3 class="mc-room-title" id="mc-room-title">Untitled Recording</h3>
+      <p class="mc-room-artist" id="mc-room-artist">Unknown Artist</p>
+      <p class="mc-room-note" id="mc-room-note">A memory left on the turntable.</p>
+    `;
+    roomPanel.appendChild(roomCard);
+
+    roomTitleEl  = roomCard.querySelector('#mc-room-title');
+    roomArtistEl = roomCard.querySelector('#mc-room-artist');
+    roomNoteEl   = roomCard.querySelector('#mc-room-note');
+    roomRoomEl   = roomCard.querySelector('#mc-room-name');
+    roomYearEl   = document.createElement('span');
+    roomSideEl   = document.createElement('span');
+
+    const trackHead = document.createElement('div');
+    trackHead.className = 'mc-track-head';
+    const trackHeadLabel = document.createElement('span');
+    trackHeadLabel.textContent = 'Recordings';
+    moodCountEl = document.createElement('span');
+    moodCountEl.className = 'mc-mood-count';
+    moodCountEl.textContent = PLAYLIST.length + ' in archive';
+    trackHead.append(trackHeadLabel, moodCountEl);
+    roomPanel.appendChild(trackHead);
 
     // Progress
     const prog = document.createElement('div');
@@ -757,30 +880,10 @@
     controlsEl.append(prev, playBtn, next);
     capsule.appendChild(controlsEl);
 
-    // Fragments toggle
-    const fragHint = document.createElement('span');
-    fragHint.className = 'mc-pl-hint';
-    fragHint.textContent = 'fragments';
-    fragHint.addEventListener('click', () => {
-      plVisible = !plVisible;
-      fragmentsEl.classList.toggle('visible', plVisible);
-    });
-    capsule.appendChild(fragHint);
-
-    // Fragment list
     fragmentsEl = document.createElement('div');
     fragmentsEl.id = 'mc-playlist';
-    PLAYLIST.forEach((t, i) => {
-      const item = document.createElement('div');
-      item.className = 'mc-frag-item mc-pl-item';
-      item.textContent = t.fragment;
-      item.addEventListener('click', () => {
-        doPause();
-        selectTrack(i, true, false);  // start from beginning
-      });
-      fragmentsEl.appendChild(item);
-    });
     roomPanel.appendChild(fragmentsEl);
+    buildTrackList();
 
     const roomFoot = document.createElement('div');
     roomFoot.className = 'mc-room-foot';
