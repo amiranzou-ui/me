@@ -296,44 +296,32 @@ function buildL1() {
   const wrap = document.createElement('div');
   wrap.className = 'mx-l1-wrap';
 
-  // Asymmetric header
-  const toolsList = DATA.skills.slice(0, 2).flatMap(g => g.tags);
+  // Dark cinematic poster
+  const [firstName, lastName] = DATA.name.split(' ');
   const header = document.createElement('div');
-  header.className = 'mx-l1-header';
+  header.className = 'mx-l1-poster';
   header.innerHTML = `
-    <div class="mx-l1-hd-left">
-      <div class="mx-hero-tag">${DATA.tag}</div>
-      <div class="mx-l1-tools">
-        ${toolsList.map(t => `<div class="mx-l1-tool">${t}</div>`).join('')}
-      </div>
-      <div class="mx-name">${DATA.name.replace(' ', '<br>')}</div>
+    <div class="mx-poster-ring mx-poster-ring-1"><div class="mx-poster-ring-dot"></div></div>
+    <div class="mx-poster-ring mx-poster-ring-2"></div>
+    <div class="mx-poster-top">
+      <span class="mx-poster-tag">${DATA.tag}</span>
+      <span class="mx-poster-meta">${DATA.contact.location} · ${new Date().getFullYear()}</span>
     </div>
-    <div class="mx-l1-hd-right">
-      <div class="mx-l1-mark">
-        <div class="mx-mark-outer">
-          <svg class="mx-mark-ring" viewBox="0 0 160 160" fill="none" stroke="currentColor">
-            <circle cx="80" cy="80" r="68" stroke-width="0.7" opacity="0.28"/>
-            <circle cx="80" cy="80" r="50" stroke-width="0.4" opacity="0.16"/>
-            <line x1="80" y1="12" x2="80" y2="26" stroke-width="1.2" opacity="0.5"/>
-            <line x1="148" y1="80" x2="134" y2="80" stroke-width="1.2" opacity="0.5"/>
-            <line x1="80" y1="148" x2="80" y2="134" stroke-width="1.2" opacity="0.5"/>
-            <line x1="12" y1="80" x2="26" y2="80" stroke-width="1.2" opacity="0.5"/>
-            <circle cx="80" cy="12" r="3" fill="currentColor" opacity="0.55"/>
-          </svg>
-          <div class="mx-mark-center">
-            <span class="mx-mark-initials">AA</span>
-            <span class="mx-mark-year">2025</span>
-          </div>
+    <div class="mx-poster-name-block">
+      <span class="mx-poster-name-line">${firstName}</span>
+      <span class="mx-poster-name-line">${lastName}</span>
+    </div>
+    <div class="mx-poster-rule"></div>
+    <div class="mx-poster-bottom">
+      <p class="mx-poster-bio">${DATA.bio}</p>
+      <div class="mx-poster-actions">
+        <div class="mx-poster-btns">
+          <button class="mx-btn mx-btn-primary" id="mx-cv-btn">Full CV</button>
+          <button class="mx-btn mx-btn-ghost"   id="mx-sys-btn">System View</button>
         </div>
-        <div class="mx-mark-label">Baghdad · Iraq</div>
-      </div>
-      <p class="mx-bio">${DATA.bio}</p>
-      <div class="mx-hero-btns">
-        <button class="mx-btn mx-btn-primary" id="mx-cv-btn">Full CV</button>
-        <button class="mx-btn mx-btn-ghost"   id="mx-sys-btn">System View</button>
-      </div>
-      <div class="mx-social-links">
-        ${DATA.links.map(l => `<a class="mx-social-link" href="${l.url}" target="_blank" rel="noopener">${l.icon}<span>${l.label}</span></a>`).join('')}
+        <div class="mx-social-links">
+          ${DATA.links.map(l => `<a class="mx-social-link" href="${l.url}" target="_blank" rel="noopener">${l.icon}<span>${l.label}</span></a>`).join('')}
+        </div>
       </div>
     </div>`;
   wrap.appendChild(header);
