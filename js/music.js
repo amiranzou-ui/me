@@ -13,7 +13,7 @@
   // ─────────────────────────────────────────────────────────────────
   const PLAYLIST = [
     {
-      src: 'music/in the mood to love.mp3',
+      src: 'music/in%20the%20mood%20to%20love.mp3',
       mood: ['arabic', 'quiet', 'jazz'],
       fragment: 'your memory here',
       title: 'In the Mood to Love',
@@ -92,10 +92,10 @@
 
   // ── Audio ─────────────────────────────────────────────
   const audio = new Audio();
-  audio.crossOrigin = 'anonymous';
   audio.preload = 'auto';
   audio.volume = 0;
   audio.playsInline = true;
+  audio.setAttribute('playsinline', '');  // iOS in-app browsers need the attribute, not just the property
   audio.style.display = 'none';
   audio.setAttribute('aria-hidden', 'true');
 

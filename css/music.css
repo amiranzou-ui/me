@@ -1100,7 +1100,7 @@
   .mc-tonearm-assy { top: 106px; right: 22px; }
   .mc-tonearm-arm { width: 118px; }
   .mc-scene-meta {
-    top: -12px;
+    top: 10px;
     gap: 6px;
   }
   .mc-scene-tag {
@@ -1136,6 +1136,11 @@
     max-width: none;
   }
   #mc-playlist { padding: 4px 0 0; max-width: none; }
-  .mc-frag-item { transform: none !important; }
+  .mc-frag-item {
+    transform: none !important;
+    border-color: rgba(196,180,154,0.12);
+    background: linear-gradient(180deg, rgba(60,40,18,0.35), rgba(30,18,8,0.2));
+  }
+  .mc-frag-title { color: rgba(218,202,172,0.85); }
   .mc-frag-year { display: none; }
 }
