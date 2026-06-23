@@ -299,27 +299,29 @@ body {
    LEVEL 2 — Full CV (sidebar + main)
 ═══════════════════════════════════════════════════════ */
 .mx-l2-layout {
-  display: grid; grid-template-columns: 260px 1fr;
+  display: grid; grid-template-columns: 280px 1fr;
   height: calc(100vh - 57px); margin-top: 57px;
 }
 
 /* Sidebar */
 .mx-l2-sb {
   border-right: 1px solid var(--border);
-  padding: 44px 32px;
+  padding: 40px 28px;
   overflow-y: auto; height: 100%;
   display: flex; flex-direction: column;
 }
 .mx-l2-sb::-webkit-scrollbar { width: 0; }
 .mx-l2-sb-name {
   font-family: 'Cormorant Garamond', serif; font-weight: 300;
-  font-size: clamp(18px, 1.6vw, 24px); color: var(--ink);
-  line-height: 1.1; margin-bottom: 5px;
+  font-size: 22px; color: var(--ink);
+  line-height: 1.15; margin-bottom: 6px;
+  white-space: nowrap;
 }
 .mx-l2-sb-role {
-  font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase;
-  color: var(--ink3); padding-bottom: 26px; margin-bottom: 26px;
+  font-size: 8px; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--ink3); padding-bottom: 22px; margin-bottom: 22px;
   border-bottom: 1px solid var(--border);
+  line-height: 1.6;
 }
 .mx-l2-sb-block {
   display: flex; flex-direction: column; gap: 8px;
@@ -577,7 +579,8 @@ body {
   .mx-l1-card:last-child { border-bottom: none; }
   .mx-l1-bar { padding: 20px 32px; }
   .mx-l2-layout { grid-template-columns: 1fr; height: auto; }
-  .mx-l2-sb { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); }
+  .mx-l2-sb { position: static; height: auto; border-right: none; border-bottom: 1px solid var(--border); white-space: normal; }
+  .mx-l2-sb-name { white-space: normal; font-size: 20px; }
   .mx-l2-main { height: auto; padding: 0 32px 60px; }
   .mx-skills-grid { grid-template-columns: 1fr; }
   .mx-poster-bottom { flex-direction: column; align-items: flex-start; }
