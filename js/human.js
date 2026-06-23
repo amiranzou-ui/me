@@ -393,21 +393,8 @@
         portal('matrix.html', '#f0ebe0', e.clientX, e.clientY);
       }
     });
-    hlRight.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => {
-        // Reset closing state on panels
-        dom.qsa('.pick-panel').forEach(p => p.classList.remove('closing'));
-        // Re-show pick screen
-        if (pickScreen) {
-          pickScreen.style.display = '';
-          pickScreen.classList.remove('visible');
-          void pickScreen.offsetHeight; // force reflow so animation re-triggers
-          pickScreen.classList.add('visible');
-        }
-        // Hide layout until they pick again
-        if (layout) layout.style.opacity = '0';
-      }, 350);
+    hlRight.addEventListener('click', e => {
+      portal('human.html', '#141008', e.clientX, e.clientY);
     });
   }
 
