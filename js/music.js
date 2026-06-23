@@ -8,12 +8,12 @@
   //  2. Example path:  music/your-song.mp3
   //  3. Supported types:  .mp3  .ogg  .wav  .m4a
   //  3. Add an entry:
-  //       { src: '../music/file.mp3', fragment: 'your memory here',
+  //       { src: 'music/file.mp3', fragment: 'your memory here',
   //         title: 'Song Name', artist: 'Artist' }
   // ─────────────────────────────────────────────────────────────────
   const PLAYLIST = [
     {
-      src: '../music/in the mood to love.mp3',
+      src: 'music/in the mood to love.mp3',
       fragment: 'your memory here',
       title: 'In the Mood to Love',
       artist: 'Unknown Artist',
@@ -23,7 +23,7 @@
       note: 'A note kept warm in the dark. Needle down. Lamp low. Let the room remember before you do.',
     },
     {
-      src: '../music/what-falling-in-love-feels-like.mp3',
+      src: 'music/what-falling-in-love-feels-like.mp3',
       fragment: 'what falling in love feels like',
       title: 'What Falling in Love Feels Like',
       artist: 'Unknown Artist',
@@ -32,7 +32,7 @@
       room: 'Listening Room',
       note: 'A softer room. A slower heartbeat. The kind of song that changes the air around it.',
     },
-    // { src: '../music/your-file.mp3', fragment: 'your memory here', title: '...', artist: '...' },
+    // { src: 'music/your-file.mp3', fragment: 'your memory here', title: '...', artist: '...' },
   ];
   // ─────────────────────────────────────────────────────────────────
 
