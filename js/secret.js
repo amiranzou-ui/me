@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const SECRET = 'complicatedbuteasy';
+  const SECRET = [73,69,71,90,70,67,73,75,94,79,78,72,95,94,79,75,89,83].map(c=>String.fromCharCode(c^42)).join('');
 
   let _audioCtx  = null;
   let _droneOscs = null;
