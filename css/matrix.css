@@ -652,7 +652,9 @@ a.mx-l1-card:hover .mx-l1-card-link { color: var(--accent); }
 /* ── Responsive ────────────────────────────────────────── */
 @media (max-width: 900px) {
   .mx-l1-poster { padding: 32px 32px 44px; }
-  .mx-poster-ring-1, .mx-poster-ring-2 { display: none; }
+  .mx-poster-ring-1, .mx-poster-ring-2, .mx-poster-ring-3 { display: none; }
+  .mx-poster-stat-col { display: none; }
+  .mx-poster-bio { max-width: 100%; }
   .mx-l1-grid { grid-template-columns: 1fr; }
   .mx-l1-card { border-right: none; }
   .mx-l1-card:nth-last-child(-n+2) { border-bottom: 1px solid var(--border); }
@@ -676,4 +678,6 @@ a.mx-l1-card:hover .mx-l1-card-link { color: var(--accent); }
   .mx-l2-main { padding: 0 20px 60px; }
   .mx-node-panel { width: 100%; top: auto; bottom: 0; height: 55vh; transform: translateY(100%); border-left: none; border-top: 1px solid rgba(200,185,160,0.08); }
   .mx-node-panel.open { transform: translateY(0); }
+  .mx-poster-reg { display: none; }
+  .mx-quote-mark { font-size: clamp(60px, 14vw, 90px); }
 }

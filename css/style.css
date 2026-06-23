@@ -576,4 +576,14 @@ body::after {
     width: calc(100vw - 48px);
     max-width: 300px;
   }
+
+  /* stack the two-column body to single column */
+  .pnp-body { grid-template-columns: 1fr; }
+  .pnp-col:first-child {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid #e8e0d0;
+    padding-bottom: 14px;
+  }
+  .pnp-col:last-child { padding-left: 0; }
 }

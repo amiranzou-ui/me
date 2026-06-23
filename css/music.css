@@ -1066,12 +1066,15 @@
     flex-direction: column;
     align-items: flex-start;
     padding: 60px 28px 40px;
+    overflow-x: hidden;
     overflow-y: auto;
     gap: 0;
   }
   .mc-player-col {
     width: 100%;
+    max-width: 100%;
   }
+  .mc-archive-head { display: none; }
   .mc-topbar {
     left: 20px;
     right: 20px;
@@ -1090,8 +1093,8 @@
     align-items: flex-start;
     gap: 6px;
   }
-  .mc-scene { width: 320px; height: 320px; }
-  .mc-canvas { width: 320px; height: 320px; }
+  .mc-scene { width: min(320px, 88vw); height: min(320px, 88vw); }
+  .mc-canvas { width: min(320px, 88vw); height: min(320px, 88vw); }
   .mc-disc-3d { width: 210px; height: 210px; margin: -105px 0 0 -105px; }
   .mc-platter { width: 238px; height: 238px; margin: -119px 0 0 -119px; }
   .mc-tonearm-assy { top: 106px; right: 22px; }
