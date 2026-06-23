@@ -12,8 +12,11 @@ const DATA = {
 
   contact: {
     email:    'amiranzou@outlook.com',
+    phone:    '+964 774 151 3345',
     location: 'Baghdad, Iraq',
   },
+
+  summary: 'Graphic Designer with hands-on experience in branding, social media management, and visual communication across retail and healthcare environments. Skilled in creating digital and print assets that align with brand identity and audience needs. Experienced in managing end-to-end visual content for active social media platforms and developing promotional materials including campaigns, ads, and physical branding. Strong focus on clarity, consistency, and detail-driven design execution.',
 
   coreSkills: [
     'Graphic Design',
@@ -65,10 +68,50 @@ const DATA = {
   ],
 
   experience: [
-    { role: 'Social Media Manager & Graphic Designer', company: 'I.G.F.I.C – Medical Imaging Center', date: '2025 — Present' },
-    { role: 'Graphic Designer',                        company: 'Bershka',                             date: 'Sep 2024 — Jan 2025' },
-    { role: 'Graphic Design Intern',                   company: 'Data Ship',                           date: 'Sep 2021 — Mar 2022' },
-    { role: 'Bachelor\'s Degree',                      company: 'University of Technology — Baghdad',  date: 'Sep 2020 — Jun 2024' },
+    {
+      role:    'Social Media Manager & Graphic Designer',
+      company: 'I.G.F.I.C – Medical Imaging Center',
+      date:    '2025 — Present',
+      points:  [
+        'Manage the clinic\'s social media platforms and overall visual communication.',
+        'Design digital content including posts, campaigns, and advertisements aligned with brand identity.',
+        'Create print materials such as billboards, posters, and promotional assets.',
+        'Develop consistent visual direction to strengthen audience engagement and brand recognition.',
+        'Handle day-to-day content needs including design requests and visual updates.',
+      ],
+    },
+    {
+      role:    'Graphic Designer',
+      company: 'Bershka',
+      date:    'Sep 2024 — Jan 2025',
+      points:  [
+        'Produced visual content aligned with brand aesthetic for marketing and promotional use.',
+        'Collaborated with marketing and merchandising teams to support seasonal campaigns.',
+        'Designed digital and print materials to enhance product presentation and visibility.',
+        'Ensured consistency with brand guidelines across multiple deliverables.',
+      ],
+    },
+    {
+      role:    'Graphic Design Intern',
+      company: 'Data Ship',
+      date:    'Sep 2021 — Mar 2022',
+      points:  [
+        'Assisted in creating visual content for digital and print media.',
+        'Supported marketing team in developing branded materials and social media assets.',
+        'Contributed to maintaining consistent visual identity across projects.',
+        'Worked collaboratively within design and development teams.',
+      ],
+    },
+  ],
+
+  education: [
+    { degree: 'Bachelor\'s Degree', school: 'University of Technology — Baghdad, Iraq', date: 'Sep 2020 — Jun 2024' },
+  ],
+
+  languages: [
+    { lang: 'Arabic',  level: 'Native' },
+    { lang: 'English', level: 'Fluent' },
+    { lang: 'German',  level: 'A2' },
   ],
 
   signals: [
@@ -307,28 +350,38 @@ function buildL2() {
       <div class="mx-l2-topbar-name">${DATA.name}</div>
       <div class="mx-l2-topbar-role">${DATA.tag}</div>
     </div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-      <span style="font-size:11px;color:var(--ink3);">${DATA.contact.location}</span>
-      <a class="mx-btn mx-btn-ghost" href="mailto:${DATA.contact.email}" style="font-size:9px;">email</a>
+    <div class="mx-l2-topbar-contact">
+      <span>${DATA.contact.location}</span>
+      <a href="tel:${DATA.contact.phone}">${DATA.contact.phone}</a>
+      <a href="mailto:${DATA.contact.email}">${DATA.contact.email}</a>
     </div>`;
   inner.appendChild(topbar);
 
-  // Projects section
-  const projSec = createSection('01', 'Projects');
-  DATA.projects.forEach(p => {
-    const row = document.createElement('div');
-    row.className = 'mx-proj';
-    row.innerHTML = `
-      <div class="mx-proj-body">
-        <div class="mx-proj-title">${p.title}</div>
-        <div class="mx-proj-role">${p.role}</div>
-        <div class="mx-proj-impact">${p.impact}</div>
-        <div class="mx-proj-stack">${p.stack.map(s => `<span>${s}</span>`).join('')}</div>
+  // Summary section
+  const sumSec = createSection('00', 'Summary');
+  const sumEl = document.createElement('p');
+  sumEl.className = 'mx-summary';
+  sumEl.textContent = DATA.summary;
+  sumSec.appendChild(sumEl);
+  inner.appendChild(sumSec);
+
+  // Experience section
+  const expSec = createSection('01', 'Experience');
+  DATA.experience.forEach(e => {
+    const item = document.createElement('div');
+    item.className = 'mx-exp-item';
+    item.innerHTML = `
+      <div class="mx-exp-header">
+        <div>
+          <div class="mx-exp-role">${e.role}</div>
+          <div class="mx-exp-company">${e.company}</div>
+        </div>
+        <div class="mx-exp-date">${e.date}</div>
       </div>
-      <div class="mx-proj-side">${p.link ? `<a class="mx-proj-link" href="${p.link}">view →</a>` : ''}</div>`;
-    projSec.appendChild(row);
+      ${e.points ? `<ul class="mx-exp-points">${e.points.map(pt => `<li>${pt}</li>`).join('')}</ul>` : ''}`;
+    expSec.appendChild(item);
   });
-  inner.appendChild(projSec);
+  inner.appendChild(expSec);
 
   // Skills section
   const skillSec = createSection('02', 'Skills');
@@ -343,23 +396,38 @@ function buildL2() {
   skillSec.appendChild(grid);
   inner.appendChild(skillSec);
 
-  // Experience section
-  const expSec = createSection('03', 'Experience');
-  DATA.experience.forEach(e => {
+  // Education section
+  const eduSec = createSection('03', 'Education');
+  DATA.education.forEach(e => {
     const item = document.createElement('div');
     item.className = 'mx-exp-item';
     item.innerHTML = `
-      <div>
-        <div class="mx-exp-role">${e.role}</div>
-        <div class="mx-exp-company">${e.company}</div>
-      </div>
-      <div class="mx-exp-date">${e.date}</div>`;
-    expSec.appendChild(item);
+      <div class="mx-exp-header">
+        <div>
+          <div class="mx-exp-role">${e.degree}</div>
+          <div class="mx-exp-company">${e.school}</div>
+        </div>
+        <div class="mx-exp-date">${e.date}</div>
+      </div>`;
+    eduSec.appendChild(item);
   });
-  inner.appendChild(expSec);
+  inner.appendChild(eduSec);
+
+  // Languages section
+  const langSec = createSection('04', 'Languages');
+  const langRow = document.createElement('div');
+  langRow.className = 'mx-lang-row';
+  DATA.languages.forEach(l => {
+    const el = document.createElement('div');
+    el.className = 'mx-lang-item';
+    el.innerHTML = `<span class="mx-lang-name">${l.lang}</span><span class="mx-lang-level">${l.level}</span>`;
+    langRow.appendChild(el);
+  });
+  langSec.appendChild(langRow);
+  inner.appendChild(langSec);
 
   // Signals section
-  const sigSec = createSection('04', 'Signals');
+  const sigSec = createSection('05', 'Signals');
   const sigList = document.createElement('div');
   sigList.className = 'mx-signals';
   DATA.signals.forEach(s => {
