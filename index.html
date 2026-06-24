@@ -29,9 +29,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 </head>
 <body>
+
+  <!-- Ambient atmosphere layers (z-index 1, behind content) -->
+  <div id="ambient-a" aria-hidden="true"></div>
+  <div id="ambient-b" aria-hidden="true"></div>
+
+  <!-- Cursor aura — large soft glow that follows with delay -->
+  <div id="cursor-aura" aria-hidden="true"></div>
+
   <div id="container">
 
     <div class="side" id="left">
+      <!-- Matrix side: geometric grid overlay -->
+      <div class="matrix-geo" aria-hidden="true"></div>
       <div class="side-inner">
         <span class="label">I</span>
         <h2 class="side-title">Matrix Side</h2>
@@ -45,6 +55,11 @@
     <div class="profile-node" id="pn-toggle">
       <div class="pn-wrap">
         <img src="images/profile.JPG" alt="Ameer" class="pn-img">
+      </div>
+      <!-- Ripple rings that expand outward from the circle -->
+      <div class="pn-ring-wrap" aria-hidden="true">
+        <div class="pn-ripple"></div>
+        <div class="pn-ripple"></div>
       </div>
     </div>
 
@@ -120,6 +135,8 @@
     </div>
 
     <div class="side" id="right">
+      <!-- Human side: organic warm light overlay -->
+      <div class="human-warmth" aria-hidden="true"></div>
       <div class="side-inner">
         <span class="label">II</span>
         <h2 class="side-title">Human Side</h2>
@@ -141,6 +158,7 @@
   <script src="js/protect.js"></script>
   <script src="js/core.js"></script>
   <script src="js/secret.js"></script>
+  <script src="js/world.js"></script>
   <script src="js/index.js"></script>
 </body>
 </html>
