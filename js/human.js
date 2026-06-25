@@ -68,9 +68,13 @@
     // Tell cooking module to clean up if it was open
     events.emit('section:change', { to: id });
 
-    // Reset scroll position so the new section always starts from the top
+    // Reset scroll — double-fire: immediate + 100ms fallback covers the case
+    // where the layout is still mid-opacity-transition and defers the first reset
     const contentEl = dom.qs('.content');
-    if (contentEl) contentEl.scrollTop = 0;
+    if (contentEl) {
+      contentEl.scrollTop = 0;
+      setTimeout(() => { contentEl.scrollTop = 0; }, 100);
+    }
 
     dom.qsa('.masonry, .soon-panel, .ck-section, .h-section').forEach(el => {
       el.classList.remove('active');

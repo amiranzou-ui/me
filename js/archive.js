@@ -344,32 +344,13 @@
     const ctx = getCtx();
     sndClick(ctx, 0.22);
 
-    // 1. Fade to black
+    // Fade to black → straight to elevator (no chapter card)
     trans('visible');
     setTimeout(() => {
       archiveHall.classList.remove('visible');
       trans('hold');
-      showChapterCard(data, ctx);
+      setTimeout(() => { trans('fading'); startElevator(data, ctx); }, 80);
     }, 720);
-  }
-
-  function showChapterCard(data, ctx) {
-    document.querySelector('.cc-ch-label').textContent   = data.label;
-    document.querySelector('.cc-ch-title').textContent   = data.title;
-    document.querySelector('.cc-ch-tagline').textContent = data.tagline;
-
-    chapterCard.classList.add('visible');
-    setTimeout(() => sndProjectorStart(ctx), 240);
-    if (lightLeak) {
-      setTimeout(() => { lightLeak.classList.add('flash'); }, 450);
-      setTimeout(() => { lightLeak.classList.remove('flash'); }, 1900);
-    }
-
-    // After 6s: card exits → elevator (long enough to actually read)
-    setTimeout(() => {
-      chapterCard.classList.remove('visible');
-      setTimeout(() => { trans('fading'); startElevator(data, ctx); }, 600);
-    }, 6000);
   }
 
   function startElevator(data, ctx) {
@@ -472,80 +453,7 @@
     if (state) transOverlay.classList.add(state);
   }
 
-  /* ── Final scene ─────────────────────────────────────────── */
-  const homeLoop = document.querySelector('.home-loop');
-  if (homeLoop) {
-    let finalTriggered = false;
-    const obs = new IntersectionObserver(entries => {
-      if (finalTriggered) return;
-      if (entries[0].isIntersecting && visited.size >= 2) {
-        finalTriggered = true;
-        obs.disconnect();
-        setTimeout(() => triggerFinalScene(), 2800);
-      }
-    }, { threshold: 0.5 });
-    obs.observe(homeLoop);
-  }
-
-  function triggerFinalScene() {
-    const ctx   = getCtx();
-    const scene = document.getElementById('final-scene');
-    if (!scene) return;
-
-    // Mark visited chapters in status list
-    scene.querySelectorAll('.fs-status-item[data-cat]').forEach(item => {
-      if (visited.has(item.dataset.cat)) item.classList.add('visited');
-    });
-
-    scene.style.opacity = '0';
-    scene.style.transition = 'none';
-    scene.classList.add('visible');
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      scene.style.transition = 'opacity 1.5s ease';
-      scene.style.opacity    = '1';
-    }));
-
-    const statusEl  = scene.querySelector('.fs-status');
-    const items     = scene.querySelectorAll('.fs-status-item');
-    const completeEl = scene.querySelector('.fs-complete');
-    const nextEl    = scene.querySelector('.fs-next');
-    const endEl     = scene.querySelector('.fs-end');
-
-    // Stage 1: archive status
-    items.forEach((item, i) => {
-      setTimeout(() => {
-        item.style.opacity    = '1';
-        item.style.transition = 'opacity 0.6s ease';
-        sndClick(ctx, 0.05);
-      }, i * 300 + 800);
-    });
-
-    const statusDur = items.length * 300 + 1800;
-
-    // Stage 2: MEMORY ARCHIVE COMPLETE
-    setTimeout(() => {
-      if (statusEl) { statusEl.style.opacity = '0'; statusEl.style.transition = 'opacity 1s ease'; }
-      setTimeout(() => {
-        if (completeEl) { completeEl.style.opacity = '1'; completeEl.style.transition = 'opacity 1.4s ease'; }
-
-        // Stage 3: THE NEXT CHAPTER
-        setTimeout(() => {
-          if (completeEl) { completeEl.style.opacity = '0'; }
-          setTimeout(() => {
-            if (nextEl) { nextEl.style.opacity = '1'; nextEl.style.transition = 'opacity 1.4s ease'; sndDing(ctx); }
-
-            // Stage 4: 2026 — |
-            setTimeout(() => {
-              if (nextEl) { nextEl.style.opacity = '0'; nextEl.style.transition = 'opacity 1.1s ease'; }
-              setTimeout(() => {
-                if (endEl) { endEl.style.opacity = '1'; endEl.style.transition = 'opacity 1.5s ease'; }
-              }, 1100);
-            }, 3600);
-          }, 1100);
-        }, 3200);
-      }, 1100);
-    }, statusDur);
-  }
+  /* Final scene removed — no completion overlay */
 
   /* ── Disable magnetic pull on text-style sidebar buttons ─────── */
   // archive.js attaches these AFTER human.js, so in same-element
