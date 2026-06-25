@@ -197,16 +197,27 @@
   const visited     = new Set();
   const navBack     = document.querySelector('.nav-back');
 
-  /* ── Immediately suppress pick-screen, show archive hall ─────── */
-  // The MutationObserver approach is unreliable because human.js adds 'visible'
-  // to pick-screen synchronously before archive.js sets up any observer.
-  // Directly take over here — all scripts run before any browser paint, so
-  // there is no visible flash.
+  /* ── Immediately suppress pick-screen ────────────────────────── */
   if (pickScreen) {
     pickScreen.classList.remove('visible');
     pickScreen.style.display = 'none';
   }
-  if (archiveHall) archiveHall.classList.add('visible');
+
+  /* ── Friend gate ─────────────────────────────────────────────── */
+  // Photography (cat:'photography') and Food Decisions (cat:'cooking')
+  // are locked for visitors.
+  const LOCKED_CATS = new Set(['photography', 'cooking']);
+
+  const _savedAccess = (() => {
+    try { return sessionStorage.getItem('archive_access'); } catch (_) { return null; }
+  })();
+
+  if (_savedAccess) {
+    applyAccess(_savedAccess);
+    if (archiveHall) archiveHall.classList.add('visible');
+  } else {
+    showGate();
+  }
 
   /* ── Nav-back: return to archive when inside a chapter ───────── */
   if (navBack) {
@@ -345,7 +356,9 @@
     });
     ch.addEventListener('click', () => {
       const d = CHAPTERS.find(c => c.cat === ch.dataset.cat);
-      if (d) enterChapter(d);
+      if (!d) return;
+      if (ch.classList.contains('locked')) { flashLocked(ch); return; }
+      enterChapter(d);
     });
   });
 
@@ -462,11 +475,121 @@
   /* Final scene removed — no completion overlay */
 
   /* ── Disable magnetic pull on text-style sidebar buttons ─────── */
-  // archive.js attaches these AFTER human.js, so in same-element
-  // listener order they fire last and clear the transform
   catBtns.forEach(btn => {
     btn.addEventListener('mousemove', () => { btn.style.transform = 'none'; });
     btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
   });
+
+  /* ══════════════════════════════════════
+     FRIEND GATE FUNCTIONS
+     ══════════════════════════════════════ */
+
+  function showGate() {
+    const gate = document.createElement('div');
+    gate.id = 'access-gate';
+    gate.innerHTML = `
+      <div class="ag-inner">
+        <p class="ag-eyebrow">Memory Archive</p>
+        <p class="ag-question">before you enter —</p>
+        <div class="ag-choices" id="ag-choices">
+          <button class="ag-choice-btn" data-role="friend">
+            <span class="ag-ch-roman">I</span>
+            <span class="ag-ch-label">we know each other</span>
+          </button>
+          <button class="ag-choice-btn" data-role="visitor">
+            <span class="ag-ch-roman">II</span>
+            <span class="ag-ch-label">just visiting</span>
+          </button>
+        </div>
+        <div class="ag-pw-wrap" id="ag-pw-wrap">
+          <span class="ag-pw-roman">the word</span>
+          <input class="ag-pw-input" id="ag-pw" type="password"
+                 placeholder="…" autocomplete="off" spellcheck="false">
+          <button class="ag-pw-submit" id="ag-pw-submit">→</button>
+        </div>
+        <p class="ag-pw-err" id="ag-pw-err">that's not it.</p>
+      </div>`;
+    document.body.appendChild(gate);
+    requestAnimationFrame(() => requestAnimationFrame(() => gate.classList.add('visible')));
+
+    gate.querySelectorAll('.ag-choice-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        unlockAudio();
+        sndClick(getCtx(), 0.08);
+        if (btn.dataset.role === 'visitor') {
+          enterGate(gate, 'visitor');
+        } else {
+          gate.querySelector('#ag-choices').classList.add('chose');
+          gate.querySelector('#ag-pw-wrap').classList.add('visible');
+          setTimeout(() => gate.querySelector('#ag-pw').focus(), 420);
+        }
+      });
+    });
+
+    const pwInput  = gate.querySelector('#ag-pw');
+    const pwSubmit = gate.querySelector('#ag-pw-submit');
+    const pwErr    = gate.querySelector('#ag-pw-err');
+
+    function tryPassword() {
+      const ok = window.SecretWord?.check(pwInput.value);
+      if (ok) {
+        pwErr.classList.remove('visible');
+        sndClick(getCtx(), 0.18);
+        enterGate(gate, 'friend');
+      } else {
+        pwErr.classList.add('visible');
+        pwInput.classList.remove('shake');
+        void pwInput.offsetWidth;
+        pwInput.classList.add('shake');
+        pwInput.value = '';
+        pwInput.focus();
+        sndClick(getCtx(), 0.06);
+      }
+    }
+
+    pwSubmit.addEventListener('click', tryPassword);
+    pwInput.addEventListener('keydown', e => { if (e.key === 'Enter') tryPassword(); });
+  }
+
+  function enterGate(gateEl, level) {
+    try { sessionStorage.setItem('archive_access', level); } catch (_) {}
+    gateEl.classList.remove('visible');
+    gateEl.classList.add('exiting');
+    applyAccess(level);
+    setTimeout(() => {
+      gateEl.remove();
+      if (archiveHall) archiveHall.classList.add('visible');
+    }, 700);
+  }
+
+  function applyAccess(level) {
+    if (level !== 'visitor') return;
+    const lockIcon = `<svg width="11" height="13" viewBox="0 0 11 13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="0.65" y="5.5" width="9.7" height="7" rx="1.5"/><path d="M2.5 5.5V3.5a3 3 0 0 1 6 0v2"/></svg>`;
+    LOCKED_CATS.forEach(cat => {
+      const ch = document.querySelector(`.ah-chapter[data-cat="${cat}"]`);
+      if (ch) {
+        ch.classList.add('locked');
+        const lockEl = document.createElement('span');
+        lockEl.className = 'ah-ch-lock';
+        lockEl.innerHTML = lockIcon;
+        ch.appendChild(lockEl);
+      }
+      const btn = document.querySelector(`.cat[data-cat="${cat}"]`);
+      if (btn) {
+        btn.classList.add('locked');
+        const badge = document.createElement('span');
+        badge.className = 'cat-lock-badge';
+        badge.innerHTML = lockIcon;
+        btn.appendChild(badge);
+      }
+    });
+  }
+
+  function flashLocked(chEl) {
+    chEl.classList.remove('lock-pulse');
+    void chEl.offsetWidth;
+    chEl.classList.add('lock-pulse');
+    setTimeout(() => chEl.classList.remove('lock-pulse'), 500);
+  }
 
 })();

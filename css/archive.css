@@ -1,6 +1,284 @@
 /* archive.css — Memory Archive cinematic experience */
 
 /* ══════════════════════════════════════
+   ACCESS GATE
+   ══════════════════════════════════════ */
+
+#access-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 160;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 min(12vw, 140px);
+  background: #0c0904;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+  pointer-events: none;
+}
+#access-gate.visible { opacity: 1; pointer-events: auto; }
+#access-gate.exiting { opacity: 0; transition: opacity 0.65s ease; pointer-events: none; }
+
+.ag-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 600px;
+}
+
+.ag-eyebrow {
+  font-family: 'Inter', sans-serif;
+  font-size: 8.5px;
+  font-weight: 300;
+  letter-spacing: 4.5px;
+  text-transform: uppercase;
+  color: rgba(196, 180, 154, 0.3);
+  margin: 0 0 26px;
+  opacity: 0;
+  animation: ah-fade-slide 1s ease forwards 0.3s;
+}
+
+.ag-question {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(26px, 4vw, 42px);
+  color: rgba(196, 180, 154, 0.72);
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+  margin: 0 0 40px;
+  opacity: 0;
+  animation: ah-fade-slide 1s ease forwards 0.5s;
+}
+
+/* Choice rows — styled like archive chapters */
+.ag-choices {
+  width: 100%;
+  border-top: 1px solid rgba(196, 180, 154, 0.08);
+  transition: opacity 0.38s ease, max-height 0.42s cubic-bezier(0.2,0,0,1);
+  overflow: hidden;
+  max-height: 200px;
+  opacity: 0;
+  animation: ah-fade-slide 1s ease forwards 0.7s;
+}
+.ag-choices.chose { opacity: 0 !important; pointer-events: none; max-height: 0; }
+
+.ag-choice-btn {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(196, 180, 154, 0.08);
+  padding: 18px 0;
+  text-align: left;
+  cursor: none;
+  gap: 0;
+  position: relative;
+  overflow: hidden;
+  transition: filter 0.35s ease;
+}
+.ag-choices:has(.ag-choice-btn:hover) .ag-choice-btn        { filter: brightness(0.3); }
+.ag-choices:has(.ag-choice-btn:hover) .ag-choice-btn:hover  { filter: brightness(1); }
+
+/* Ambient sweep on hover */
+.ag-choice-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(196, 98, 45, 0.07), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+.ag-choice-btn:hover::before { opacity: 1; }
+
+.ag-ch-roman {
+  font-family: 'Inter', sans-serif;
+  font-size: 8px;
+  font-weight: 300;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(196, 180, 154, 0.4);
+  min-width: clamp(80px, 11vw, 130px);
+  transition: color 0.35s ease;
+}
+.ag-choice-btn:hover .ag-ch-roman { color: rgba(196, 98, 45, 0.7); }
+
+.ag-ch-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(20px, 2.8vw, 32px);
+  color: rgba(196, 180, 154, 0.55);
+  letter-spacing: 0.5px;
+  line-height: 1;
+  transition: color 0.35s ease;
+}
+.ag-choice-btn:hover .ag-ch-label { color: rgba(196, 180, 154, 0.95); }
+
+/* Password slide-in */
+.ag-pw-wrap {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-bottom: 1px solid rgba(196, 180, 154, 0.12);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.45s cubic-bezier(0.2,0,0,1),
+              opacity     0.4s ease,
+              margin-top  0.35s ease;
+  margin-top: 0;
+}
+.ag-pw-wrap.visible {
+  max-height: 68px;
+  opacity: 1;
+  margin-top: 36px;
+}
+
+.ag-pw-roman {
+  font-family: 'Inter', sans-serif;
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: rgba(196, 98, 45, 0.45);
+  min-width: clamp(80px, 11vw, 130px);
+  flex-shrink: 0;
+}
+
+.ag-pw-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 22px;
+  color: rgba(196, 180, 154, 0.8);
+  padding: 14px 0;
+  letter-spacing: 0.5px;
+  caret-color: rgba(196, 98, 45, 0.7);
+}
+.ag-pw-input::placeholder {
+  color: rgba(196, 180, 154, 0.2);
+  font-style: italic;
+}
+.ag-pw-input.shake { animation: ag-shake 0.4s ease; }
+@keyframes ag-shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX( 7px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX( 4px); }
+}
+
+.ag-pw-submit {
+  background: none;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: rgba(196, 98, 45, 0.45);
+  cursor: none;
+  padding: 10px 0 10px 16px;
+  transition: color 0.3s;
+}
+.ag-pw-submit:hover { color: rgba(196, 98, 45, 0.9); }
+
+.ag-pw-err {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(196, 98, 45, 0.5);
+  margin: 0;
+  padding-left: clamp(80px, 11vw, 130px);
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, opacity 0.3s ease, margin-top 0.3s ease;
+}
+.ag-pw-err.visible { max-height: 24px; opacity: 1; margin-top: 10px; }
+
+/* ── Touch / coarse pointer ── */
+@media (pointer: coarse) {
+  .ag-choice-btn  { cursor: pointer; }
+  .ag-pw-submit   { cursor: pointer; }
+}
+
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  #access-gate { padding: 0 22px; }
+  .ag-ch-roman, .ag-pw-roman { min-width: 66px; font-size: 7px; letter-spacing: 2.5px; }
+  .ag-choice-btn { padding: 15px 0; }
+  .ag-pw-input { font-size: 19px; }
+  .ag-pw-err { padding-left: 66px; }
+}
+
+/* ══════════════════════════════════════
+   LOCKED CHAPTERS (visitor mode)
+   ══════════════════════════════════════ */
+
+/* Archive hall rows */
+.ah-chapter.locked {
+  opacity: 0.42;
+  cursor: default !important;
+}
+.ah-chapter.locked .ah-ch-title { color: rgba(196, 180, 154, 0.38) !important; }
+.ah-chapter.locked::before       { opacity: 0 !important; }
+
+/* Suppress hover on locked — keep it dim */
+.ah-chapters:has(.ah-chapter:hover) .ah-chapter.locked { filter: brightness(0.18) !important; }
+.ah-chapter.locked:hover { filter: none !important; }
+
+/* Always show tagline on locked so visitors know what they're missing */
+.ah-chapter.locked .ah-ch-tagline {
+  max-height: 56px !important;
+  opacity: 0.45 !important;
+  padding-top: 7px !important;
+}
+
+/* Lock icon in the "enter" column */
+.ah-ch-lock {
+  grid-column: 3;
+  grid-row: 1;
+  padding-left: 20px;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  color: rgba(196, 180, 154, 0.28);
+}
+.ah-chapter.locked .ah-ch-enter { display: none !important; }
+
+/* Brief pulse on click when locked */
+.ah-chapter.locked.lock-pulse .ah-ch-lock { color: rgba(196, 98, 45, 0.55); transition: color 0.08s; }
+.ah-chapter.locked.lock-pulse { opacity: 0.6; transition: opacity 0.08s; }
+
+/* Sidebar locked buttons */
+.cat.locked {
+  opacity: 0.28 !important;
+  pointer-events: none !important;
+}
+.cat-lock-badge {
+  display: flex;
+  align-items: center;
+  color: rgba(196, 180, 154, 0.3);
+  flex-shrink: 0;
+}
+
+/* Mobile: add explicit third column for lock icon */
+@media (max-width: 768px) {
+  .ah-chapter.locked {
+    grid-template-columns: 66px 1fr 22px;
+  }
+  .ah-ch-lock {
+    padding-left: 6px;
+  }
+}
+
+/* ══════════════════════════════════════
    ARCHIVE HALL
    ══════════════════════════════════════ */
 

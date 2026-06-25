@@ -199,5 +199,5 @@
     });
   }
 
-  window.SecretWord = Object.freeze({ init, showMindEntry });
+  window.SecretWord = Object.freeze({ init, showMindEntry, check: w => w.trim().toLowerCase() === SECRET.toLowerCase() });
 })();
