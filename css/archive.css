@@ -682,6 +682,12 @@
   .sn-msg      { font-size: clamp(12px, 3.5vw, 17px); }
 }
 
+/* ── Touch / coarse pointer: restore default cursors ── */
+@media (pointer: coarse) {
+  .ah-chapter { cursor: pointer; }
+  .ah-back    { cursor: pointer; }
+}
+
 /* prefers-reduced-motion */
 @media (prefers-reduced-motion: reduce) {
   #archive-hall,

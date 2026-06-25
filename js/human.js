@@ -280,10 +280,12 @@
     }
 
     // glow lerp
-    glowX += (tGlowX - glowX) * 0.07;
-    glowY += (tGlowY - glowY) * 0.07;
-    cursorGlow.style.left = glowX + 'px';
-    cursorGlow.style.top  = glowY + 'px';
+    if (cursorGlow) {
+      glowX += (tGlowX - glowX) * 0.07;
+      glowY += (tGlowY - glowY) * 0.07;
+      cursorGlow.style.left = glowX + 'px';
+      cursorGlow.style.top  = glowY + 'px';
+    }
 
     // particles
     pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);

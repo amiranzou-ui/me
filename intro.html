@@ -96,6 +96,10 @@
       color: #c4622d;
       border-color: #c4622d;
     }
+
+    @media (prefers-reduced-motion: reduce) {
+      .line, #enter-btn { transition: opacity 0.4s ease; transform: none !important; }
+    }
   </style>
 </head>
 <body>

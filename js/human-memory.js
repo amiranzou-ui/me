@@ -46,7 +46,7 @@
     patterns    : { label: '03 — Graphics',    text: 'this is what I do. grids, shapes, and making things feel right.' },
     music       : { label: '04 — Music',       text: 'what I had on repeat. the songs that stayed.' },
     cooking     : { label: '05 — Food Decisions', text: 'things i made. things i felt.' },
-    '3d'        : { label: '07 — 3D',          text: 'geometry and I are still figuring each other out.' },
+    '3d'        : { label: '06 — 3D',          text: 'geometry and I are still figuring each other out.' },
   };
 
   function updateTagline(cat) {
