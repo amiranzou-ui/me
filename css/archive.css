@@ -589,11 +589,11 @@
    ══════════════════════════════════════ */
 
 .layout .sidebar {
-  width: 148px !important;
+  width: 168px !important;
   align-items: flex-start !important;
   justify-content: center !important;
   gap: 0 !important;
-  padding-left: 10px !important;
+  padding-left: 14px !important;
 }
 
 /* Remove all circle styling */
@@ -607,8 +607,8 @@
   flex-direction: column !important;
   align-items: flex-start !important;
   justify-content: flex-start !important;
-  gap: 5px !important;
-  padding: 16px 0 !important;
+  gap: 6px !important;
+  padding: 18px 0 !important;
   overflow: visible !important;
   text-align: left !important;
   min-width: 0 !important;
@@ -626,9 +626,9 @@
   display: block !important;
   font-family: 'Cormorant Garamond', serif !important;
   font-style: italic !important;
-  font-size: 15px !important;
+  font-size: 20px !important;
   font-weight: 300 !important;
-  color: rgba(196, 180, 154, 0.2) !important;
+  color: rgba(196, 180, 154, 0.22) !important;
   letter-spacing: 0.5px !important;
   line-height: 1 !important;
   width: auto !important;
@@ -647,7 +647,7 @@
 .layout .cat-label {
   font-family: 'Cormorant Garamond', serif !important;
   font-style: italic !important;
-  font-size: 14px !important;
+  font-size: 16px !important;
   font-weight: 300 !important;
   letter-spacing: 0.3px !important;
   color: rgba(196, 180, 154, 0.2) !important;
@@ -672,4 +672,104 @@
   background: transparent !important;
   border-color: transparent !important;
   color: inherit !important;
+}
+
+/* ══════════════════════════════════════
+   SECTION NOTICE
+   Shown when clicking a different chapter
+   from inside a section — returns you to
+   floor 00 first
+   ══════════════════════════════════════ */
+
+#section-notice {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(7, 5, 3, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+#section-notice.visible { opacity: 1; }
+
+.sn-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+  max-width: 520px;
+  padding: 0 32px;
+}
+
+.sn-ch-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 8px;
+  font-weight: 300;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: rgba(196, 98, 45, 0.55);
+  opacity: 0;
+  transform: translateY(12px);
+}
+#section-notice.visible .sn-ch-label {
+  animation: cc-in 0.75s ease forwards 0.15s;
+}
+
+.sn-ch-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(38px, 6vw, 70px);
+  color: rgba(196, 180, 154, 0.85);
+  letter-spacing: 2px;
+  line-height: 1;
+  opacity: 0;
+  transform: translateY(16px);
+}
+#section-notice.visible .sn-ch-title {
+  animation: cc-in 0.85s ease forwards 0.3s;
+}
+
+.sn-rule {
+  width: 48px;
+  height: 1px;
+  background: rgba(196, 180, 154, 0.14);
+  opacity: 0;
+  transform: translateY(8px);
+}
+#section-notice.visible .sn-rule {
+  animation: cc-in 0.6s ease forwards 0.5s;
+}
+
+.sn-msg {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(15px, 1.8vw, 19px);
+  color: rgba(196, 180, 154, 0.38);
+  letter-spacing: 0.4px;
+  line-height: 1.5;
+  opacity: 0;
+  transform: translateY(10px);
+}
+#section-notice.visible .sn-msg {
+  animation: cc-in 0.7s ease forwards 0.65s;
+}
+
+.sn-hint {
+  font-family: 'Inter', sans-serif;
+  font-size: 7.5px;
+  font-weight: 300;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: rgba(196, 180, 154, 0.18);
+  opacity: 0;
+  transform: translateY(8px);
+}
+#section-notice.visible .sn-hint {
+  animation: cc-in 0.6s ease forwards 0.9s;
 }

@@ -208,17 +208,100 @@
   }
 
   function returnToArchive() {
-    sndBoom(getCtx());
+    const ctx = getCtx();
+    sndClick(ctx, 0.18);
     trans('visible');
     setTimeout(() => {
       trans('hold');
       if (layout) layout.style.opacity = '0';
-      archiveHall.classList.add('visible');
-      insideChapter  = false;
-      currentFloor   = '00'; // reset to lobby so next chapter always ascends from 00
-      if (navBack) navBack.textContent = '← home';
-      setTimeout(() => trans('fading'), 80);
-    }, 700);
+      // Ride the elevator DOWN to floor 00 before showing the archive hall
+      descElevator(ctx, () => {
+        trans('visible');
+        setTimeout(() => {
+          elevatorEl.classList.remove('visible');
+          trans('hold');
+          archiveHall.classList.add('visible');
+          insideChapter = false;
+          if (navBack) navBack.textContent = '← home';
+          setTimeout(() => trans('fading'), 80);
+        }, 700);
+      });
+    }, 720);
+  }
+
+  /* ── Descending elevator: returns to floor 00 ───────────────── */
+  function descElevator(ctx, onArrived) {
+    const fromNum = currentFloor;
+
+    // Already at lobby — skip the sequence
+    if (fromNum === '00') {
+      if (onArrived) onArrived();
+      return;
+    }
+
+    document.getElementById('el-from').textContent = fromNum;
+    document.getElementById('el-to').textContent   = '00';
+    elCounter.textContent = fromNum;
+    elCounter.classList.remove('arrived', 'tick');
+    elStatus.textContent  = 'DESCENDING';
+    elStatus.classList.remove('arrived');
+
+    elevatorEl.classList.add('visible', 'moving');
+    setTimeout(() => sndElevatorMove(ctx), 150);
+
+    const from  = parseInt(fromNum, 10);
+    const steps = from || 1;
+    const step  = Math.min(380, Math.max(130, 1200 / steps));
+
+    let cur = from;
+    const tick = () => {
+      cur--;
+      const label = cur < 10 ? '0' + cur : String(cur);
+      elCounter.textContent = label;
+      elCounter.classList.remove('tick');
+      void elCounter.offsetWidth;
+      elCounter.classList.add('tick');
+      sndClick(ctx, 0.05);
+
+      if (cur > 0) {
+        setTimeout(tick, step);
+      } else {
+        // Arrived at lobby
+        elevatorEl.classList.remove('moving');
+        elCounter.classList.add('arrived');
+        elStatus.textContent = 'LOBBY';
+        elStatus.classList.add('arrived');
+        currentFloor = '00';
+        setTimeout(() => sndDing(ctx), 80);
+        setTimeout(() => { if (onArrived) onArrived(); }, 1800);
+      }
+    };
+    setTimeout(tick, 400);
+  }
+
+  /* ── Section notice: shown when clicking sidebar cat from inside chapter ── */
+  function showSectionNotice(d) {
+    const notice = document.getElementById('section-notice');
+    if (!notice || notice.classList.contains('visible')) return;
+    notice.querySelector('.sn-ch-label').textContent = d.label;
+    notice.querySelector('.sn-ch-title').textContent = d.title;
+    sndClick(getCtx(), 0.09);
+    notice.classList.add('visible');
+    setTimeout(() => notice.classList.remove('visible'), 3000);
+  }
+
+  /* ── Intercept sidebar cat clicks when inside a chapter ─────── */
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.addEventListener('click', e => {
+      if (!insideChapter) return;
+      const btn = e.target.closest('.cat');
+      if (!btn || btn.classList.contains('active')) return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      const d = CHAPTERS.find(c => c.cat === btn.dataset.cat);
+      if (d) showSectionNotice(d);
+    }, true);
   }
 
   /* ── Intercept pick-screen, show archive hall instead ──────── */
