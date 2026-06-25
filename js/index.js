@@ -66,22 +66,6 @@
   if (pnToggle)   pnToggle.addEventListener('click', () => pnPanel.classList.contains('open') ? closePanel() : openPanel());
   if (pnBackdrop) pnBackdrop.addEventListener('click', closePanel);
 
-  // ── Music link on card ────────────────────────────────────
-  const musicLink = dom.qs('#pnp-music-link');
-  const listeningVal = dom.qs('#pnp-listening-val');
-
-  // Show saved track title (set by music.js on human page)
-  const savedTitle = (() => { try { return localStorage.getItem('music_title_v1') || ''; } catch(e) { return ''; } })();
-  if (listeningVal) listeningVal.textContent = savedTitle ? '♫ ' + savedTitle : '♫ Open the room';
-
-  if (musicLink) {
-    musicLink.addEventListener('click', e => {
-      e.stopPropagation();
-      try { sessionStorage.setItem('mc_autoopen', '1'); } catch(_) {}
-      portal('human.html', '#141008', e.clientX, e.clientY);
-    });
-  }
-
   // ── Secret word ───────────────────────────────────────────
   window.SecretWord.init();
 })();
