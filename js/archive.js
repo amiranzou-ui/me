@@ -214,7 +214,8 @@
       trans('hold');
       if (layout) layout.style.opacity = '0';
       archiveHall.classList.add('visible');
-      insideChapter = false;
+      insideChapter  = false;
+      currentFloor   = '00'; // reset to lobby so next chapter always ascends from 00
       if (navBack) navBack.textContent = '← home';
       setTimeout(() => trans('fading'), 80);
     }, 700);
@@ -278,11 +279,11 @@
       setTimeout(() => { lightLeak.classList.remove('flash'); }, 1900);
     }
 
-    // After 2.2s: card exits → elevator
+    // After 4.5s: card exits → elevator (long enough to actually read)
     setTimeout(() => {
       chapterCard.classList.remove('visible');
       setTimeout(() => { trans('fading'); startElevator(data, ctx); }, 600);
-    }, 2300);
+    }, 4500);
   }
 
   function startElevator(data, ctx) {
@@ -325,7 +326,7 @@
         currentFloor = toNum;
         setTimeout(() => sndDing(ctx), 80);
 
-        // Fade to black → reveal content → fade in
+        // Pause at arrival floor, then fade to black → reveal content → fade in
         setTimeout(() => {
           trans('visible');
           setTimeout(() => {
@@ -335,7 +336,7 @@
               setTimeout(() => trans('fading'), 320);
             });
           }, 620);
-        }, 1450);
+        }, 2000);
       }
     };
     setTimeout(tick, 460);
