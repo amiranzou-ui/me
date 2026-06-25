@@ -1023,6 +1023,21 @@ nav {
   body { cursor: auto; }
   .cursor-dot, .cursor-ring { display: none; }
   .cat, .cell, #lb-close, #lb-prev, #lb-next { cursor: pointer; }
+
+  /* Micro-story: always visible on touch (can't hover) */
+  .micro-story {
+    opacity: 0.72;
+    transform: translateY(0);
+    transition: none;
+  }
+
+  /* Disable focus-dimming — :has(:hover) breaks on touch */
+  .content:has(.cell:hover) .cell,
+  .content:has(.cell:hover) .cell:hover {
+    opacity: 1;
+    filter: none;
+    transition: none;
+  }
 }
 
 /* ── Mobile ── */
@@ -1086,6 +1101,15 @@ nav {
   .home-loop.hl-touch-right #hl-right .hl-desc  { opacity: 1; transform: translateY(0); }
   .home-loop.hl-touch-right #hl-right .hl-enter { opacity: 1; }
   .home-loop.hl-touch-right #hl-right::after    { clip-path: inset(0 0 0 0%); }
+
+  /* Sidebar divider: invisible in column layout */
+  .sidebar-divider { display: none; }
+
+  /* Frame corners: slightly smaller on phone */
+  .frame-corner { width: 34px; height: 34px; }
+
+  /* Memory tagline: tighter spacing */
+  .mem-tagline { padding: 14px 0 10px; }
 
   /* Lightbox: bigger tap targets */
   #lb-prev, #lb-next { font-size: 30px; padding: 16px 12px; }

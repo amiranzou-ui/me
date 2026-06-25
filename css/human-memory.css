@@ -213,6 +213,27 @@ body::after {
 /* ── Depth parallax CSS custom props (set by JS on .mem-frag) ── */
 .mem-frag { transform: translate(var(--dx, 0px), var(--dy, 0px)); }
 
+/* ── Mobile ── */
+@media (max-width: 768px) {
+  /* Fragments: keep them as atmosphere but more subtle
+     They're pointer-events:none so they never interfere */
+  .mem-frag {
+    font-size: 7px;
+    letter-spacing: 1.5px;
+    color: rgba(196, 180, 154, 0.07);
+  }
+  .mem-frag.vert { writing-mode: horizontal-tb; } /* avoid vertical clipping on narrow screens */
+
+  /* Micro-story: reduce top gradient height (images smaller on mobile) */
+  .micro-story {
+    padding: 28px 10px 10px;
+    font-size: 12px;
+  }
+
+  /* Tagline: tighter on mobile */
+  .mem-tagline-text { font-size: clamp(13px, 3.8vw, 18px); }
+}
+
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
   .mem-atm-img               { animation: none !important; opacity: 0.04 !important; }
