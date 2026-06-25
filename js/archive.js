@@ -192,8 +192,33 @@
   const catBtns      = document.querySelectorAll('.cat');
   const pickScreen   = document.getElementById('pick-screen');
 
-  let currentFloor = '00';
-  const visited    = new Set();
+  let currentFloor  = '00';
+  let insideChapter = false;
+  const visited     = new Set();
+  const navBack     = document.querySelector('.nav-back');
+
+  /* ── Nav-back: return to archive when inside a chapter ───────── */
+  if (navBack) {
+    navBack.addEventListener('click', e => {
+      if (!insideChapter) return;
+      e.stopImmediatePropagation();
+      e.preventDefault();
+      returnToArchive();
+    }, true); // capture phase fires before human.js bubble listener
+  }
+
+  function returnToArchive() {
+    sndBoom(getCtx());
+    trans('visible');
+    setTimeout(() => {
+      trans('hold');
+      if (layout) layout.style.opacity = '0';
+      archiveHall.classList.add('visible');
+      insideChapter = false;
+      if (navBack) navBack.textContent = '← home';
+      setTimeout(() => trans('fading'), 80);
+    }, 700);
+  }
 
   /* ── Intercept pick-screen, show archive hall instead ──────── */
   if (pickScreen) {
@@ -319,6 +344,8 @@
   /* ── Reveal content ──────────────────────────────────────── */
   function revealContent(catId, onDone) {
     visited.add(catId);
+    insideChapter = true;
+    if (navBack) navBack.textContent = '← archive';
 
     // Suppress cat-reveal since we showed the chapter card
     const catReveal = document.getElementById('cat-reveal');
@@ -429,5 +456,13 @@
       }, 1100);
     }, statusDur);
   }
+
+  /* ── Disable magnetic pull on text-style sidebar buttons ─────── */
+  // archive.js attaches these AFTER human.js, so in same-element
+  // listener order they fire last and clear the transform
+  catBtns.forEach(btn => {
+    btn.addEventListener('mousemove', () => { btn.style.transform = 'none'; });
+    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+  });
 
 })();

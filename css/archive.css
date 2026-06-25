@@ -572,3 +572,104 @@
   .ah-header, .ah-rule, .ah-footer, .ah-chapter { animation: none !important; opacity: 1 !important; transform: none !important; }
   #elevator-overlay.moving .el-content { animation: none !important; }
 }
+
+/* ══════════════════════════════════════
+   FIX — archive hall chapter list vertical
+   human.css has `nav { display:flex }` which
+   makes <nav class="ah-chapters"> a flex row
+   ══════════════════════════════════════ */
+.ah-chapters {
+  display: block !important;
+}
+
+/* ══════════════════════════════════════
+   ARCHIVE-STYLE SIDEBAR
+   Replaces circle cat buttons with a
+   minimal numbered chapter list
+   ══════════════════════════════════════ */
+
+.layout .sidebar {
+  width: 96px !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  padding-left: 6px !important;
+}
+
+/* Remove all circle styling */
+.layout .cat {
+  width: auto !important;
+  height: auto !important;
+  border-radius: 0 !important;
+  border: none !important;
+  border-bottom: 1px solid rgba(196, 180, 154, 0.05) !important;
+  background: transparent !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 3px !important;
+  padding: 12px 0 !important;
+  overflow: visible !important;
+  text-align: left !important;
+  min-width: 0 !important;
+}
+
+/* Kill the spinning ring — repurpose ::before as Roman numeral */
+.layout .cat::before {
+  content: attr(data-roman) !important;
+  position: static !important;
+  inset: auto !important;
+  border: none !important;
+  border-radius: 0 !important;
+  animation: none !important;
+  opacity: 1 !important;
+  display: block !important;
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+  font-size: 11px !important;
+  font-weight: 300 !important;
+  color: rgba(196, 180, 154, 0.18) !important;
+  letter-spacing: 0.5px !important;
+  line-height: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  transform: none !important;
+  transition: color 0.35s ease !important;
+  background: transparent !important;
+}
+.layout .cat.active::before { color: rgba(196, 98, 45, 0.58) !important; }
+.layout .cat:hover::before  { color: rgba(196, 180, 154, 0.38) !important; }
+
+/* Hide SVG icons */
+.layout .cat-icon { display: none !important; }
+
+/* Category label */
+.layout .cat-label {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+  font-size: 11.5px !important;
+  font-weight: 300 !important;
+  letter-spacing: 0.3px !important;
+  color: rgba(196, 180, 154, 0.2) !important;
+  line-height: 1.25 !important;
+  white-space: normal !important;
+  text-align: left !important;
+  transition: color 0.35s ease !important;
+}
+.layout .cat.active .cat-label { color: rgba(196, 180, 154, 0.75) !important; }
+.layout .cat:hover .cat-label  { color: rgba(196, 180, 154, 0.48) !important; }
+
+/* Hover: dim siblings, brighten self */
+.layout .sidebar:has(.cat:hover) .cat        { filter: brightness(0.4) !important; }
+.layout .sidebar:has(.cat:hover) .cat:hover  { filter: brightness(1) !important; }
+.layout .sidebar:has(.cat:hover) .cat.active { filter: brightness(0.65) !important; }
+
+/* Remove music EQ bars */
+.layout .mc-cat-eq { display: none !important; }
+
+/* Remove background fill on active state */
+.layout .cat.active {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: inherit !important;
+}
