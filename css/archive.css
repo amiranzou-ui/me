@@ -12,12 +12,35 @@
   flex-direction: column;
   justify-content: center;
   padding: 0 min(12vw, 140px);
-  background: rgba(12, 9, 4, 0.96);
+  background: #0c0904; /* fully opaque — no nav text bleedthrough */
   opacity: 0;
   pointer-events: none;
   transition: opacity 1.2s ease;
   overflow: hidden;
 }
+
+/* ── Elements that float ABOVE the archive hall ──────────────
+   nav-rule: orange scan animation visible on top of dark bg
+   #page-top: "II" and nav-back fully painted (not bleeding through)
+   .frame-corner: corners appear above the dark overlay
+   All at z-index 200 > archive-hall z-index 150
+   ──────────────────────────────────────────────────────────── */
+#page-top {
+  position: relative !important;
+  z-index: 200 !important;
+}
+.nav-rule {
+  z-index: 200 !important; /* already position:relative in human.css */
+}
+.frame-corner {
+  z-index: 200 !important;
+  opacity: 0.85 !important;
+}
+/* Brighter gradient lines for corners on dark archive background */
+.fc-tl { background: linear-gradient(to right, rgba(196,180,154,0.7), transparent) top left / 100% 1px no-repeat, linear-gradient(to bottom, rgba(196,180,154,0.7), transparent) top left / 1px 100% no-repeat !important; }
+.fc-tr { background: linear-gradient(to left, rgba(196,180,154,0.7), transparent) top right / 100% 1px no-repeat, linear-gradient(to bottom, rgba(196,180,154,0.7), transparent) top right / 1px 100% no-repeat !important; }
+.fc-bl { background: linear-gradient(to right, rgba(196,180,154,0.7), transparent) bottom left / 100% 1px no-repeat, linear-gradient(to top, rgba(196,180,154,0.7), transparent) bottom left / 1px 100% no-repeat !important; }
+.fc-br { background: linear-gradient(to left, rgba(196,180,154,0.7), transparent) bottom right / 100% 1px no-repeat, linear-gradient(to top, rgba(196,180,154,0.7), transparent) bottom right / 1px 100% no-repeat !important; }
 #archive-hall.visible {
   opacity: 1;
   pointer-events: auto;
