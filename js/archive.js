@@ -291,10 +291,13 @@
   }
 
   /* ── Intercept sidebar cat clicks when inside a chapter ─────── */
+  // e.isTrusted === false for programmatic btn.click() calls (revealContent),
+  // true only for real user gestures — prevents the notice from firing
+  // during the archive entry sequence regardless of insideChapter state
   const sidebar = document.querySelector('.sidebar');
   if (sidebar) {
     sidebar.addEventListener('click', e => {
-      if (!insideChapter) return;
+      if (!e.isTrusted || !insideChapter) return;
       const btn = e.target.closest('.cat');
       if (!btn || btn.classList.contains('active')) return;
       e.stopImmediatePropagation();
