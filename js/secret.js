@@ -8,7 +8,7 @@
 (function () {
   'use strict';
 
-  const SECRET = [73,69,71,90,70,67,73,75,94,79,78,72,95,94,79,75,89,83].map(c=>String.fromCharCode(c^42)).join('');
+  const SECRET = [75,71,79,79,88,4,67,89,4,69,76,76].map(c=>String.fromCharCode(c^42)).join('');
 
   let _audioCtx  = null;
   let _droneOscs = null;
