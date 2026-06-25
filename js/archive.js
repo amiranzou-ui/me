@@ -428,17 +428,20 @@
   /* ── Reveal content ──────────────────────────────────────── */
   function revealContent(catId, onDone) {
     visited.add(catId);
-    insideChapter = true;
     if (navBack) navBack.textContent = '← archive';
 
     // Suppress cat-reveal since we showed the chapter card
     const catReveal = document.getElementById('cat-reveal');
     if (catReveal) catReveal.style.visibility = 'hidden';
 
-    // Activate sidebar button (triggers human.js / cooking.js section logic)
+    // Activate sidebar button — insideChapter is set AFTER click so the
+    // sidebar capture listener doesn't intercept this programmatic click
     catBtns.forEach(b => b.classList.remove('active'));
     const btn = document.querySelector(`.cat[data-cat="${catId}"]`);
-    if (btn) setTimeout(() => btn.click(), 40);
+    if (btn) setTimeout(() => {
+      btn.click();
+      insideChapter = true; // set after click fires, not before
+    }, 40);
 
     // Show layout
     if (layout) {
