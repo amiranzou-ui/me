@@ -207,6 +207,7 @@
   // Photography (cat:'photography') and Food Decisions (cat:'cooking')
   // are locked for visitors.
   const LOCKED_CATS = new Set(['photography', 'cooking']);
+  const GATE_PW = [75,71,79,79,88,4,67,89,4,69,76,76].map(c=>String.fromCharCode(c^42)).join('');
 
   const _savedAccess = (() => {
     try { return sessionStorage.getItem('archive_access'); } catch (_) { return null; }
@@ -531,7 +532,7 @@
     const pwErr    = gate.querySelector('#ag-pw-err');
 
     function tryPassword() {
-      const ok = window.SecretWord?.check(pwInput.value);
+      const ok = pwInput.value.trim().toLowerCase() === GATE_PW.toLowerCase();
       if (ok) {
         pwErr.classList.remove('visible');
         sndClick(getCtx(), 0.18);
