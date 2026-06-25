@@ -25,6 +25,7 @@
     })();
   </script>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/atmosphere.css">
 
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=Inter:wght@300;400&display=swap" rel="stylesheet">
 </head>
@@ -46,6 +47,10 @@
   <div id="container">
 
     <div class="side" id="left">
+      <!-- Atmosphere: photographic archive layer, fades in over 15s -->
+      <div class="atm-wrap atm-matrix" aria-hidden="true">
+        <img class="atm-img" src="images/bg-matrix.jpg" alt="" loading="lazy" draggable="false">
+      </div>
       <!-- Matrix side: geometric grid overlay -->
       <div class="matrix-geo" aria-hidden="true"></div>
       <div class="side-inner">
@@ -143,6 +148,10 @@
     </div>
 
     <div class="side" id="right">
+      <!-- Atmosphere: portrait dissolved into memory, fades in over 13s -->
+      <div class="atm-wrap atm-human" aria-hidden="true">
+        <img class="atm-img" src="images/profile.JPG" alt="" loading="lazy" draggable="false">
+      </div>
       <!-- Human side: organic warm light overlay -->
       <div class="human-warmth" aria-hidden="true"></div>
       <div class="side-inner">

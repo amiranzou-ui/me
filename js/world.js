@@ -379,6 +379,36 @@
   }());
 
   // ═══════════════════════════════════════════════════
+  // 11. ATMOSPHERE PARALLAX
+  //     Human layer resists cursor (memory pulling away).
+  //     Matrix layer follows cursor (deliberate, systematic).
+  //     CSS handles fade-in and ambient float; JS adds cursor depth.
+  // ═══════════════════════════════════════════════════
+  const atmHuman  = dom.qs('.atm-human');
+  const atmMatrix = dom.qs('.atm-matrix');
+
+  if ((atmHuman || atmMatrix) && hasPointer) {
+    let atmHX = 0, atmHY = 0;
+    let atmMX = 0, atmMY = 0;
+
+    raf.add('atm', () => {
+      const normX = (mx / window.innerWidth  - 0.5) * 2; // -1 → +1
+      const normY = (my / window.innerHeight - 0.5) * 2;
+
+      // Human: drifts against cursor — very slow, dreamlike resistance
+      atmHX = lerp(atmHX, -normX * 14, 0.011);
+      atmHY = lerp(atmHY, -normY *  9, 0.011);
+
+      // Matrix: follows cursor — measured, geometric
+      atmMX = lerp(atmMX,  normX * 10, 0.015);
+      atmMY = lerp(atmMY,  normY *  6, 0.015);
+
+      if (atmHuman)  atmHuman.style.transform  = `translate(${atmHX.toFixed(2)}px,${atmHY.toFixed(2)}px)`;
+      if (atmMatrix) atmMatrix.style.transform = `translate(${atmMX.toFixed(2)}px,${atmMY.toFixed(2)}px)`;
+    });
+  }
+
+  // ═══════════════════════════════════════════════════
   // CURSOR MOVE DISPATCH
   // ═══════════════════════════════════════════════════
   function onMove(e) {
