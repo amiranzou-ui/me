@@ -197,6 +197,17 @@
   const visited     = new Set();
   const navBack     = document.querySelector('.nav-back');
 
+  /* ── Immediately suppress pick-screen, show archive hall ─────── */
+  // The MutationObserver approach is unreliable because human.js adds 'visible'
+  // to pick-screen synchronously before archive.js sets up any observer.
+  // Directly take over here — all scripts run before any browser paint, so
+  // there is no visible flash.
+  if (pickScreen) {
+    pickScreen.classList.remove('visible');
+    pickScreen.style.display = 'none';
+  }
+  if (archiveHall) archiveHall.classList.add('visible');
+
   /* ── Nav-back: return to archive when inside a chapter ───────── */
   if (navBack) {
     navBack.addEventListener('click', e => {
@@ -207,9 +218,25 @@
     }, true); // capture phase fires before human.js bubble listener
   }
 
+  /* ── home-loop right side ("↑ back to top"): return to archive ─ */
+  const hlRight = document.querySelector('#hl-right');
+  if (hlRight) {
+    hlRight.addEventListener('click', e => {
+      if (!insideChapter) return;
+      e.stopImmediatePropagation();
+      returnToArchive();
+    }, true);
+  }
+
+  /* ── Music capsule "← Back" → return to archive ──────────────── */
+  window.Core.events.on('music:closed-by-user', () => {
+    if (insideChapter) returnToArchive();
+  });
+
   function returnToArchive() {
     const ctx = getCtx();
     sndClick(ctx, 0.18);
+    window.Core.events.emit('archive:returning'); // close music capsule if open
     trans('visible');
     setTimeout(() => {
       trans('hold');
@@ -305,22 +332,6 @@
       const d = CHAPTERS.find(c => c.cat === btn.dataset.cat);
       if (d) showSectionNotice(d);
     }, true);
-  }
-
-  /* ── Intercept pick-screen, show archive hall instead ──────── */
-  if (pickScreen) {
-    const obs = new MutationObserver(mutations => {
-      for (const m of mutations) {
-        if (m.type === 'attributes' && m.attributeName === 'class' && pickScreen.classList.contains('visible')) {
-          pickScreen.classList.remove('visible');
-          pickScreen.style.display = 'none';
-          obs.disconnect();
-          if (archiveHall) archiveHall.classList.add('visible');
-          break;
-        }
-      }
-    });
-    obs.observe(pickScreen, { attributes: true });
   }
 
   /* ── Chapter hover: update background numeral ─────────────── */

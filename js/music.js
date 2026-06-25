@@ -698,7 +698,10 @@
       <span class="mc-top-name">II</span>
       <button class="mc-top-back" type="button">← Back</button>
     `;
-    topBar.querySelector('.mc-top-back').addEventListener('click', closeCapsule);
+    topBar.querySelector('.mc-top-back').addEventListener('click', () => {
+      closeCapsule();
+      window.Core?.events?.emit('music:closed-by-user');
+    });
     capsule.appendChild(topBar);
 
     const topRule = document.createElement('div');
@@ -1093,6 +1096,10 @@
     hasInteracted = true;
     setTimeout(openCapsule, 900);
   }
+
+  // ── Archive integration ───────────────────────────────
+  // When archive.js triggers a return-to-archive, close the capsule cleanly
+  window.Core?.events?.on('archive:returning', closeCapsule);
 
   // ── Helpers ───────────────────────────────────────────
   function rand(n) { return Math.random() * n; }
