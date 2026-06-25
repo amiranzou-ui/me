@@ -7,44 +7,44 @@
   //  1. Put images in  images/cooking/  folder
   //  2. Add entries:
   //       {
-  //         src:   '../images/cooking/filename.png',
+  //         src:   'images/cooking/filename.png',
   //         hover: 'one line — what you felt',        ← shown on card (Arabic ok)
   //         text:  ['line one', 'line two'],           ← shown when expanded (1–2 lines)
   //       }
   // ─────────────────────────────────────────────────────────────────
   const MOMENTS = [
     {
-      src:   '../images/cooking/1.png',
+      src:   'images/cooking/1.png',
       hover: 'يمكن اول مره اسوي شي بالمطبخ وحدي',
       text:  ['وهذا الكلاص حرفيا حبيته وكالعادة هيجي نهايات ويه الاشياء الأحبها '],
     },
     {
-      src:   '../images/cooking/2.png',
+      src:   'images/cooking/2.png',
       hover: 'واهنا حسيت سويت ماعون بسعر $69',
       text:  ['طبعا سويته واني عايد مادة مرتين ورسبت بيها (حسيت نفسي غبي بشكل مخيف)'],
     },
     {
-      src:   '../images/cooking/3.png',
+      src:   'images/cooking/3.png',
       hover: 'الطعم يجنن صراحه ',
       text:  ['بس عرفت ليش نحتاج female touch '],
     },
     {
-      src:   '../images/cooking/4.png',
+      src:   'images/cooking/4.png',
       hover: 'واهنا عرفت لازم ابدي اصور اكثر ',
       text:  ['...'],
     },
     {
-      src:   '../images/cooking/5.png',
+      src:   'images/cooking/5.png',
       hover: 'the pic changes when ur friend is black and white',
       text:  ['but i still feel like the same idiot who can only make 2 dishes and burns everything'],
     },
     {
-      src:   '../images/cooking/6.png',
+      src:   'images/cooking/6.png',
       hover: 'and here i was really proud of myself for making something that looks like the original recipe',
       text:  ['but it tasted like garbage and i had to throw it away after one bite'],
     },
     {
-      src:   '../images/cooking/7.png',
+      src:   'images/cooking/7.png',
       hover: 'its not even that bad but it just looks so sad and pathetic and i cant even look at it without feeling like a failure',
       text:  ['i just want to be good at something and cooking is supposed to be fun but it just makes me feel like a useless piece of trash who cant even boil water without burning it'],
     },

@@ -5,51 +5,8 @@
   const hasPointer  = window.matchMedia('(pointer: fine)').matches;
   const reducedMot  = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ── Animated film grain canvas ─────────────────────────────────
-  const grainCanvas = dom.qs('#mem-grain-canvas');
-  if (grainCanvas && !reducedMot) {
-    const gc = grainCanvas.getContext('2d');
-    let gW, gH;
-
-    function resizeGrain() {
-      gW = grainCanvas.width  = window.innerWidth;
-      gH = grainCanvas.height = window.innerHeight;
-    }
-    resizeGrain();
-    window.addEventListener('resize', resizeGrain);
-
-    // Use a small tile redrawn every ~3 frames, scaled up via drawImage
-    const TILE = 200;
-    const offscreen = document.createElement('canvas');
-    offscreen.width  = TILE;
-    offscreen.height = TILE;
-    const oc = offscreen.getContext('2d');
-
-    let grainFrame = 0;
-    function drawGrain() {
-      grainFrame++;
-      if (grainFrame % 3 !== 0) return; // redraw every 3 RAF ticks ≈ 20fps grain
-      const imageData = oc.createImageData(TILE, TILE);
-      const data      = imageData.data;
-      for (let i = 0; i < data.length; i += 4) {
-        const v = Math.random() * 255 | 0;
-        data[i]     = v;
-        data[i + 1] = v;
-        data[i + 2] = v;
-        data[i + 3] = Math.random() * 60 + 20 | 0; // semi-transparent
-      }
-      oc.putImageData(imageData, 0, 0);
-      gc.clearRect(0, 0, gW, gH);
-      // tile the offscreen across the viewport
-      for (let x = 0; x < gW; x += TILE) {
-        for (let y = 0; y < gH; y += TILE) {
-          gc.drawImage(offscreen, x, y);
-        }
-      }
-    }
-
-    raf.add('mem-grain', drawGrain);
-  }
+  // grain is handled purely by CSS (animation on body::after background-position)
+  // no canvas needed — zero JS overhead for the cursor RAF loop
 
   // ── Depth parallax for memory fragments ───────────────────────
   const frags = dom.qsa('.mem-frag');

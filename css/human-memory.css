@@ -37,14 +37,19 @@
   78%     { transform: translate(-4px,   6px) scale(1.004); }
 }
 
-/* ── Animated film grain canvas ── */
-#mem-grain-canvas {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9996;
-  opacity: 0.055;
-  mix-blend-mode: screen;
+/* ── Animated grain: shift the existing SVG tile pattern instead of canvas ── */
+body::after {
+  animation: mem-grain-shift 0.12s steps(1) infinite;
+}
+@keyframes mem-grain-shift {
+  0%   { background-position:   0px   0px; }
+  14%  { background-position: -42px  22px; }
+  28%  { background-position:  28px -16px; }
+  42%  { background-position: -22px -32px; }
+  57%  { background-position:  34px  12px; }
+  71%  { background-position: -18px  28px; }
+  85%  { background-position:  18px -8px;  }
+  100% { background-position:  -6px  4px;  }
 }
 
 /* ── Ambient light sweep (CSS-only, no JS needed) ── */
@@ -210,11 +215,12 @@
 
 /* ── Reduced motion ── */
 @media (prefers-reduced-motion: reduce) {
-  .mem-atm-img     { animation: none !important; opacity: 0.04 !important; }
-  .mem-light       { animation: none !important; display: none; }
-  .mem-frag        { animation: none !important; opacity: 1 !important; }
+  .mem-atm-img               { animation: none !important; opacity: 0.04 !important; }
+  .mem-light                 { animation: none !important; display: none; }
+  .mem-frag                  { animation: none !important; opacity: 1 !important; }
   .masonry.active .cell-inner { animation: none !important; }
-  .micro-story     { transition: none !important; }
+  .micro-story               { transition: none !important; }
+  body::after                { animation: none !important; }
   .content:has(.cell:hover) .cell,
   .content:has(.cell:hover) .cell:hover { transition: none !important; }
 }
