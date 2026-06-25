@@ -365,11 +365,11 @@
       setTimeout(() => { lightLeak.classList.remove('flash'); }, 1900);
     }
 
-    // After 4.5s: card exits → elevator (long enough to actually read)
+    // After 6s: card exits → elevator (long enough to actually read)
     setTimeout(() => {
       chapterCard.classList.remove('visible');
       setTimeout(() => { trans('fading'); startElevator(data, ctx); }, 600);
-    }, 4500);
+    }, 6000);
   }
 
   function startElevator(data, ctx) {

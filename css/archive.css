@@ -663,8 +663,15 @@
 .layout .cat.active::before { color: rgba(196, 98, 45, 0.58) !important; }
 .layout .cat:hover::before  { color: rgba(196, 180, 154, 0.38) !important; }
 
-/* Hide SVG icons */
-.layout .cat-icon { display: none !important; }
+/* Show SVG icons */
+.layout .cat-icon {
+  display: flex !important;
+  margin-bottom: 3px !important;
+  opacity: 0.45 !important;
+  transition: opacity 0.35s ease !important;
+}
+.layout .cat.active .cat-icon { opacity: 0.78 !important; }
+.layout .cat:hover  .cat-icon { opacity: 0.55 !important; }
 
 /* Category label */
 .layout .cat-label {
@@ -686,6 +693,24 @@
 .layout .sidebar:has(.cat:hover) .cat        { filter: brightness(0.4) !important; }
 .layout .sidebar:has(.cat:hover) .cat:hover  { filter: brightness(1) !important; }
 .layout .sidebar:has(.cat:hover) .cat.active { filter: brightness(0.65) !important; }
+
+/* ── Animated orange accent line — draws down on active ── */
+.layout .cat::after {
+  content: '' !important;
+  position: absolute !important;
+  left: -14px !important;
+  top: 20% !important;
+  height: 60% !important;
+  width: 2px !important;
+  background: rgba(196, 98, 45, 0.72) !important;
+  transform: scaleY(0) !important;
+  transform-origin: top center !important;
+  transition: transform 0.45s cubic-bezier(0.2, 0, 0, 1) !important;
+  border-radius: 0 1px 1px 0 !important;
+}
+.layout .cat.active::after {
+  transform: scaleY(1) !important;
+}
 
 /* Remove music EQ bars */
 .layout .mc-cat-eq { display: none !important; }
