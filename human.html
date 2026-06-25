@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/music.css">
   <link rel="stylesheet" href="css/cooking.css">
   <link rel="stylesheet" href="css/human-memory.css">
+  <link rel="stylesheet" href="css/archive.css">
 </head>
 <body>
 
@@ -18,6 +19,109 @@
     <img class="mem-atm-img" src="https://images.unsplash.com/photo-1575209239550-322a4b125c6d?auto=format&fit=crop&w=1920&q=85" alt="" loading="lazy" draggable="false" crossorigin="anonymous">
   </div>
   <div class="mem-light" aria-hidden="true"></div>
+
+  <!-- ── MEMORY ARCHIVE HALL ── -->
+  <div id="archive-hall" role="dialog" aria-label="Memory Archive">
+    <span class="ah-bg-numeral" aria-hidden="true">I</span>
+    <header class="ah-header">
+      <span class="ah-label">Memory Archive</span>
+      <span class="ah-year">2026</span>
+    </header>
+    <div class="ah-rule"></div>
+    <nav class="ah-chapters">
+      <div class="ah-chapter" data-cat="photography" style="--ch-i:0" role="button" tabindex="0">
+        <span class="ah-ch-num">Chapter I</span>
+        <span class="ah-ch-title">Photography</span>
+        <span class="ah-ch-enter">enter →</span>
+        <span class="ah-ch-tagline">to remember. because some things are too beautiful to just walk past.</span>
+      </div>
+      <div class="ah-chapter" data-cat="posters" style="--ch-i:1" role="button" tabindex="0">
+        <span class="ah-ch-num">Chapter II</span>
+        <span class="ah-ch-title">Posters</span>
+        <span class="ah-ch-enter">enter →</span>
+        <span class="ah-ch-tagline">life taught me something. I made a poster about it.</span>
+      </div>
+      <div class="ah-chapter" data-cat="patterns" style="--ch-i:2" role="button" tabindex="0">
+        <span class="ah-ch-num">Chapter III</span>
+        <span class="ah-ch-title">Graphics</span>
+        <span class="ah-ch-enter">enter →</span>
+        <span class="ah-ch-tagline">this is what I do. grids, shapes, and making things feel right.</span>
+      </div>
+      <div class="ah-chapter" data-cat="music" style="--ch-i:3" role="button" tabindex="0">
+        <span class="ah-ch-num">Chapter IV</span>
+        <span class="ah-ch-title">Music</span>
+        <span class="ah-ch-enter">enter →</span>
+        <span class="ah-ch-tagline">what I had on repeat. the songs that stayed.</span>
+      </div>
+      <div class="ah-chapter" data-cat="cooking" style="--ch-i:4" role="button" tabindex="0">
+        <span class="ah-ch-num">Chapter V</span>
+        <span class="ah-ch-title">Food Decisions</span>
+        <span class="ah-ch-enter">enter →</span>
+        <span class="ah-ch-tagline">things i made. things i felt.</span>
+      </div>
+      <div class="ah-chapter" data-cat="3d" style="--ch-i:5" role="button" tabindex="0">
+        <span class="ah-ch-num">Chapter VI</span>
+        <span class="ah-ch-title">3D</span>
+        <span class="ah-ch-enter">enter →</span>
+        <span class="ah-ch-tagline">geometry and I are still figuring each other out.</span>
+      </div>
+    </nav>
+    <div class="ah-rule" style="animation-delay:0.95s"></div>
+    <footer class="ah-footer">
+      <a href="index.html" class="ah-back">← home</a>
+    </footer>
+  </div>
+
+  <!-- ── BLACK TRANSITION ── -->
+  <div id="trans-overlay" aria-hidden="true"></div>
+
+  <!-- ── CHAPTER TITLE CARD ── -->
+  <div id="chapter-card" aria-hidden="true">
+    <div class="cc-inner">
+      <span class="cc-ch-label"></span>
+      <span class="cc-ch-title"></span>
+      <span class="cc-ch-tagline"></span>
+    </div>
+  </div>
+  <div class="cc-light-leak" aria-hidden="true"></div>
+
+  <!-- ── ELEVATOR ── -->
+  <div id="elevator-overlay" aria-hidden="true">
+    <div class="el-content">
+      <div class="el-archive-label">Memory Archive</div>
+      <div class="el-floors">
+        <div class="el-floor-item">
+          <span class="el-floor-label">Current Floor</span>
+          <span class="el-floor-num" id="el-from">00</span>
+        </div>
+        <span class="el-arrow">→</span>
+        <div class="el-floor-item">
+          <span class="el-floor-label">Destination</span>
+          <span class="el-floor-num" id="el-to">00</span>
+        </div>
+      </div>
+      <span id="el-counter">00</span>
+      <span id="el-status">ASCENDING</span>
+    </div>
+  </div>
+
+  <!-- ── FINAL SCENE ── -->
+  <div id="final-scene" aria-hidden="true">
+    <div class="fs-status">
+      <span class="fs-status-title">Archive Status</span>
+      <div class="fs-status-item" data-cat="photography"><span class="fs-check">✓</span>Photography</div>
+      <div class="fs-status-item" data-cat="posters">    <span class="fs-check">✓</span>Posters</div>
+      <div class="fs-status-item" data-cat="patterns">   <span class="fs-check">✓</span>Graphics</div>
+      <div class="fs-status-item" data-cat="music">      <span class="fs-check">✓</span>Music</div>
+      <div class="fs-status-item" data-cat="cooking">    <span class="fs-check">✓</span>Food Decisions</div>
+      <div class="fs-status-item" data-cat="3d">         <span class="fs-check">✓</span>3D</div>
+    </div>
+    <div class="fs-complete"><span class="fs-complete-text">Memory Archive Complete</span></div>
+    <div class="fs-next"><span class="fs-next-text">The Next Chapter</span></div>
+    <div class="fs-end">
+      <span class="fs-end-line">2026 — <span class="fs-cursor">|</span></span>
+    </div>
+  </div>
 
   <!-- Custom cursor -->
   <div class="cursor-dot"></div>
@@ -331,5 +435,6 @@
   <script src="js/music.js"></script>
   <script src="js/cooking.js"></script>
   <script src="js/human-memory.js"></script>
+  <script src="js/archive.js"></script>
 </body>
 </html>

@@ -226,6 +226,9 @@ body::after {
 }
 
 
+/* pick-screen superseded by #archive-hall */
+#pick-screen { display: none !important; }
+
 /* ════════════════════════════════════════════════════════
    PICK SCREEN — Cinematic Memory Cards (desktop only)
    Overrides the tall-column layout from human.css
