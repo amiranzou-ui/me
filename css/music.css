@@ -1040,6 +1040,21 @@
 .mc-frag-item.active .mc-frag-sub   { color: rgba(196,180,154,0.62); }
 .mc-frag-item.active .mc-frag-year  { color: rgba(196,180,154,0.44); }
 
+/* ── Loading / buffering state ── */
+.mc-btn-play.is-loading::before {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: rgba(196, 98, 45, 0.75);
+  animation: mc-load-spin 0.9s linear infinite;
+  pointer-events: none;
+}
+@keyframes mc-load-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Sidebar eq bars ── */
 .mc-cat-eq {
   display: flex; align-items: center; gap: 2px;
@@ -1112,9 +1127,12 @@
   .mc-mood-btn { padding: 9px 18px; font-size: 8px; letter-spacing: 2px; }
   .mc-controls { opacity: 1; pointer-events: auto; }
   .mc-room-panel {
-    padding: 34px 0 0;
+    padding: 34px 0 48px;
     border-left: none;
     border-top: 1px solid rgba(196,180,154,0.06);
+    overflow: visible;
+    justify-content: flex-start;
+    flex: none;
   }
   .mc-room-watermark {
     font-size: clamp(54px, 16vw, 108px);
@@ -1143,4 +1161,37 @@
   }
   .mc-frag-title { color: rgba(218,202,172,0.85); }
   .mc-frag-year { display: none; }
+
+  /* Show play/pause glyph on mobile so the button is clearly tappable */
+  .mc-btn-play { touch-action: manipulation; overflow: visible; }
+  .mc-disc-3d  { touch-action: manipulation; }
+
+  .mc-btn-play-glyph {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .mc-icon-play {
+    display: block !important;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 8px 0 8px 14px;
+    border-color: transparent transparent transparent rgba(196,180,154,0.72);
+    margin-left: 3px;
+  }
+  .mc-btn-play.is-playing .mc-icon-play { display: none !important; }
+  .mc-icon-pause { display: none; gap: 5px; align-items: center; }
+  .mc-btn-play.is-playing .mc-icon-pause { display: flex !important; }
+  .mc-icon-pause::before,
+  .mc-icon-pause::after {
+    content: '';
+    display: block;
+    width: 3px; height: 14px;
+    background: rgba(196,180,154,0.72);
+    border-radius: 1px;
+  }
 }

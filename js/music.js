@@ -1029,6 +1029,12 @@
   audio.addEventListener('seeked', syncProgress);
   audio.addEventListener('ended', autoNext);
 
+  // Show loading spinner while buffering so users know something is happening
+  audio.addEventListener('waiting', () => { if (playBtn) playBtn.classList.add('is-loading'); });
+  audio.addEventListener('stalled', () => { if (playBtn) playBtn.classList.add('is-loading'); });
+  audio.addEventListener('playing', () => { if (playBtn) playBtn.classList.remove('is-loading'); });
+  audio.addEventListener('canplay', () => { if (playBtn) playBtn.classList.remove('is-loading'); });
+
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'hidden') {
       shouldResumeAfterHidden = isPlaying && audio.paused === false;
