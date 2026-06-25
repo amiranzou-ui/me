@@ -82,14 +82,14 @@
   font-weight: 300;
   letter-spacing: 4.5px;
   text-transform: uppercase;
-  color: rgba(196, 180, 154, 0.28);
+  color: rgba(196, 180, 154, 0.55);
 }
 .ah-year {
   font-family: 'Cormorant Garamond', serif;
   font-size: 13px;
   font-weight: 300;
   font-style: italic;
-  color: rgba(196, 180, 154, 0.18);
+  color: rgba(196, 180, 154, 0.42);
   letter-spacing: 2px;
 }
 
@@ -153,11 +153,11 @@
   font-weight: 300;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(196, 180, 154, 0.25);
+  color: rgba(196, 180, 154, 0.5);
   transition: color 0.35s ease;
   align-self: center;
 }
-.ah-chapter:hover .ah-ch-num { color: rgba(196, 98, 45, 0.6); }
+.ah-chapter:hover .ah-ch-num { color: rgba(196, 98, 45, 0.75); }
 
 /* Chapter title */
 .ah-ch-title {
@@ -167,13 +167,13 @@
   font-weight: 300;
   font-style: italic;
   font-size: clamp(20px, 2.8vw, 36px);
-  color: rgba(196, 180, 154, 0.42);
+  color: rgba(196, 180, 154, 0.72);
   letter-spacing: 1px;
   line-height: 1;
   transition: color 0.35s ease;
   align-self: center;
 }
-.ah-chapter:hover .ah-ch-title { color: rgba(196, 180, 154, 0.9); }
+.ah-chapter:hover .ah-ch-title { color: rgba(196, 180, 154, 1); }
 
 /* Enter arrow */
 .ah-ch-enter {
@@ -199,7 +199,7 @@
   font-weight: 300;
   font-style: italic;
   font-size: clamp(11px, 1.15vw, 14px);
-  color: rgba(196, 180, 154, 0.38);
+  color: rgba(196, 180, 154, 0.6);
   letter-spacing: 0.3px;
   line-height: 1.45;
   max-height: 0;
@@ -231,12 +231,12 @@
   font-size: 8.5px;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: rgba(196, 180, 154, 0.18);
+  color: rgba(196, 180, 154, 0.42);
   text-decoration: none;
   cursor: none;
   transition: color 0.3s;
 }
-.ah-back:hover { color: rgba(196, 180, 154, 0.6); }
+.ah-back:hover { color: rgba(196, 180, 154, 0.8); }
 
 @keyframes ah-fade-slide {
   from { opacity: 0; transform: translateY(6px); }
@@ -591,13 +591,13 @@
     min-height: 52px; /* comfortable tap target */
   }
   .ah-ch-enter { display: none; }
-  .ah-ch-num   { font-size: 7px; letter-spacing: 2.5px; }
-  .ah-ch-title { font-size: clamp(17px, 5.5vw, 26px); }
+  .ah-ch-num   { font-size: 7px; letter-spacing: 2.5px; color: rgba(196, 180, 154, 0.55); }
+  .ah-ch-title { font-size: clamp(22px, 6vw, 30px); color: rgba(196, 180, 154, 0.82); }
 
   /* Always reveal tagline — no hover on touch */
   .ah-ch-tagline {
-    max-height: 48px;
-    opacity: 0.5;
+    max-height: 52px;
+    opacity: 0.72;
     padding-top: 5px;
   }
 
@@ -647,21 +647,29 @@
   .layout .cat::before { display: none !important; } /* roman numeral */
   .layout .cat-icon    { display: none !important; }
   .layout .cat-label {
-    font-size: 11.5px   !important;
+    font-size: 13px     !important;
     letter-spacing: 0.4px !important;
     white-space: nowrap !important;
+    color: rgba(196, 180, 154, 0.65) !important;
+  }
+  .layout .cat.active .cat-label {
+    color: rgba(196, 180, 154, 0.92) !important;
   }
 
   /* Active indicator: 2px bottom line (was left vertical bar) */
   .layout .cat::after {
+    content: ''              !important;
+    position: absolute       !important;
     left: 0                  !important;
     top: auto                !important;
     bottom: 0                !important;
     height: 2px              !important;
     width: 100%              !important;
+    background: rgba(196, 98, 45, 0.72) !important;
     transform: scaleX(0)     !important;
     transform-origin: center !important;
     border-radius: 0         !important;
+    transition: transform 0.35s ease !important;
   }
   .layout .cat.active::after { transform: scaleX(1) !important; }
 
@@ -694,10 +702,12 @@
 }
 
 /* ══════════════════════════════════════
-   ARCHIVE-STYLE SIDEBAR
+   ARCHIVE-STYLE SIDEBAR (desktop only)
    Replaces circle cat buttons with a
    minimal numbered chapter list
    ══════════════════════════════════════ */
+
+@media (min-width: 769px) {
 
 .layout .sidebar {
   width: 168px !important;
@@ -809,6 +819,8 @@
   border-color: transparent !important;
   color: inherit !important;
 }
+
+} /* end @media (min-width: 769px) */
 
 /* ══════════════════════════════════════
    SECTION NOTICE
