@@ -13,7 +13,7 @@
   // ─────────────────────────────────────────────────────────────────
   const PLAYLIST = [
     {
-      src: 'music/in%20the%20mood%20to%20love.mp3',
+      src: 'music/in-the-mood-to-love.m4a',
       mood: ['arabic', 'quiet', 'jazz'],
       fragment: 'your memory here',
       title: 'In the Mood to Love',
@@ -24,7 +24,7 @@
       note: 'A note kept warm in the dark. Needle down. Lamp low. Let the room remember before you do.',
     },
     {
-      src: 'music/what-falling-in-love-feels-like.mp3',
+      src: 'music/what-falling-in-love-feels-like.m4a',
       mood: ['quiet', 'english'],
       fragment: 'what falling in love feels like',
       title: 'What Falling in Love Feels Like',

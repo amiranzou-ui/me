@@ -199,7 +199,7 @@
   font-weight: 300;
   font-style: italic;
   font-size: clamp(11px, 1.15vw, 14px);
-  color: rgba(196, 180, 154, 0.6);
+  color: rgba(196, 98, 45, 0.75);
   letter-spacing: 0.3px;
   line-height: 1.45;
   max-height: 0;
@@ -597,7 +597,8 @@
   /* Always reveal tagline — no hover on touch */
   .ah-ch-tagline {
     max-height: 52px;
-    opacity: 0.72;
+    opacity: 1;
+    color: rgba(196, 98, 45, 0.82);
     padding-top: 5px;
   }
 
