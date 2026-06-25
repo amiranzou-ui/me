@@ -148,19 +148,10 @@
   // ── Category switching (sidebar) ───────────────────────────
   cats.forEach(btn => {
     btn.addEventListener('click', () => {
-      const target  = btn.dataset.cat;
-      const tagline = btn.dataset.tagline || '';
+      const target = btn.dataset.cat;
       cats.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      // flash tagline briefly without blocking section load
-      if (catReveal && catRevealLine && tagline) {
-        catRevealLine.textContent = tagline;
-        catReveal.classList.add('show');
-        setTimeout(() => catReveal.classList.remove('show'), 1400);
-        setTimeout(() => showSection(target, false), 500);
-      } else {
-        showSection(target, false);
-      }
+      showSection(target, false);
     });
   });
 

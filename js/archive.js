@@ -414,10 +414,6 @@
     visited.add(catId);
     if (navBack) navBack.textContent = '← archive';
 
-    // Suppress cat-reveal since we showed the chapter card
-    const catReveal = document.getElementById('cat-reveal');
-    if (catReveal) catReveal.style.visibility = 'hidden';
-
     // Activate sidebar button — insideChapter is set AFTER click so the
     // sidebar capture listener doesn't intercept this programmatic click
     catBtns.forEach(b => b.classList.remove('active'));
@@ -436,13 +432,12 @@
       setTimeout(() => layout.classList.remove('entering'), 1400);
     }
 
-    // Reveal bottom sections + restore cat-reveal
+    // Reveal bottom sections
     setTimeout(() => {
       ['.home-loop', '.page-bridge', '.closing'].forEach(sel => {
         const el = document.querySelector(sel);
         if (el) el.classList.add('revealed');
       });
-      if (catReveal) catReveal.style.visibility = '';
       if (onDone) onDone();
     }, 900);
   }
