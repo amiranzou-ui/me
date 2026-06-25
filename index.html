@@ -30,12 +30,18 @@
 </head>
 <body>
 
-  <!-- Ambient atmosphere layers (z-index 1, behind content) -->
+  <!-- Dust particles -->
+  <canvas id="dust-canvas" aria-hidden="true"></canvas>
+
+  <!-- Ambient atmosphere layers -->
   <div id="ambient-a" aria-hidden="true"></div>
   <div id="ambient-b" aria-hidden="true"></div>
 
-  <!-- Cursor aura — large soft glow that follows with delay -->
+  <!-- Cursor aura -->
   <div id="cursor-aura" aria-hidden="true"></div>
+
+  <!-- Cursor distortion lens -->
+  <div id="cursor-distort" aria-hidden="true"></div>
 
   <div id="container">
 
@@ -50,7 +56,9 @@
       </div>
     </div>
 
-    <div class="divider"></div>
+    <div class="divider" id="divider-el"></div>
+    <!-- Living divider — canvas draws curve, scan, glow; replaces CSS visual -->
+    <canvas id="divider-canvas" aria-hidden="true"></canvas>
 
     <div class="profile-node" id="pn-toggle">
       <div class="pn-wrap">
@@ -158,6 +166,7 @@
   <script src="js/protect.js"></script>
   <script src="js/core.js"></script>
   <script src="js/secret.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" crossorigin="anonymous"></script>
   <script src="js/world.js"></script>
   <script src="js/index.js"></script>
 </body>

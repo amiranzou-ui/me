@@ -629,6 +629,8 @@ body::after { animation: grain-shift 9s steps(1) infinite; }
     pn-breathe 5s   ease-in-out 2s   infinite;
 }
 .profile-node:hover .pn-wrap {
+  border-color: #c4b49a;
+  transform: scale(1.07);
   animation: none;
   box-shadow: 0 0 0 5px rgba(196,180,154,0.18);
 }
@@ -766,4 +768,126 @@ body::after { animation: grain-shift 9s steps(1) infinite; }
     padding-bottom: 14px;
   }
   .pnp-col:last-child { padding-left: 0; }
+  /* hide canvas-based divider, ripple rings on mobile */
+  #divider-canvas, .pn-ring-wrap { display: none; }
+}
+
+/* ═══════════════════════════════════════════════════
+   ADVANCED IMMERSION LAYER — world systems
+   ═══════════════════════════════════════════════════ */
+
+/* ── Dust canvas ── */
+#dust-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 1;
+}
+
+/* ── Living divider canvas ── */
+#divider-canvas {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  pointer-events: none;
+  z-index: 11;
+  transition: opacity 0.5s ease;
+}
+
+/* Hide the original divider's visuals once JS activates canvas mode */
+.divider.canvas-active {
+  background: none;
+  overflow: visible;
+}
+.divider.canvas-active::before,
+.divider.canvas-active::after {
+  display: none;
+}
+
+/* ── Cursor distortion lens ── */
+#cursor-distort {
+  position: fixed;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 8;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(0.8px) brightness(1.015);
+  -webkit-backdrop-filter: blur(0.8px) brightness(1.015);
+  -webkit-mask-image: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.6) 72%, transparent 100%);
+  mask-image: radial-gradient(circle, transparent 55%, rgba(0,0,0,0.6) 72%, transparent 100%);
+  will-change: left, top;
+}
+
+/* ── Liquid crossing ripple ── */
+.crossing-ripple {
+  position: fixed;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 1px solid rgba(196,98,45,0.35);
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  z-index: 9;
+}
+
+/* ── Profile image: extra size for parallax room ── */
+.pn-img {
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  margin: -4px;
+  object-fit: cover;
+  opacity: 0.88;
+  transition: opacity 0.4s;
+  will-change: transform;
+}
+.profile-node:hover .pn-img { opacity: 1; }
+
+/* ── Cinematic entry: initial hidden state ──
+   Added to <html> by JS only if GSAP loaded + no reduced-motion.
+   Opacity-only — no transforms, to avoid conflicting with
+   CSS-defined transforms (translateX -50%, etc.) */
+.entry-ready #container         { opacity: 0; }
+.entry-ready .frame-corner      { opacity: 0; }
+.entry-ready .corner            { opacity: 0; }
+.entry-ready .profile-node      { opacity: 0; }
+.entry-ready #left  .side-inner { opacity: 0; }
+.entry-ready #right .side-inner { opacity: 0; }
+.entry-ready #divider-canvas    { opacity: 0; }
+
+/* ── Atmosphere blend near divider ── */
+.matrix-geo {
+  /* Matrix side: also responds to how far cursor is into matrix territory */
+  background-image:
+    linear-gradient(rgba(44,36,22,0.038) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(44,36,22,0.038) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ── Matrix glitch ── */
+@keyframes glitch-shift {
+  0%,100% { transform: translateX(0); filter: none; }
+  20%     { transform: translateX( 2px); filter: hue-rotate(18deg) contrast(1.08); }
+  40%     { transform: translateX(-1px); filter: hue-rotate(-6deg) brightness(1.04); }
+  60%     { transform: translateX( 1.5px); filter: hue-rotate(10deg) contrast(1.06); }
+  80%     { transform: translateX(-0.5px); filter: none; }
+}
+#left.glitching {
+  animation: glitch-shift 0.28s steps(1) forwards;
+}
+
+/* ── Breathing world ── */
+#container {
+  transform-origin: center center;
+}
+
+/* world.js RAF drives side-inner transform directly every frame;
+   suppress the CSS transition so gravity pull is responsive, not laggy */
+#left .side-inner,
+#right .side-inner {
+  transition: opacity 0.5s ease 0.1s; /* keep opacity for hover reveal, drop transform */
 }
