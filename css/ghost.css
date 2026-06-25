@@ -1,0 +1,241 @@
+/* ghost.css — Atmospheric ghost imagery layer
+ * Human Side: nostalgic objects at memory-like opacity
+ * Matrix Side: retro-tech relics with geometric precision
+ * All at 4–8% opacity — noticed only after time on page
+ */
+
+/* ── Stacking context so z-index:-1 stays inside each side ── */
+.side {
+  isolation: isolate;
+}
+
+/* ── Layer container ── */
+.ghost-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: -1;
+  will-change: transform;
+}
+
+/* ── Individual object wrapper ── */
+.ghost-obj {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+  opacity: 0; /* animations control opacity */
+}
+
+.ghost-obj svg {
+  display: block;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── Human side — warm amber tone, organic blur ── */
+.ghost-human-layer .ghost-obj {
+  color: #8a7460;
+  filter: blur(1.4px);
+}
+
+/* ── Matrix side — cooler amber, sharper blur ── */
+.ghost-matrix-layer .ghost-obj {
+  color: #796a55;
+  filter: blur(0.9px);
+}
+
+/* ════════════════════════════════════════════════════
+   HUMAN SIDE — organic float keyframes
+   Each has slight rotation for warmth and imperfection
+   ════════════════════════════════════════════════════ */
+
+@keyframes gh-float-a {
+  0%,100% { transform: translate(0px,0px) rotate(-1deg);     opacity: 0; }
+  18%     {                                                   opacity: 0.065; }
+  50%     { transform: translate(-5px,-9px) rotate(0.5deg);  opacity: 0.055; }
+  82%     {                                                   opacity: 0.065; }
+}
+
+@keyframes gh-float-b {
+  0%,100% { transform: translate(0px,0px) rotate(1.5deg);    opacity: 0; }
+  20%     {                                                   opacity: 0.072; }
+  55%     { transform: translate(6px,-6px) rotate(-0.8deg);  opacity: 0.062; }
+  80%     {                                                   opacity: 0.055; }
+}
+
+@keyframes gh-float-c {
+  0%,100% { transform: translate(0px,0px) rotate(-0.5deg);   opacity: 0; }
+  22%     {                                                   opacity: 0.078; }
+  48%     { transform: translate(-4px,7px) rotate(1deg);     opacity: 0.068; }
+  78%     {                                                   opacity: 0.075; }
+}
+
+@keyframes gh-float-d {
+  0%,100% { transform: translate(0px,0px) rotate(0.8deg);    opacity: 0; }
+  15%     {                                                   opacity: 0.062; }
+  45%     { transform: translate(4px,-4px) rotate(-1.2deg);  opacity: 0.055; }
+  85%     {                                                   opacity: 0.062; }
+}
+
+@keyframes gh-float-e {
+  0%,100% { transform: translate(0px,0px) rotate(-2deg);     opacity: 0; }
+  25%     {                                                   opacity: 0.08; }
+  60%     { transform: translate(-3px,-8px) rotate(0.6deg);  opacity: 0.07; }
+  85%     {                                                   opacity: 0.05; }
+}
+
+@keyframes gh-float-f {
+  0%,100% { transform: translate(0px,0px) rotate(1deg);      opacity: 0; }
+  30%     {                                                   opacity: 0.065; }
+  58%     { transform: translate(5px,5px) rotate(-0.4deg);   opacity: 0.058; }
+  75%     {                                                   opacity: 0.07; }
+}
+
+/* ════════════════════════════════════════════════════
+   MATRIX SIDE — geometric scan keyframes
+   No rotation — precise, purposeful, digital
+   ════════════════════════════════════════════════════ */
+
+@keyframes gm-scan-a {
+  0%,100% { transform: translate(0px,0px);   opacity: 0; }
+  20%     {                                  opacity: 0.065; }
+  50%     { transform: translate(5px,-2px);  opacity: 0.055; }
+  80%     {                                  opacity: 0.065; }
+}
+
+@keyframes gm-scan-b {
+  0%,100% { transform: translate(0px,0px);   opacity: 0; }
+  25%     {                                  opacity: 0.07; }
+  52%     { transform: translate(-4px,4px);  opacity: 0.06; }
+  78%     {                                  opacity: 0.065; }
+}
+
+@keyframes gm-scan-c {
+  0%,100% { transform: translate(0px,0px);   opacity: 0; }
+  18%     {                                  opacity: 0.06; }
+  50%     { transform: translate(0px,-6px);  opacity: 0.055; }
+  82%     {                                  opacity: 0.06; }
+}
+
+@keyframes gm-scan-d {
+  0%,100% { transform: translate(0px,0px);   opacity: 0; }
+  30%     {                                  opacity: 0.075; }
+  55%     { transform: translate(6px,3px);   opacity: 0.065; }
+  80%     {                                  opacity: 0.07; }
+}
+
+@keyframes gm-scan-e {
+  0%,100% { transform: translate(0px,0px);   opacity: 0; }
+  20%     {                                  opacity: 0.065; }
+  50%     { transform: translate(-5px,0px);  opacity: 0.055; }
+  75%     {                                  opacity: 0.055; }
+}
+
+/* ════════════════════════════════════════════════════
+   HUMAN SIDE — individual object positioning
+   ════════════════════════════════════════════════════ */
+
+/* Film camera — upper right corner */
+.gh-camera {
+  top: 12%;
+  right: 9%;
+  width: 102px;
+  animation: gh-float-a 30s ease-in-out infinite 4s;
+}
+
+/* Vinyl record — lower right */
+.gh-vinyl {
+  top: 60%;
+  right: 5%;
+  width: 92px;
+  animation: gh-float-b 36s ease-in-out infinite 9s;
+}
+
+/* Walkman — mid left */
+.gh-walkman {
+  top: 38%;
+  left: 7%;
+  width: 60px;
+  animation: gh-float-c 33s ease-in-out infinite 2s;
+}
+
+/* Cassette tape — upper mid-left */
+.gh-cassette {
+  top: 20%;
+  left: 16%;
+  width: 112px;
+  animation: gh-float-d 28s ease-in-out infinite 16s;
+}
+
+/* Film strip — far right edge, tall vertical */
+.gh-filmstrip {
+  top: 28%;
+  right: 0%;
+  width: 34px;
+  animation: gh-float-e 42s ease-in-out infinite 6s;
+}
+
+/* Polaroid frame — lower left */
+.gh-polaroid {
+  top: 70%;
+  left: 9%;
+  width: 76px;
+  animation: gh-float-f 24s ease-in-out infinite 12s;
+}
+
+/* ════════════════════════════════════════════════════
+   MATRIX SIDE — individual object positioning
+   ════════════════════════════════════════════════════ */
+
+/* CRT monitor — upper mid-left */
+.gm-monitor {
+  top: 14%;
+  left: 12%;
+  width: 126px;
+  animation: gm-scan-a 32s ease-in-out infinite 3s;
+}
+
+/* Floppy disk — lower right of matrix side */
+.gm-floppy {
+  top: 62%;
+  right: 7%;
+  width: 76px;
+  animation: gm-scan-b 26s ease-in-out infinite 10s;
+}
+
+/* Terminal window — mid */
+.gm-terminal {
+  top: 37%;
+  left: 7%;
+  width: 136px;
+  animation: gm-scan-c 38s ease-in-out infinite 5s;
+}
+
+/* Circuit schematic — upper right of matrix side */
+.gm-circuit {
+  top: 8%;
+  right: 4%;
+  width: 108px;
+  animation: gm-scan-d 30s ease-in-out infinite 15s;
+}
+
+/* Keyboard — lower mid */
+.gm-keyboard {
+  top: 76%;
+  left: 7%;
+  width: 124px;
+  animation: gm-scan-e 34s ease-in-out infinite 8s;
+}
+
+/* ════════════════════════════════════════════════════
+   ACCESSIBILITY — honour reduced motion
+   ════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .ghost-obj {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+}

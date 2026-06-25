@@ -379,6 +379,34 @@
   }());
 
   // ═══════════════════════════════════════════════════
+  // 11. GHOST PARALLAX — ghost layers drift opposite to cursor
+  //     Very slow lerp (0.018) for dreamy, memory-like lag
+  // ═══════════════════════════════════════════════════
+  const humanLayer  = dom.qs('.ghost-human-layer');
+  const matrixLayer = dom.qs('.ghost-matrix-layer');
+
+  if ((humanLayer || matrixLayer) && hasPointer) {
+    let ghostHX = 0, ghostHY = 0;
+    let ghostMX = 0, ghostMY = 0;
+
+    raf.add('ghost', () => {
+      const normX = (mx / window.innerWidth  - 0.5) * 2; // -1 → 1
+      const normY = (my / window.innerHeight - 0.5) * 2;
+
+      // Human side drifts opposite to cursor (warm, slightly resisting)
+      ghostHX = lerp(ghostHX, -normX * 9,  0.018);
+      ghostHY = lerp(ghostHY, -normY * 5.5, 0.018);
+
+      // Matrix side drifts with cursor (precise, deliberate)
+      ghostMX = lerp(ghostMX,  normX * 7,  0.022);
+      ghostMY = lerp(ghostMY,  normY * 4.5, 0.022);
+
+      if (humanLayer)  humanLayer.style.transform  = `translate(${ghostHX.toFixed(2)}px,${ghostHY.toFixed(2)}px)`;
+      if (matrixLayer) matrixLayer.style.transform = `translate(${ghostMX.toFixed(2)}px,${ghostMY.toFixed(2)}px)`;
+    });
+  }
+
+  // ═══════════════════════════════════════════════════
   // CURSOR MOVE DISPATCH
   // ═══════════════════════════════════════════════════
   function onMove(e) {
