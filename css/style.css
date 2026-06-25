@@ -768,8 +768,23 @@ body::after { animation: grain-shift 9s steps(1) infinite; }
     padding-bottom: 14px;
   }
   .pnp-col:last-child { padding-left: 0; }
-  /* hide canvas-based divider, ripple rings on mobile */
-  #divider-canvas, .pn-ring-wrap { display: none; }
+  /* Divider canvas: visible on mobile, narrower */
+  #divider-canvas {
+    width: 16px;
+  }
+
+  /* Ripple rings: match smaller circle size on mobile */
+  .pn-ring-wrap {
+    width: 52px;
+    height: 52px;
+  }
+
+  /* Profile image: no parallax room needed on mobile */
+  .pn-img {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
 }
 
 /* ═══════════════════════════════════════════════════

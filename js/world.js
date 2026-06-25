@@ -217,45 +217,50 @@
   // ═══════════════════════════════════════════════════
   const PN_RADIUS = 165;
 
-  if (pnNode && hasPointer) {
+  if (pnNode) {
     raf.add('pn', ts => {
       if (!entryDone) return;
 
-      magCX = lerp(magCX, magTX, 0.09);
-      magCY = lerp(magCY, magTY, 0.09);
-      glowC = lerp(glowC, glowT,  0.07);
+      // Cursor-driven effects only on pointer devices
+      if (hasPointer) {
+        magCX = lerp(magCX, magTX, 0.09);
+        magCY = lerp(magCY, magTY, 0.09);
+        glowC = lerp(glowC, glowT,  0.07);
+      }
 
-      // Float + magnetic combined transform
+      // Float runs on all devices — pure time-based sin wave
       const floatY = Math.sin(ts * 0.00055) * 4;
       pnNode.style.transform =
         `translateX(calc(-50% + ${magCX.toFixed(2)}px)) ` +
         `translateY(${(floatY + magCY).toFixed(2)}px)`;
 
-      // Proximity glow on the wrap
-      if (pnWrap) {
-        if (glowC > 0.015) {
-          const g = glowC;
-          pnWrap.style.boxShadow   = `0 0 ${(g * 18).toFixed(1)}px ${(g * 5).toFixed(1)}px rgba(196,98,45,${(g * 0.12).toFixed(3)})`;
-          pnWrap.style.borderColor = `rgba(196,${Math.round(180 + g * 22)},${Math.round(154 + g * 20)},${(0.35 + g * 0.4).toFixed(2)})`;
-        } else {
-          pnWrap.style.boxShadow   = '';
-          pnWrap.style.borderColor = '';
+      if (hasPointer) {
+        // Proximity glow on the wrap
+        if (pnWrap) {
+          if (glowC > 0.015) {
+            const g = glowC;
+            pnWrap.style.boxShadow   = `0 0 ${(g * 18).toFixed(1)}px ${(g * 5).toFixed(1)}px rgba(196,98,45,${(g * 0.12).toFixed(3)})`;
+            pnWrap.style.borderColor = `rgba(196,${Math.round(180 + g * 22)},${Math.round(154 + g * 20)},${(0.35 + g * 0.4).toFixed(2)})`;
+          } else {
+            pnWrap.style.boxShadow   = '';
+            pnWrap.style.borderColor = '';
+          }
         }
-      }
 
-      // Parallax eyes — portrait tracks cursor
-      if (pnImg) {
-        const W = window.innerWidth, H = window.innerHeight;
-        imgX = lerp(imgX, clamp((mx - W / 2) / (W / 2), -1, 1) * 3.2, 0.04);
-        imgY = lerp(imgY, clamp((my - H / 2) / (H / 2), -1, 1) * 2.8, 0.04);
-        pnImg.style.transform = `translate(${imgX.toFixed(2)}px, ${imgY.toFixed(2)}px)`;
-      }
+        // Parallax eyes — portrait tracks cursor
+        if (pnImg) {
+          const W = window.innerWidth, H = window.innerHeight;
+          imgX = lerp(imgX, clamp((mx - W / 2) / (W / 2), -1, 1) * 3.2, 0.04);
+          imgY = lerp(imgY, clamp((my - H / 2) / (H / 2), -1, 1) * 2.8, 0.04);
+          pnImg.style.transform = `translate(${imgX.toFixed(2)}px, ${imgY.toFixed(2)}px)`;
+        }
 
-      // Gravity field — side content softly pulled toward the profile node
-      const centerProx = Math.max(0, 1 - Math.abs((mx / window.innerWidth) - 0.5) * 2.5);
-      const pull = centerProx * 3;
-      if (leftInner)  leftInner.style.transform  = `translateX(${( pull * 0.25).toFixed(2)}px)`;
-      if (rightInner) rightInner.style.transform = `translateX(${(-pull * 0.25).toFixed(2)}px)`;
+        // Gravity field — side content softly pulled toward the profile node
+        const centerProx = Math.max(0, 1 - Math.abs((mx / window.innerWidth) - 0.5) * 2.5);
+        const pull = centerProx * 3;
+        if (leftInner)  leftInner.style.transform  = `translateX(${( pull * 0.25).toFixed(2)}px)`;
+        if (rightInner) rightInner.style.transform = `translateX(${(-pull * 0.25).toFixed(2)}px)`;
+      }
     });
   }
 
