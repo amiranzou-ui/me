@@ -42,8 +42,8 @@
 }
 
 .atm-human .atm-img {
-  /* Push face/subject toward upper-right — feels partially hidden */
-  object-position: 62% 22%;
+  /* Film strip is horizontal mid-frame — anchor slightly above center */
+  object-position: 50% 38%;
   filter: grayscale(1) blur(3px) brightness(0.88) contrast(0.85);
   animation:
     atm-appear  13s ease           forwards 2s,
@@ -59,7 +59,8 @@
 }
 
 .atm-matrix .atm-img {
-  object-position: 40% 48%;
+  /* Code panel — anchor to left-center where the code block is densest */
+  object-position: 30% 50%;
   filter: grayscale(0.88) blur(2px) brightness(0.78) contrast(1.08);
   animation:
     atm-appear  15s ease           forwards 3.5s,
