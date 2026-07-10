@@ -1,26 +1,46 @@
 @import "tailwindcss";
 
+/*
+ * Palette extracted from the legacy site (css/style.css and friends).
+ * These are the values actually reused across pages, not the long tail
+ * of one-off shadow/glow shades — see ARCHITECTURE.md.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-cream: #f0ebe0;
+  --color-cream-alt: #e8e0ce;
+  --color-tan: #c4b49a;
+  --color-tan-alt: #d4c9b4;
+  --color-ink: #2c2416;
+  --color-accent: #c4622d;
+  --color-brown: #8a7a65;
+  --color-brown-dark: #6e5d48;
+  --color-void: #141008;
+  --color-void-deep: #0c0904;
+
+  --background: var(--color-cream);
+  --foreground: var(--color-ink);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-cream: var(--color-cream);
+  --color-cream-alt: var(--color-cream-alt);
+  --color-tan: var(--color-tan);
+  --color-tan-alt: var(--color-tan-alt);
+  --color-ink: var(--color-ink);
+  --color-accent: var(--color-accent);
+  --color-brown: var(--color-brown);
+  --color-brown-dark: var(--color-brown-dark);
+  --color-void: var(--color-void);
+  --color-void-deep: var(--color-void-deep);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-serif: var(--font-serif);
+  --font-sans: var(--font-sans);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
