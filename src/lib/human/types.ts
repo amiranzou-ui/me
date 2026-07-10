@@ -26,6 +26,7 @@ export type GalleryItem = {
   alt_text: string | null;
   asset_id: string | null;
   sort_order: number;
+  status: "draft" | "published" | "archived";
   meta: { hover_caption?: string; text?: string[] } | null;
   assets: Asset | null;
 };

@@ -6,9 +6,9 @@ export default function StudioHomePage() {
       <h1 className="font-serif text-2xl italic text-ink">Welcome back</h1>
       <p className="text-sm text-brown max-w-lg">
         This is the private Studio — edits here go live on the site immediately, no code required.
-        More sections (Gallery, Music, Mind) arrive in later phases.
+        Music track management and the Mind subsystem arrive in later phases.
       </p>
-      <div className="grid grid-cols-2 gap-4 max-w-lg mt-4">
+      <div className="grid grid-cols-3 gap-4 max-w-2xl mt-4">
         <Link
           href="/studio/cv"
           className="border border-tan p-6 transition-colors hover:border-accent"
@@ -22,6 +22,13 @@ export default function StudioHomePage() {
         >
           <div className="font-serif text-lg italic text-ink mb-1">Projects</div>
           <div className="text-xs text-brown">Create, edit, publish, and archive projects</div>
+        </Link>
+        <Link
+          href="/studio/gallery"
+          className="border border-tan p-6 transition-colors hover:border-accent"
+        >
+          <div className="font-serif text-lg italic text-ink mb-1">Gallery</div>
+          <div className="text-xs text-brown">Categories and photos for the Human side</div>
         </Link>
       </div>
     </div>
