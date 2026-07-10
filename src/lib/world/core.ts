@@ -80,6 +80,17 @@ export const raf = {
   },
 };
 
+// ── Perf helpers ──────────────────────────────────────────
+export function throttle<T extends (...args: never[]) => void>(fn: T, ms: number) {
+  let last = 0;
+  return function (this: unknown, ...args: Parameters<T>) {
+    const now = Date.now();
+    if (now - last < ms) return;
+    last = now;
+    return fn.apply(this, args);
+  };
+}
+
 // ── Math ──────────────────────────────────────────────────
 export const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));

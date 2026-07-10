@@ -1,25 +1,35 @@
-/**
- * Placeholder — the real Human gallery page is built in Phase 2, backed by
- * categories/gallery_items/assets in Supabase. This stub exists so the
- * landing page's portal() navigation has a real destination during the
- * Phase 0 smoke test.
- */
-export default function HumanPlaceholder() {
+import "@/styles/human.css";
+import { createClient } from "@/lib/supabase/server";
+import HumanApp from "@/components/human/HumanApp";
+import type { Category, GalleryItem, Track } from "@/lib/human/types";
+
+export const revalidate = 60;
+
+export default async function HumanPage() {
+  const supabase = await createClient();
+
+  const [{ data: categories }, { data: galleryItems }, { data: tracks }] = await Promise.all([
+    supabase.from("categories").select("*").order("sort_order"),
+    supabase
+      .from("gallery_items")
+      .select("*, assets(*)")
+      .eq("status", "published")
+      .order("sort_order"),
+    supabase.from("tracks").select("*").eq("status", "published").order("sort_order"),
+  ]);
+
+  const itemsByCategory: Record<string, GalleryItem[]> = {};
+  for (const item of (galleryItems ?? []) as GalleryItem[]) {
+    const cat = (categories ?? []).find((c) => c.id === item.category_id);
+    if (!cat) continue;
+    (itemsByCategory[cat.slug] ??= []).push(item);
+  }
+
   return (
-    <div
-      style={{
-        minHeight: "100dvh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "var(--color-void)",
-        color: "var(--color-cream)",
-        fontFamily: "var(--font-serif), serif",
-        fontStyle: "italic",
-        fontSize: "clamp(24px, 4vw, 40px)",
-      }}
-    >
-      Human — coming in Phase 2
-    </div>
+    <HumanApp
+      categories={(categories ?? []) as Category[]}
+      itemsByCategory={itemsByCategory}
+      tracks={(tracks ?? []) as Track[]}
+    />
   );
 }
