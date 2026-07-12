@@ -5,11 +5,17 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 /**
- * Lands here from Supabase's password-recovery email link. The browser
- * client parses the recovery token from the URL on load and fires a
- * PASSWORD_RECOVERY auth event, which is the signal that updateUser({password})
- * is now allowed. Exempted from the owner-only gate in proxy.ts since the
- * visitor isn't authenticated as the owner yet when this page first loads.
+ * Lands here from the password-recovery email link. The link's flow depends
+ * on how the reset was initiated:
+ *  - Initiated via /studio/forgot-password (this app, PKCE): link carries
+ *    ?code=... which must be exchanged using the code_verifier this same
+ *    browser stored when it called resetPasswordForEmail.
+ *  - Legacy/implicit style: link carries #access_token=...&type=recovery in
+ *    the hash, auto-detected by the client and surfaced as a
+ *    PASSWORD_RECOVERY auth event.
+ * Either way, once a session exists, updateUser({password}) is allowed.
+ * Exempted from the owner-only gate in proxy.ts since there's no session yet
+ * on first load.
  */
 export default function ResetPasswordPage() {
   const router = useRouter();
@@ -23,21 +29,32 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     const supabase = createClient();
+    let cancelled = false;
 
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+      if (event === "PASSWORD_RECOVERY" && !cancelled) {
         setReady(true);
         setChecking(false);
       }
     });
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) setReady(true);
-    });
+    const code = new URL(window.location.href).searchParams.get("code");
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (cancelled) return;
+        if (!error) setReady(true);
+        setChecking(false);
+      });
+    } else {
+      supabase.auth.getSession().then(({ data }) => {
+        if (!cancelled && data.session) setReady(true);
+      });
+    }
 
-    const timeout = setTimeout(() => setChecking(false), 2000);
+    const timeout = setTimeout(() => !cancelled && setChecking(false), 2500);
 
     return () => {
+      cancelled = true;
       sub.subscription.unsubscribe();
       clearTimeout(timeout);
     };
@@ -80,8 +97,11 @@ export default function ResetPasswordPage() {
 
         {!checking && !ready && !done && (
           <p className="text-center text-sm text-brown">
-            This link is invalid or has expired. Send a new one from Supabase&apos;s dashboard
-            (Authentication → Users → your account → Send password recovery).
+            This link is invalid or has expired.{" "}
+            <a href="/studio/forgot-password" className="text-accent hover:underline">
+              Request a new one
+            </a>
+            .
           </p>
         )}
 

@@ -32,8 +32,9 @@ export async function proxy(request: NextRequest) {
   const isOwner = user?.email === OWNER_EMAIL;
   const isLoginPage = request.nextUrl.pathname === "/studio/login";
   const isResetPasswordPage = request.nextUrl.pathname === "/studio/reset-password";
+  const isForgotPasswordPage = request.nextUrl.pathname === "/studio/forgot-password";
 
-  if (!isOwner && !isLoginPage && !isResetPasswordPage) {
+  if (!isOwner && !isLoginPage && !isResetPasswordPage && !isForgotPasswordPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/studio/login";
     return NextResponse.redirect(url);

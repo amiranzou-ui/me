@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { signIn } from "./actions";
 
 /**
@@ -59,6 +60,13 @@ export default function StudioLoginPage() {
             {pending ? "Signing in…" : "Sign in"}
           </button>
         </form>
+
+        <Link
+          href="/studio/forgot-password"
+          className="mt-6 block text-center text-xs text-brown hover:text-accent"
+        >
+          Forgot password?
+        </Link>
       </div>
     </div>
   );
