@@ -106,6 +106,8 @@ function ItemsEditor({
   const [newCaption, setNewCaption] = useState("");
   const [newHover, setNewHover] = useState("");
   const [newText, setNewText] = useState("");
+  const [pending, setPending] = useState<{ assetId: string; previewUrl: string } | null>(null);
+  const [saving, setSaving] = useState(false);
 
   async function move(item: GalleryItem, dir: -1 | 1) {
     const sorted = [...items].sort((a, b) => a.sort_order - b.sort_order);
@@ -140,6 +142,36 @@ function ItemsEditor({
   async function updateCaption(item: GalleryItem, caption: string) {
     onChange(items.map((i) => (i.id === item.id ? { ...i, caption } : i)));
     await upsertGalleryItem({ ...item, caption } as never);
+  }
+
+  async function addItem() {
+    if (!pending) return;
+    setSaving(true);
+    const meta = category.slug === "cooking" ? { hover_caption: newHover, text: newText.split("\n").filter(Boolean) } : {};
+    const res = await upsertGalleryItem({
+      category_id: category.id,
+      title: null,
+      caption: newCaption || null,
+      alt_text: null,
+      asset_id: pending.assetId,
+      sort_order: items.length,
+      status: "published",
+      meta,
+    });
+    if (!("error" in res)) {
+      setNewCaption("");
+      setNewHover("");
+      setNewText("");
+      setPending(null);
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("gallery_items")
+        .select("*, assets(*)")
+        .eq("category_id", category.id)
+        .order("sort_order");
+      onChange((data ?? []) as GalleryItem[]);
+    }
+    setSaving(false);
   }
 
   return (
@@ -179,52 +211,57 @@ function ItemsEditor({
 
       <div className="border border-dashed border-tan p-4 flex flex-col gap-3">
         <p className="text-xs uppercase tracking-wider text-brown">Add to {category.label}</p>
-        <input className={inputCls} placeholder="Caption" value={newCaption} onChange={(e) => setNewCaption(e.target.value)} />
-        {category.slug === "cooking" && (
+        {pending ? (
           <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={pending.previewUrl} alt="" className="w-24 h-24 object-cover flex-shrink-0" />
             <input
               className={inputCls}
-              placeholder="Hover caption"
-              value={newHover}
-              onChange={(e) => setNewHover(e.target.value)}
+              placeholder="Caption"
+              value={newCaption}
+              onChange={(e) => setNewCaption(e.target.value)}
+              autoFocus
             />
-            <textarea
-              className={inputCls}
-              placeholder="Expanded text (one line per paragraph)"
-              rows={2}
-              value={newText}
-              onChange={(e) => setNewText(e.target.value)}
-            />
+            {category.slug === "cooking" && (
+              <>
+                <input
+                  className={inputCls}
+                  placeholder="Hover caption"
+                  value={newHover}
+                  onChange={(e) => setNewHover(e.target.value)}
+                />
+                <textarea
+                  className={inputCls}
+                  placeholder="Expanded text (one line per paragraph)"
+                  rows={2}
+                  value={newText}
+                  onChange={(e) => setNewText(e.target.value)}
+                />
+              </>
+            )}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={addItem}
+                disabled={saving}
+                className="self-start bg-ink px-4 py-2 text-xs uppercase tracking-widest text-cream hover:bg-accent disabled:opacity-50"
+              >
+                {saving ? "Adding…" : "Add"}
+              </button>
+              <button
+                onClick={() => setPending(null)}
+                disabled={saving}
+                className="text-xs text-brown hover:text-accent"
+              >
+                Cancel
+              </button>
+            </div>
           </>
+        ) : (
+          <MediaUpload
+            pathPrefix={`gallery/${category.slug}`}
+            onUploaded={(assetId, previewUrl) => setPending({ assetId, previewUrl })}
+          />
         )}
-        <MediaUpload
-          pathPrefix={`gallery/${category.slug}`}
-          onUploaded={async (assetId) => {
-            const meta = category.slug === "cooking" ? { hover_caption: newHover, text: newText.split("\n").filter(Boolean) } : {};
-            const res = await upsertGalleryItem({
-              category_id: category.id,
-              title: null,
-              caption: newCaption || null,
-              alt_text: null,
-              asset_id: assetId,
-              sort_order: items.length,
-              status: "published",
-              meta,
-            });
-            if (!("error" in res)) {
-              setNewCaption("");
-              setNewHover("");
-              setNewText("");
-              const supabase = createClient();
-              const { data } = await supabase
-                .from("gallery_items")
-                .select("*, assets(*)")
-                .eq("category_id", category.id)
-                .order("sort_order");
-              onChange((data ?? []) as GalleryItem[]);
-            }
-          }}
-        />
       </div>
     </div>
   );
