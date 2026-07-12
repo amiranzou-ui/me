@@ -360,7 +360,7 @@ export default function MusicCapsule({
             angle = TONEARM_PLAY + tonearmVisualProgress * TONEARM_SWEEP + drift + energy * 0.6;
           }
           tonearmTargetAngle = angle;
-          const ease = isPlaying ? Math.min(0.05, dt * 0.0018) : Math.min(0.08, dt * 0.0024);
+          const ease = Math.min(0.05, dt * 0.0018);
           tonearmAngle += (tonearmTargetAngle - tonearmAngle) * ease;
           tonearmRef.current.style.setProperty("--tonearm-angle", `${tonearmAngle.toFixed(2)}deg`);
           tonearmRef.current.classList.toggle("playing", isPlaying);
