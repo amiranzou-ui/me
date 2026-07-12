@@ -18,6 +18,9 @@ export default function StudioDashboardLayout({ children }: { children: React.Re
           <Link href="/studio/gallery" className="transition-colors hover:text-accent">
             Gallery
           </Link>
+          <Link href="/studio/tracks" className="transition-colors hover:text-accent">
+            Tracks
+          </Link>
           <Link href="/matrix" target="_blank" className="transition-colors hover:text-accent">
             Matrix ↗
           </Link>

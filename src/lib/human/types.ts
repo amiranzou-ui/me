@@ -43,4 +43,5 @@ export type Track = {
   note: string | null;
   storage_path: string;
   sort_order: number;
+  status: "draft" | "published" | "archived";
 };
