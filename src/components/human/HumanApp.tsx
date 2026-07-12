@@ -75,6 +75,7 @@ export default function HumanApp({
         visible={archive.archiveHallVisible}
         bgNumeral={archive.bgNumeral}
         lockPulse={archive.lockPulse}
+        accessLevel={archive.accessLevel}
         onChapterClick={archive.handleChapterClick}
         onChapterHover={archive.handleChapterHover}
       />
@@ -87,6 +88,7 @@ export default function HumanApp({
         categories={categories}
         itemsByCategory={itemsByCategory}
         activeCategory={archive.activeCategory}
+        accessLevel={archive.accessLevel}
         onSidebarClick={archive.handleSidebarClick}
       />
 

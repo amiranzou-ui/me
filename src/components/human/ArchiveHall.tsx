@@ -8,6 +8,7 @@ type Props = {
   visible: boolean;
   bgNumeral: string;
   lockPulse: string | null;
+  accessLevel: "friend" | "visitor" | null;
   onChapterClick: (c: Category) => void;
   onChapterHover: (c: Category) => void;
 };
@@ -19,7 +20,15 @@ const LockIcon = () => (
   </svg>
 );
 
-export default function ArchiveHall({ categories, visible, bgNumeral, lockPulse, onChapterClick, onChapterHover }: Props) {
+export default function ArchiveHall({
+  categories,
+  visible,
+  bgNumeral,
+  lockPulse,
+  accessLevel,
+  onChapterClick,
+  onChapterHover,
+}: Props) {
   return (
     <div id="archive-hall" className={visible ? "visible" : ""}>
       <span className="ah-bg-numeral" aria-hidden="true">
@@ -31,27 +40,32 @@ export default function ArchiveHall({ categories, visible, bgNumeral, lockPulse,
       </header>
       <div className="ah-rule" />
       <nav className="ah-chapters">
-        {categories.map((c, i) => (
-          <div
-            key={c.slug}
-            className={`ah-chapter${c.is_locked ? " locked" : ""}${lockPulse === c.slug ? " lock-pulse" : ""}`}
-            style={{ "--ch-i": i } as React.CSSProperties}
-            role="button"
-            tabIndex={0}
-            onMouseEnter={() => onChapterHover(c)}
-            onClick={() => onChapterClick(c)}
-          >
-            <span className="ah-ch-num">Chapter {c.roman}</span>
-            <span className="ah-ch-title">{c.label}</span>
-            <span className="ah-ch-enter">enter →</span>
-            <span className="ah-ch-tagline">{c.tagline}</span>
-            {c.is_locked && (
-              <span className="ah-ch-lock">
-                <LockIcon />
-              </span>
-            )}
-          </div>
-        ))}
+        {categories.map((c, i) => {
+          // Matches the original's applyAccess(): the lock indicator only
+          // ever shows to visitors, never to friends.
+          const showLock = c.is_locked && accessLevel === "visitor";
+          return (
+            <div
+              key={c.slug}
+              className={`ah-chapter${showLock ? " locked" : ""}${lockPulse === c.slug ? " lock-pulse" : ""}`}
+              style={{ "--ch-i": i } as React.CSSProperties}
+              role="button"
+              tabIndex={0}
+              onMouseEnter={() => onChapterHover(c)}
+              onClick={() => onChapterClick(c)}
+            >
+              <span className="ah-ch-num">Chapter {c.roman}</span>
+              <span className="ah-ch-title">{c.label}</span>
+              <span className="ah-ch-enter">enter →</span>
+              <span className="ah-ch-tagline">{c.tagline}</span>
+              {showLock && (
+                <span className="ah-ch-lock">
+                  <LockIcon />
+                </span>
+              )}
+            </div>
+          );
+        })}
       </nav>
       <div className="ah-rule" style={{ animationDelay: "0.95s" }} />
       <footer className="ah-footer">

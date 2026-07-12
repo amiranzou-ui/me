@@ -87,11 +87,13 @@ export default function GalleryContent({
   categories,
   itemsByCategory,
   activeCategory,
+  accessLevel,
   onSidebarClick,
 }: {
   categories: Category[];
   itemsByCategory: Record<string, GalleryItem[]>;
   activeCategory: string | null;
+  accessLevel: "friend" | "visitor" | null;
   onSidebarClick: (c: Category) => void;
 }) {
   const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null);
@@ -110,28 +112,33 @@ export default function GalleryContent({
   return (
     <div className="layout">
       <div className="sidebar">
-        {categories.map((c, i) => (
-          <button
-            key={c.slug}
-            className={`cat${c.slug === "music" ? " cat-music" : ""}${c.slug === "cooking" ? " cat-cooking" : ""}${activeCategory === c.slug ? " active" : ""}${c.is_locked ? " locked" : ""}`}
-            data-cat={c.slug}
-            data-roman={c.roman}
-            style={{ "--cat-i": i } as React.CSSProperties}
-            onClick={() => onSidebarClick(c)}
-          >
-            <span className="cat-icon">
-              <CategoryIcon slug={c.slug} />
-            </span>
-            <span className="cat-label">{c.label}</span>
-            {c.slug === "music" && (
-              <span className="mc-cat-eq">
-                <span />
-                <span />
-                <span />
+        {categories.map((c, i) => {
+          // Matches ArchiveHall's fix: locked-for-visitors styling (and the
+          // pointer-events:none it carries) must never apply to friends.
+          const locked = c.is_locked && accessLevel === "visitor";
+          return (
+            <button
+              key={c.slug}
+              className={`cat${c.slug === "music" ? " cat-music" : ""}${c.slug === "cooking" ? " cat-cooking" : ""}${activeCategory === c.slug ? " active" : ""}${locked ? " locked" : ""}`}
+              data-cat={c.slug}
+              data-roman={c.roman}
+              style={{ "--cat-i": i } as React.CSSProperties}
+              onClick={() => onSidebarClick(c)}
+            >
+              <span className="cat-icon">
+                <CategoryIcon slug={c.slug} />
               </span>
-            )}
-          </button>
-        ))}
+              <span className="cat-label">{c.label}</span>
+              {c.slug === "music" && (
+                <span className="mc-cat-eq">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       <div className="sidebar-divider" />
