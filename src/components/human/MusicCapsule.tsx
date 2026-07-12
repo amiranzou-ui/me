@@ -116,9 +116,19 @@ export default function MusicCapsule({
     if (i < 0 || i >= tracks.length) return;
     playTonearmSfx("off");
     setTrackIdx(i);
-    setIsPlaying(true);
     setFragmentFade(true);
     setTimeout(() => setFragmentFade(false), 340);
+
+    const audio = audioRef.current;
+    const next = tracks[i];
+    if (!audio || !next) return;
+    audio.src = mediaUrl(next.storage_path);
+    audio.load();
+    playTonearmSfx("on");
+    audio
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch(() => setIsPlaying(false));
   }
 
   function goPrev() {
