@@ -127,8 +127,8 @@ function ProjectForm({
     setError(null);
     startTransition(async () => {
       const res = await upsertProject(data);
-      if (res?.error) setError(res.error);
-      else onSaved(data);
+      if ("error" in res) setError(res.error);
+      else onSaved({ ...data, id: res.id, slug: res.slug });
     });
   }
 

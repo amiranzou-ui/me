@@ -12,7 +12,7 @@ function slugify(title: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-export async function upsertProject(data: StudioProject) {
+export async function upsertProject(data: StudioProject): Promise<{ error: string } | { ok: true; id: string; slug: string }> {
   const supabase = await createClient();
   const slug = data.slug || slugify(data.title);
 
@@ -30,14 +30,15 @@ export async function upsertProject(data: StudioProject) {
     published_at: data.status === "published" ? new Date().toISOString() : null,
   };
 
-  const { error } = data.id
-    ? await supabase.from("projects").update(payload).eq("id", data.id)
-    : await supabase.from("projects").insert(payload);
+  const { data: row, error } = data.id
+    ? await supabase.from("projects").update(payload).eq("id", data.id).select("id, slug").single()
+    : await supabase.from("projects").insert(payload).select("id, slug").single();
 
   if (error) return { error: error.message };
 
   revalidatePath("/matrix");
-  return { ok: true };
+  revalidatePath(`/project/${row.slug}`);
+  return { ok: true, id: row.id as string, slug: row.slug as string };
 }
 
 export async function deleteProject(id: string) {
