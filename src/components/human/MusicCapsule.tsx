@@ -533,9 +533,18 @@ export default function MusicCapsule({
   const filteredTracks = tracks
     .map((t, i) => ({ t, i }))
     .filter(({ t }) => !activeMood || t.mood.includes(activeMood));
-  const moodColor = activeMood ? MOODS[activeMood]?.color : "#c4b49a";
-  const moodDesc = activeMood ? MOODS[activeMood]?.desc : "Every song is a room. You choose which one to enter.";
-  const moodRoom = activeMood ? MOODS[activeMood]?.room : "Listening Room";
+  // When no filter is chosen, the page's color still follows whatever is
+  // actually playing, so the room's whole vibe shifts per song rather than
+  // sitting on one flat neutral tone until a filter is clicked.
+  const trackPrimaryMood = track?.mood[0];
+  const fallbackMoodKey = activeMood ?? trackPrimaryMood;
+  const moodColor = (fallbackMoodKey && MOODS[fallbackMoodKey]?.color) || "#c4b49a";
+  const moodDesc = activeMood
+    ? MOODS[activeMood]?.desc
+    : (trackPrimaryMood && MOODS[trackPrimaryMood]?.desc) || "Every song is a room. You choose which one to enter.";
+  const moodRoom = activeMood
+    ? MOODS[activeMood]?.room
+    : track?.room || (trackPrimaryMood && MOODS[trackPrimaryMood]?.room) || "Listening Room";
 
   return (
     <>
@@ -636,7 +645,7 @@ export default function MusicCapsule({
           </div>
           <p className="mc-mood-desc">{moodDesc}</p>
 
-          <div className="mc-room-card">
+          <div className="mc-room-card" key={trackIdx}>
             <span className="mc-room-card-label">Now Playing</span>
             <span className="mc-room-card-stamp">{track?.room ?? "Listening Room"}</span>
             <h3 className="mc-room-title">{track?.title ?? "Untitled Recording"}</h3>
