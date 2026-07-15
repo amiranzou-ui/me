@@ -96,7 +96,7 @@
   background: #c4b49a;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 10001;
   transform: translate(-50%, -50%);
   transition: background 0.2s;
 }
@@ -106,7 +106,7 @@
   border: 1px solid rgba(196,180,154,0.25);
   border-radius: 50%;
   pointer-events: none;
-  z-index: 9998;
+  z-index: 10000;
   transform: translate(-50%, -50%);
   transition: width 0.3s ease, height 0.3s ease, border-color 0.3s, transform 0.08s linear;
 }
@@ -764,9 +764,10 @@
   --mc-text-secondary: #cdb48f;
   --mc-text-support: #a58a68;
   --mc-text-inactive: #6b5842;
-  position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: row; align-items: center; gap: 70px;
-  padding: 0 80px 0 90px; opacity: 0; pointer-events: none; transition: opacity 0.9s ease;
+  position: fixed; inset: 0; z-index: 9999; display: flex; flex-direction: row; align-items: flex-start; gap: 70px;
+  padding: 168px 80px 60px 90px; opacity: 0; pointer-events: none; transition: opacity 0.9s ease;
   background: radial-gradient(ellipse 120% 90% at 50% 100%, #140d06 0%, #0b0704 60%, #070402 100%);
+  overflow-y: auto;
 }
 #music-capsule.open { opacity: 1; pointer-events: auto; }
 .mc-player-col { flex-shrink: 0; width: 460px; display: flex; flex-direction: column; align-items: center; }
@@ -896,9 +897,8 @@
 .mc-progress:hover .mc-progress-fill { background: rgba(196,180,154,0.55); }
 .mc-time-row { display: flex; justify-content: space-between; width: 100%; max-width: 270px; margin: 10px auto 0; font-family: var(--font-sans), sans-serif; font-size: 9px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--mc-text-support); z-index: 1; }
 .mc-time { line-height: 1; }
-.mc-controls { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 26px 0 0; opacity: 0; transition: opacity 0.5s ease; pointer-events: none; z-index: 1; }
-.mc-controls.visible { opacity: 1; pointer-events: auto; }
-.mc-btn { background: none; border: none; cursor: pointer; font-family: var(--font-serif), serif; font-style: italic; font-size: 18px; color: var(--mc-text-inactive); transition: color 0.35s; padding: 8px 6px; outline: none; line-height: 1; }
+.mc-controls { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 26px 0 0; opacity: 1; pointer-events: auto; z-index: 1; }
+.mc-btn { background: none; border: none; cursor: pointer; font-family: var(--font-serif), serif; font-style: italic; font-size: 18px; color: var(--mc-text-support); transition: color 0.35s; padding: 8px 6px; outline: none; line-height: 1; }
 .mc-btn:hover { color: var(--mc-text-secondary); }
 .mc-btn-play {
   position: relative; width: 54px; height: 54px; border-radius: 50%;
@@ -911,6 +911,11 @@
 .mc-btn-play::after { content: ""; position: absolute; width: 6px; height: 6px; border-radius: 50%; background: rgba(196,180,154,0.24); box-shadow: 0 0 0 1px rgba(24,17,10,0.72); }
 .mc-btn-play-glyph, .mc-icon-play, .mc-icon-pause { display: none; }
 .mc-btn-play.is-playing { box-shadow: 0 10px 28px rgba(0,0,0,0.42), 0 0 16px rgba(161,111,45,0.1), inset 0 0 0 1px rgba(196,180,154,0.06); }
+.mc-volume-row { display: flex; align-items: center; gap: 10px; width: 100%; max-width: 270px; margin: 18px auto 0; }
+.mc-volume-label { font-family: var(--font-sans), sans-serif; font-size: 9px; letter-spacing: 1.8px; text-transform: uppercase; color: var(--mc-text-support); flex-shrink: 0; }
+.mc-volume-bar { flex: 1; height: 3px; border-radius: 999px; background: rgba(196,180,154,0.12); cursor: pointer; }
+.mc-volume-fill { height: 100%; border-radius: 999px; background: var(--mc-text-secondary); transition: width 0.15s ease; }
+.mc-volume-pct { font-family: var(--font-sans), sans-serif; font-size: 9px; letter-spacing: 1px; color: var(--mc-text-support); flex-shrink: 0; width: 32px; text-align: right; }
 .mc-mood-row { display: flex; flex-wrap: wrap; gap: 7px; position: relative; z-index: 1; }
 .mc-mood-btn { background: rgba(30,20,10,0.35); border: 1px solid rgba(196,180,154,0.18); border-radius: 3px; padding: 7px 15px; font-family: var(--font-sans), sans-serif; font-size: 8px; letter-spacing: 2.4px; text-transform: uppercase; color: var(--mc-text-support); cursor: pointer; transition: color 0.3s, border-color 0.3s, background 0.3s; }
 .mc-mood-btn:hover { color: var(--mc-text-secondary); border-color: rgba(196,180,154,0.3); }
@@ -990,7 +995,6 @@
   .mc-tonearm-arm { width: 118px; }
   .mc-mood-row { gap: 8px; flex-wrap: wrap; padding: 4px 0 8px; }
   .mc-mood-btn { padding: 9px 18px; font-size: 8px; letter-spacing: 2px; }
-  .mc-controls { opacity: 1; pointer-events: auto; }
   .mc-room-panel { padding: 34px 0 48px; border-left: none; border-top: 1px solid rgba(196,180,154,0.06); overflow: visible; justify-content: flex-start; flex: none; }
   .mc-room-watermark { font-size: clamp(54px, 16vw, 108px); right: 0; }
   .mc-room-card { padding: 22px 20px 24px; }

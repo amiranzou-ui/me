@@ -104,8 +104,12 @@ export default function MusicCapsule({
   });
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [volume, setVolume] = useState(() => {
+    if (typeof window === "undefined") return 0.85;
+    const raw = parseFloat(localStorage.getItem("music_volume_v1") || "0.85");
+    return Number.isFinite(raw) && raw >= 0 && raw <= 1 ? raw : 0.85;
+  });
   const [activeMood, setActiveMood] = useState<string | null>(null);
-  const [controlsVisible, setControlsVisible] = useState(false);
   const [presence, setPresence] = useState<string | null>(null);
   const [discRevealed, setDiscRevealed] = useState(false);
   const [fragmentRevealed, setFragmentRevealed] = useState(false);
@@ -131,6 +135,22 @@ export default function MusicCapsule({
       /* no-op */
     }
   }, [trackIdx]);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) audio.volume = volume;
+    try {
+      localStorage.setItem("music_volume_v1", String(volume));
+    } catch {
+      /* no-op */
+    }
+  }, [volume]);
+
+  function handleVolumeSeek(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    setVolume(ratio);
+  }
 
   useEffect(() => {
     if (!("mediaSession" in navigator) || !track) return;
@@ -185,13 +205,6 @@ export default function MusicCapsule({
     const audio = audioRef.current;
     if (!audio || !audio.duration) return;
     audio.currentTime = Math.max(0, Math.min(audio.duration, audio.currentTime + s));
-  }
-
-  const wakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  function wakeUp() {
-    setControlsVisible(true);
-    if (wakeTimer.current) clearTimeout(wakeTimer.current);
-    wakeTimer.current = setTimeout(() => setControlsVisible(false), 2800);
   }
 
   // ── Auto-advance when a track ends ──
@@ -261,7 +274,6 @@ export default function MusicCapsule({
   useEffect(() => {
     if (!open) return;
     function onKey(e: KeyboardEvent) {
-      wakeUp();
       if (e.key === "Escape") {
         onClose();
         return;
@@ -326,7 +338,6 @@ export default function MusicCapsule({
       dustLightR = 195;
 
     function onSceneMove(e: MouseEvent) {
-      wakeUp();
       const r = sceneRef.current!.getBoundingClientRect();
       targetTiltX = 18 - ((e.clientY - r.top - r.height / 2) / (r.height / 2)) * 9;
       targetTiltY = -6 + ((e.clientX - r.left - r.width / 2) / (r.width / 2)) * 9;
@@ -550,7 +561,6 @@ export default function MusicCapsule({
             ref={sceneRef}
             onWheel={(e) => {
               e.preventDefault();
-              wakeUp();
               if (e.deltaY > 0) goNext();
               else goPrev();
             }}
@@ -574,7 +584,7 @@ export default function MusicCapsule({
 
           <ProgressBar audioRef={audioRef} />
 
-          <div className={`mc-controls${controlsVisible ? " visible" : ""}`}>
+          <div className="mc-controls">
             <button className="mc-btn" title="Back 10 seconds" onClick={() => seekBy(-10)}>
               « 10
             </button>
@@ -582,6 +592,14 @@ export default function MusicCapsule({
             <button className="mc-btn" title="Forward 10 seconds" onClick={() => seekBy(10)}>
               10 »
             </button>
+          </div>
+
+          <div className="mc-volume-row">
+            <span className="mc-volume-label">Vol</span>
+            <div className="mc-volume-bar" onClick={handleVolumeSeek}>
+              <div className="mc-volume-fill" style={{ width: `${Math.round(volume * 100)}%` }} />
+            </div>
+            <span className="mc-volume-pct">{Math.round(volume * 100)}%</span>
           </div>
         </div>
 
