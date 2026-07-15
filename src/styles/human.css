@@ -790,7 +790,7 @@
 .mc-top-rule { position: absolute; top: 103px; left: 48px; right: 48px; height: 1px; background: linear-gradient(to right, transparent, #c4b49a 18%, #c4b49a 82%, transparent); overflow: hidden; z-index: 2; }
 .mc-top-rule::before { content: ""; position: absolute; top: -1px; left: 0; width: 10%; height: 3px; background: linear-gradient(to right, transparent, rgba(196,98,45,0.85), transparent); animation: nav-scan 5s ease-in-out infinite; }
 .mc-top-rule::after { content: ""; position: absolute; top: 50%; left: 50%; width: 5px; height: 5px; background: #c4b49a; transform: translate(-50%, -50%) rotate(45deg); }
-.mc-archive-head { position: absolute; top: 128px; left: 90px; right: 80px; display: flex; align-items: center; justify-content: space-between; gap: 20px; z-index: 2; }
+.mc-archive-head { position: absolute; top: 128px; left: 90px; right: 80px; display: flex; align-items: center; justify-content: space-between; gap: 20px; z-index: 2; pointer-events: none; }
 .mc-archive-head::after { content: ""; position: absolute; left: 0; right: 0; bottom: -14px; height: 1px; background: linear-gradient(to right, rgba(196,180,154,0.12), rgba(196,180,154,0.02), transparent 85%); }
 .mc-ah-label, .mc-ah-copy { font-family: var(--font-sans), sans-serif; font-size: 8px; letter-spacing: 3.2px; text-transform: uppercase; color: rgba(196,180,154,0.32); }
 .mc-close-hint { position: absolute; top: 24px; right: 32px; font-family: var(--font-sans), sans-serif; font-size: 7px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(196,180,154,0.18); cursor: pointer; transition: color 0.3s; z-index: 2; }
