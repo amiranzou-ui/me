@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { unlockAudio, sndClick } from "@/lib/human/audio";
 
 export default function FriendGate({
@@ -15,6 +15,16 @@ export default function FriendGate({
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
   const [exiting, setExiting] = useState(false);
+  const pwInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!chose) return;
+    // Matches .ag-pw-wrap's max-height transition — focusing before it's
+    // done expanding is unreliable in some browsers since the input still
+    // sits inside a zero-height, overflow:hidden box until then.
+    const t = setTimeout(() => pwInputRef.current?.focus(), 460);
+    return () => clearTimeout(t);
+  }, [chose]);
 
   function choose(role: "friend" | "visitor") {
     unlockAudio();
@@ -64,6 +74,7 @@ export default function FriendGate({
         <div className={`ag-pw-wrap${chose ? " visible" : ""}`}>
           <span className="ag-pw-roman">the word</span>
           <input
+            ref={pwInputRef}
             className={`ag-pw-input${shake ? " shake" : ""}`}
             type="password"
             placeholder="…"
