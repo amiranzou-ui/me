@@ -465,12 +465,6 @@ export default function MusicCapsule({
         className={open ? "open" : ""}
         ref={capsuleRef}
         style={{ "--mc-mood-color": moodColor } as React.CSSProperties}
-        onWheel={(e) => {
-          e.preventDefault();
-          wakeUp();
-          if (e.deltaY > 0) goNext();
-          else goPrev();
-        }}
       >
         <div className="mc-frame-corner mc-fc-tl" />
         <div className="mc-frame-corner mc-fc-tr" />
@@ -493,7 +487,16 @@ export default function MusicCapsule({
         </div>
 
         <div className="mc-player-col">
-          <div className="mc-scene" ref={sceneRef}>
+          <div
+            className="mc-scene"
+            ref={sceneRef}
+            onWheel={(e) => {
+              e.preventDefault();
+              wakeUp();
+              if (e.deltaY > 0) goNext();
+              else goPrev();
+            }}
+          >
             <canvas className="mc-canvas" width={380} height={380} ref={canvasRef} />
             <div className="mc-platter" />
             <div className={`mc-disc-3d${discRevealed ? " revealed" : ""}`} ref={discRef} onClick={togglePlay}>
