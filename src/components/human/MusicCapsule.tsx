@@ -113,7 +113,9 @@ export default function MusicCapsule({
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dustCanvasRef = useRef<HTMLCanvasElement>(null);
   const discRef = useRef<HTMLDivElement>(null);
+  const discSheenRef = useRef<HTMLDivElement>(null);
   const tonearmRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const capsuleRef = useRef<HTMLDivElement>(null);
@@ -307,6 +309,21 @@ export default function MusicCapsule({
     let listenTime = 0;
     let presenceNextAt = 10000 + Math.random() * 7000;
     let presenceActiveLocal = false;
+    const barValues = new Float32Array(64).fill(0.03);
+
+    // Dust motes drifting through the lamp light — only visible near the
+    // glow, per the "warm lamp + drifting dust" atmosphere brief.
+    const dust = Array.from({ length: 34 }, () => ({
+      x: Math.random() * 380,
+      y: Math.random() * 380,
+      vx: (Math.random() - 0.5) * 0.05,
+      vy: -0.025 - Math.random() * 0.05,
+      r: 0.6 + Math.random() * 1.5,
+      phase: Math.random() * Math.PI * 2,
+    }));
+    const dustLightCx = 158,
+      dustLightCy = 148,
+      dustLightR = 195;
 
     function onSceneMove(e: MouseEvent) {
       wakeUp();
@@ -357,15 +374,42 @@ export default function MusicCapsule({
         }
         const collW = Math.max(0, Math.cos(angle + 0.9));
         norm *= 1 - vizColl * collW * 0.92;
-        const len = norm * maxH * wake + (isPlaying ? 1 : 0.4);
-        const alpha = (0.18 + norm * 0.75) * wake;
+        // Per-bar inertia with a touch of random variation, so bars don't all
+        // move in perfect lockstep like a digital equalizer.
+        barValues[i] += (norm - barValues[i]) * (0.05 + Math.random() * 0.025);
+        const eased = barValues[i];
+        const len = eased * maxH * wake + (isPlaying ? 1 : 0.4);
+        const alpha = (0.18 + eased * 0.75) * wake;
         ctx.beginPath();
         ctx.moveTo(cx + Math.cos(angle) * baseR, cy + Math.sin(angle) * baseR);
         ctx.lineTo(cx + Math.cos(angle) * (baseR + len), cy + Math.sin(angle) * (baseR + len));
-        ctx.strokeStyle = `rgba(196,160,100,${alpha.toFixed(3)})`;
+        ctx.strokeStyle = `rgba(210,168,104,${alpha.toFixed(3)})`;
         ctx.lineWidth = 1.8;
         ctx.lineCap = "round";
         ctx.stroke();
+      }
+    }
+
+    function drawDust(dt: number, ctx: CanvasRenderingContext2D) {
+      ctx.clearRect(0, 0, 380, 380);
+      for (const d of dust) {
+        d.phase += dt * 0.0004;
+        d.x += (d.vx + Math.sin(d.phase) * 0.02) * (dt / 16);
+        d.y += d.vy * (dt / 16);
+        if (d.y < -10) {
+          d.y = 390;
+          d.x = Math.random() * 380;
+        }
+        if (d.x < -10) d.x = 390;
+        if (d.x > 390) d.x = -10;
+        const dist = Math.hypot(d.x - dustLightCx, d.y - dustLightCy);
+        const proximity = Math.max(0, 1 - dist / dustLightR);
+        const alpha = proximity * proximity * 0.5;
+        if (alpha <= 0.006) continue;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(238,214,168,${alpha.toFixed(3)})`;
+        ctx.fill();
       }
     }
 
@@ -385,7 +429,10 @@ export default function MusicCapsule({
       }
 
       if (isPlaying) {
-        spinSpeed += (0.95 * wake - spinSpeed) * 0.018;
+        // The tiny random term keeps the spin-up from being perfectly
+        // mathematical — a small analog imperfection rather than a
+        // digitally exact ease.
+        spinSpeed += (0.95 * wake - spinSpeed) * 0.018 + (Math.random() - 0.5) * 0.0006;
       } else {
         spinSpeed = 0;
       }
@@ -395,6 +442,13 @@ export default function MusicCapsule({
       if (discRef.current) {
         discRef.current.style.transform = `rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg) rotateZ(${spinAngle.toFixed(2)}deg)`;
       }
+      if (discSheenRef.current) {
+        // Deliberately omits rotateZ(spinAngle) — this sits in the same
+        // tilted plane as the disc but doesn't spin with it, so the
+        // highlight reads as a fixed light source the grooves rotate under.
+        discSheenRef.current.style.transform = `rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg)`;
+      }
+      if (dustCanvasRef.current) drawDust(dt, dustCanvasRef.current.getContext("2d")!);
 
       if (open) {
         tonearmDriftPhase += dt * (isPlaying ? 0.0012 : 0.0004);
@@ -471,6 +525,14 @@ export default function MusicCapsule({
         <div className="mc-frame-corner mc-fc-bl" />
         <div className="mc-frame-corner mc-fc-br" />
 
+        <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
+          <filter id="mc-grain-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch" result="noise" />
+            <feColorMatrix in="noise" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.05 0" />
+          </filter>
+        </svg>
+        <div className="mc-grain-overlay" />
+
         <div className="mc-topbar">
           <span className="mc-top-name">II</span>
           <button className="mc-top-back" type="button" onClick={handleBackClick}>
@@ -498,14 +560,11 @@ export default function MusicCapsule({
             <div className={`mc-disc-3d${discRevealed ? " revealed" : ""}`} ref={discRef} onClick={togglePlay}>
               <div className="mc-disc-label" />
             </div>
+            <div className="mc-disc-sheen" ref={discSheenRef} />
+            <canvas className="mc-dust-canvas" width={380} height={380} ref={dustCanvasRef} />
             <div className="mc-tonearm-assy">
               <div className="mc-tonearm-pivot" />
               <div className="mc-tonearm-arm" ref={tonearmRef} />
-            </div>
-            <div className="mc-scene-meta">
-              <span className="mc-scene-tag">Needle Warm</span>
-              <span className="mc-scene-tag">Lamp Low</span>
-              <span className="mc-scene-tag">Room Tone</span>
             </div>
           </div>
 
@@ -571,9 +630,10 @@ export default function MusicCapsule({
                   <div
                     key={t.id}
                     className={`mc-frag-item mc-pl-item${i === trackIdx ? " active" : ""}`}
+                    style={{ "--mc-dot-c": dotColor } as React.CSSProperties}
                     onClick={() => selectTrack(i)}
                   >
-                    <span className="mc-frag-dot" style={{ "--mc-dot-c": dotColor } as React.CSSProperties} />
+                    <span className="mc-frag-dot" />
                     <span className="mc-frag-body">
                       <span className="mc-frag-title">{t.title}</span>
                       <span className="mc-frag-sub">{t.fragment}</span>
