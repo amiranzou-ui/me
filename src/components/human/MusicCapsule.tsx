@@ -41,6 +41,49 @@ function formatTime(s: number) {
   return `${m}:${String(sec).padStart(2, "0")}`;
 }
 
+/**
+ * Isolated so the audio's timeupdate event (fires several times a second
+ * during playback) only re-renders this small bar/time display, instead of
+ * the whole capsule — including the track list — on every tick.
+ */
+function ProgressBar({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement | null> }) {
+  const [progress, setProgress] = useState({ current: 0, duration: 0 });
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const sync = () => setProgress({ current: audio.currentTime, duration: audio.duration || 0 });
+    audio.addEventListener("timeupdate", sync);
+    audio.addEventListener("loadedmetadata", sync);
+    return () => {
+      audio.removeEventListener("timeupdate", sync);
+      audio.removeEventListener("loadedmetadata", sync);
+    };
+  }, [audioRef]);
+
+  return (
+    <>
+      <div
+        className="mc-progress"
+        onClick={(e) => {
+          const audio = audioRef.current;
+          const rect = e.currentTarget.getBoundingClientRect();
+          if (audio?.duration) audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+        }}
+      >
+        <div
+          className="mc-progress-fill"
+          style={{ width: progress.duration ? `${(progress.current / progress.duration) * 100}%` : "0%" }}
+        />
+      </div>
+      <div className="mc-time-row">
+        <span className="mc-time">{formatTime(progress.current)}</span>
+        <span className="mc-time">{progress.duration ? formatTime(progress.duration) : "0:00"}</span>
+      </div>
+    </>
+  );
+}
+
 const TONEARM_PARKED = -58;
 const TONEARM_PLAY = 6;
 const TONEARM_SWEEP = 18;
@@ -67,7 +110,6 @@ export default function MusicCapsule({
   const [discRevealed, setDiscRevealed] = useState(false);
   const [fragmentRevealed, setFragmentRevealed] = useState(false);
   const [fragmentFade, setFragmentFade] = useState(false);
-  const [progress, setProgress] = useState({ current: 0, duration: 0 });
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -160,18 +202,22 @@ export default function MusicCapsule({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackIdx]);
 
-  // ── Progress display ──
+  // ── Loading state (progress display itself lives in <ProgressBar>) ──
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
-    const sync = () => setProgress({ current: audio.currentTime, duration: audio.duration || 0 });
-    audio.addEventListener("timeupdate", sync);
-    audio.addEventListener("loadedmetadata", sync);
-    audio.addEventListener("waiting", () => setIsLoading(true));
-    audio.addEventListener("stalled", () => setIsLoading(true));
-    audio.addEventListener("playing", () => setIsLoading(false));
-    audio.addEventListener("canplay", () => setIsLoading(false));
-    return () => audio.removeEventListener("timeupdate", sync);
+    const onWaiting = () => setIsLoading(true);
+    const onReady = () => setIsLoading(false);
+    audio.addEventListener("waiting", onWaiting);
+    audio.addEventListener("stalled", onWaiting);
+    audio.addEventListener("playing", onReady);
+    audio.addEventListener("canplay", onReady);
+    return () => {
+      audio.removeEventListener("waiting", onWaiting);
+      audio.removeEventListener("stalled", onWaiting);
+      audio.removeEventListener("playing", onReady);
+      audio.removeEventListener("canplay", onReady);
+    };
   }, []);
 
   // ── Open/close reveal choreography ──
@@ -468,23 +514,7 @@ export default function MusicCapsule({
             {track?.fragment}
           </p>
 
-          <div
-            className="mc-progress"
-            onClick={(e) => {
-              const audio = audioRef.current;
-              const rect = e.currentTarget.getBoundingClientRect();
-              if (audio?.duration) audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-            }}
-          >
-            <div
-              className="mc-progress-fill"
-              style={{ width: progress.duration ? `${(progress.current / progress.duration) * 100}%` : "0%" }}
-            />
-          </div>
-          <div className="mc-time-row">
-            <span className="mc-time">{formatTime(progress.current)}</span>
-            <span className="mc-time">{progress.duration ? formatTime(progress.duration) : "0:00"}</span>
-          </div>
+          <ProgressBar audioRef={audioRef} />
 
           <div className={`mc-controls${controlsVisible ? " visible" : ""}`}>
             <button className="mc-btn" title="Back 10 seconds" onClick={() => seekBy(-10)}>
