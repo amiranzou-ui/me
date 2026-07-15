@@ -146,10 +146,25 @@ export default function MusicCapsule({
     }
   }, [volume]);
 
-  function handleVolumeSeek(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-    setVolume(ratio);
+  function handleVolumePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    const bar = e.currentTarget;
+    bar.setPointerCapture(e.pointerId);
+    const update = (clientX: number) => {
+      const rect = bar.getBoundingClientRect();
+      const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      setVolume(ratio);
+    };
+    update(e.clientX);
+
+    function onMove(ev: PointerEvent) {
+      update(ev.clientX);
+    }
+    function onUp() {
+      bar.removeEventListener("pointermove", onMove);
+      bar.removeEventListener("pointerup", onUp);
+    }
+    bar.addEventListener("pointermove", onMove);
+    bar.addEventListener("pointerup", onUp);
   }
 
   useEffect(() => {
@@ -596,7 +611,7 @@ export default function MusicCapsule({
 
           <div className="mc-volume-row">
             <span className="mc-volume-label">Vol</span>
-            <div className="mc-volume-bar" onClick={handleVolumeSeek}>
+            <div className="mc-volume-bar" onPointerDown={handleVolumePointerDown}>
               <div className="mc-volume-fill" style={{ width: `${Math.round(volume * 100)}%` }} />
             </div>
             <span className="mc-volume-pct">{Math.round(volume * 100)}%</span>
