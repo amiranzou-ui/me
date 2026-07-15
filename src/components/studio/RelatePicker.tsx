@@ -39,6 +39,7 @@ export default function RelatePicker({
   const [query, setQuery] = useState("");
   const [label, setLabel] = useState("");
   const [results, setResults] = useState<RelationSearchResult[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -57,6 +58,7 @@ export default function RelatePicker({
   }, [query]);
 
   function add(result: RelationSearchResult) {
+    setError(null);
     startTransition(async () => {
       const res = await addRelation({
         from_type: fromType,
@@ -66,22 +68,26 @@ export default function RelatePicker({
         relation_label: label || null,
         revalidatePagePath,
       });
-      if (!("error" in res)) {
-        setRelations((r) => [
-          ...r,
-          { id: res.id, to_type: result.type, to_id: result.id, relation_label: label || null, title: result.title },
-        ]);
-        setQuery("");
-        setResults([]);
-        setLabel("");
+      if ("error" in res) {
+        setError(res.error);
+        return;
       }
+      setRelations((r) => [
+        ...r,
+        { id: res.id, to_type: result.type, to_id: result.id, relation_label: label || null, title: result.title },
+      ]);
+      setQuery("");
+      setResults([]);
+      setLabel("");
     });
   }
 
   function remove(id: string) {
+    setError(null);
     setRelations((r) => r.filter((x) => x.id !== id));
-    startTransition(() => {
-      removeRelation(id, revalidatePagePath);
+    startTransition(async () => {
+      const res = await removeRelation(id, revalidatePagePath);
+      if ("error" in res) setError(res.error);
     });
   }
 
@@ -105,6 +111,8 @@ export default function RelatePicker({
           ))}
         </div>
       )}
+
+      {error && <p className="text-xs text-accent">{error}</p>}
 
       <div className="flex flex-col gap-2 border border-dashed border-tan p-3">
         <div className="grid grid-cols-2 gap-2">
