@@ -84,6 +84,37 @@ function ProgressBar({ audioRef }: { audioRef: React.RefObject<HTMLAudioElement 
   );
 }
 
+/**
+ * Replaces the old static "Baghdad / After Midnight / Room Copy" ledger
+ * with the visitor's own real, ticking local time — isolated in its own
+ * component (same reasoning as ProgressBar) so a re-render every 30s
+ * doesn't touch the rest of the capsule. Starts null and fills in after
+ * mount to avoid a server/client render mismatch.
+ */
+function LiveStamp() {
+  const [now, setNow] = useState<Date | null>(null);
+
+  useEffect(() => {
+    // Deliberately client-only: rendering the real time during SSR would
+    // never match the client's clock, so the first paint stays null and
+    // this fills it in immediately after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNow(new Date());
+    const id = setInterval(() => setNow(new Date()), 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  if (!now) return null;
+
+  return (
+    <div className="mc-room-foot-ledger">
+      <span>{now.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}</span>
+      <span>{now.toLocaleDateString([], { weekday: "long" })}</span>
+      <span>{now.toLocaleDateString([], { month: "long", day: "numeric" })}</span>
+    </div>
+  );
+}
+
 const TONEARM_PARKED = -58;
 const TONEARM_PLAY = 6;
 const TONEARM_SWEEP = 18;
@@ -600,6 +631,10 @@ export default function MusicCapsule({
               <div className="mc-tonearm-pivot" />
               <div className="mc-tonearm-arm" ref={tonearmRef} />
             </div>
+            <div className={`mc-rpm-badge${isPlaying ? " is-playing" : ""}`}>
+              <span className="mc-rpm-pulse" />
+              33 RPM
+            </div>
           </div>
 
           <p className={`mc-fragment-text${fragmentRevealed ? " revealed" : ""}${fragmentFade ? " fade" : ""}`}>
@@ -689,11 +724,7 @@ export default function MusicCapsule({
 
           <div className="mc-room-foot">
             <p className="mc-room-foot-line">For nights that only make sense at low volume.</p>
-            <div className="mc-room-foot-ledger">
-              <span>Baghdad</span>
-              <span>After Midnight</span>
-              <span>Room Copy</span>
-            </div>
+            <LiveStamp />
           </div>
         </div>
       </div>
