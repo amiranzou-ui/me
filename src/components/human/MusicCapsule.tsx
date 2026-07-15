@@ -385,7 +385,7 @@ export default function MusicCapsule({
       y: Math.random() * 380,
       vx: (Math.random() - 0.5) * 0.05,
       vy: -0.025 - Math.random() * 0.05,
-      r: 1.1 + Math.random() * 2.4,
+      r: 0.6 + Math.random() * 1.2,
       phase: Math.random() * Math.PI * 2,
     }));
     const dustLightCx = 158,
@@ -476,7 +476,7 @@ export default function MusicCapsule({
         ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(244,222,178,${alpha.toFixed(3)})`;
         ctx.shadowColor = "rgba(244,210,150,0.8)";
-        ctx.shadowBlur = 3;
+        ctx.shadowBlur = 1.6;
         ctx.fill();
       }
     }
