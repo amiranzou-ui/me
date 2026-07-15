@@ -154,6 +154,15 @@ export default function MusicCapsule({
   const tonearmRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const capsuleRef = useRef<HTMLDivElement>(null);
+  // Read inside the RAF loop instead of closing over isPlaying directly —
+  // the loop's effect intentionally does NOT restart on every play/pause
+  // toggle (see its dependency array), since restarting reset tonearmAngle
+  // and friends back to their hardcoded initial values every toggle,
+  // making pause snap the tonearm straight to parked with zero easing.
+  const isPlayingRef = useRef(isPlaying);
+  useEffect(() => {
+    isPlayingRef.current = isPlaying;
+  }, [isPlaying]);
 
   const track = tracks[trackIdx];
   const presencePool = useRef<string[]>(shuffle(PRESENCE));
@@ -371,17 +380,17 @@ export default function MusicCapsule({
 
     // Dust motes drifting through the lamp light — only visible near the
     // glow, per the "warm lamp + drifting dust" atmosphere brief.
-    const dust = Array.from({ length: 34 }, () => ({
+    const dust = Array.from({ length: 46 }, () => ({
       x: Math.random() * 380,
       y: Math.random() * 380,
       vx: (Math.random() - 0.5) * 0.05,
       vy: -0.025 - Math.random() * 0.05,
-      r: 0.6 + Math.random() * 1.5,
+      r: 1.1 + Math.random() * 2.4,
       phase: Math.random() * Math.PI * 2,
     }));
     const dustLightCx = 158,
       dustLightCy = 148,
-      dustLightR = 195;
+      dustLightR = 260;
 
     function onSceneMove(e: MouseEvent) {
       const r = sceneRef.current!.getBoundingClientRect();
@@ -435,7 +444,7 @@ export default function MusicCapsule({
         // move in perfect lockstep like a digital equalizer.
         barValues[i] += (norm - barValues[i]) * (0.05 + Math.random() * 0.025);
         const eased = barValues[i];
-        const len = eased * maxH * wake + (isPlaying ? 1 : 0.4);
+        const len = eased * maxH * wake + (isPlayingRef.current ? 1 : 0.4);
         const alpha = (0.18 + eased * 0.75) * wake;
         ctx.beginPath();
         ctx.moveTo(cx + Math.cos(angle) * baseR, cy + Math.sin(angle) * baseR);
@@ -461,11 +470,13 @@ export default function MusicCapsule({
         if (d.x > 390) d.x = -10;
         const dist = Math.hypot(d.x - dustLightCx, d.y - dustLightCy);
         const proximity = Math.max(0, 1 - dist / dustLightR);
-        const alpha = proximity * proximity * 0.5;
-        if (alpha <= 0.006) continue;
+        const alpha = Math.min(1, proximity * 1.15) * 0.85 + 0.05;
+        if (proximity <= 0.01) continue;
         ctx.beginPath();
         ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(238,214,168,${alpha.toFixed(3)})`;
+        ctx.fillStyle = `rgba(244,222,178,${alpha.toFixed(3)})`;
+        ctx.shadowColor = "rgba(244,210,150,0.8)";
+        ctx.shadowBlur = 3;
         ctx.fill();
       }
     }
@@ -481,11 +492,11 @@ export default function MusicCapsule({
       breathPhase += dt * 0.00018;
 
       let energy = 0;
-      if (isPlaying) {
+      if (isPlayingRef.current) {
         energy = Math.max(0.06, 0.14 + Math.sin(now * 0.0022) * 0.04 + Math.sin(now * 0.0007 + 1.4) * 0.03);
       }
 
-      if (isPlaying) {
+      if (isPlayingRef.current) {
         // The tiny random term keeps the spin-up from being perfectly
         // mathematical — a small analog imperfection rather than a
         // digitally exact ease.
@@ -508,11 +519,11 @@ export default function MusicCapsule({
       if (dustCanvasRef.current) drawDust(dt, dustCanvasRef.current.getContext("2d")!);
 
       if (open) {
-        tonearmDriftPhase += dt * (isPlaying ? 0.0012 : 0.0004);
-        tonearmVisualProgress = isPlaying ? Math.min(1, tonearmVisualProgress + dt / 90000) : 0;
+        tonearmDriftPhase += dt * (isPlayingRef.current ? 0.0012 : 0.0004);
+        tonearmVisualProgress = isPlayingRef.current ? Math.min(1, tonearmVisualProgress + dt / 90000) : 0;
         if (tonearmRef.current) {
           let angle = TONEARM_PARKED;
-          if (isPlaying) {
+          if (isPlayingRef.current) {
             const drift = Math.sin(tonearmDriftPhase) * 1.2 + Math.sin(tonearmDriftPhase * 0.45 + 1.1) * 0.55;
             angle = TONEARM_PLAY + tonearmVisualProgress * TONEARM_SWEEP + drift + energy * 0.6;
           }
@@ -520,7 +531,7 @@ export default function MusicCapsule({
           const ease = Math.min(0.05, dt * 0.0018);
           tonearmAngle += (tonearmTargetAngle - tonearmAngle) * ease;
           tonearmRef.current.style.setProperty("--tonearm-angle", `${tonearmAngle.toFixed(2)}deg`);
-          tonearmRef.current.classList.toggle("playing", isPlaying);
+          tonearmRef.current.classList.toggle("playing", isPlayingRef.current);
         }
       }
 
@@ -528,7 +539,7 @@ export default function MusicCapsule({
       vizColl += (targetVizColl - vizColl) * 0.007;
       if (canvasRef.current) drawViz(energy, wake, canvasRef.current.getContext("2d")!);
 
-      if (isPlaying) {
+      if (isPlayingRef.current) {
         listenTime += dt;
         if (!presenceActiveLocal && listenTime >= presenceNextAt) {
           presenceActiveLocal = true;
@@ -559,7 +570,7 @@ export default function MusicCapsule({
       scene?.removeEventListener("mouseleave", onSceneLeave);
       capsule?.removeEventListener("mousemove", onActivity);
     };
-  }, [open, isPlaying]);
+  }, [open]);
 
   const filteredTracks = tracks
     .map((t, i) => ({ t, i }))
@@ -685,7 +696,7 @@ export default function MusicCapsule({
             <span className="mc-room-card-stamp">{track?.room ?? "Listening Room"}</span>
             <h3 className="mc-room-title">{track?.title ?? "Untitled Recording"}</h3>
             <p className="mc-room-artist">{track?.artist ?? "Unknown Artist"}</p>
-            <p className="mc-room-note">{track?.note ?? track?.fragment ?? "A memory left on the turntable."}</p>
+            <p className="mc-room-note">{track?.note || "A memory left on the turntable."}</p>
           </div>
 
           <div className="mc-track-head">
