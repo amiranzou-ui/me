@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { upsertProject, deleteProject } from "./actions";
+import RelatePicker from "@/components/studio/RelatePicker";
 import type { StudioProject } from "./types";
 
 const inputCls =
@@ -252,6 +253,15 @@ function ProjectForm({
           </button>
         )}
       </div>
+
+      {data.id && (
+        <div className="flex flex-col gap-2 pt-4 border-t border-tan">
+          <label className={labelCls}>
+            Related content — shown on /project/{data.slug}
+          </label>
+          <RelatePicker fromType="project" fromId={data.id} revalidatePagePath={`/project/${data.slug}`} />
+        </div>
+      )}
     </div>
   );
 }

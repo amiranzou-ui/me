@@ -596,9 +596,6 @@
   text-decoration: none;
   color: inherit;
   display: block;
-  cursor: default;
-}
-a.mx-l1-card {
   cursor: pointer;
 }
 .mx-l1-card:nth-child(even) {
@@ -661,7 +658,21 @@ a.mx-l1-card {
   color: var(--ink3);
   transition: color 0.3s;
 }
-a.mx-l1-card:hover .mx-l1-card-link {
+.mx-l1-card:hover .mx-l1-card-link {
+  color: var(--accent);
+}
+.mx-l1-card-external {
+  position: absolute;
+  top: 44px;
+  right: 56px;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--ink3);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.mx-l1-card-external:hover {
   color: var(--accent);
 }
 

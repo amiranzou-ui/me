@@ -238,22 +238,33 @@ export default function MatrixApp({ cvMeta, projects, experience, skillsGroups, 
 
           <div className="mx-l1-grid">
             {projects.map((p, i) => {
-              const href = p.behance_url || p.external_url;
-              const external = !!p.behance_url;
-              const linkLabel = p.behance_url ? "View on Behance →" : "View →";
-              const CardTag = href ? "a" : "div";
+              const external = p.behance_url || p.external_url;
+              const externalLabel = p.behance_url ? "Behance ↗" : "External ↗";
               return (
-                <CardTag
+                <div
                   key={p.slug}
                   className="mx-l1-card"
-                  {...(href ? { href, ...(external ? { target: "_blank", rel: "noopener" } : {}) } : {})}
+                  role="button"
+                  tabIndex={0}
+                  onClick={(e) => portal(`/project/${p.slug}`, "#f0ebe0", e.clientX, e.clientY)}
                 >
                   <div className="mx-l1-card-num">0{i + 1}</div>
                   <div className="mx-l1-card-title">{p.title}</div>
                   <div className="mx-l1-card-role">{p.role}</div>
                   <div className="mx-l1-card-desc">{p.description}</div>
-                  {href && <span className="mx-l1-card-link">{linkLabel}</span>}
-                </CardTag>
+                  <span className="mx-l1-card-link">View project →</span>
+                  {external && (
+                    <a
+                      href={external}
+                      target="_blank"
+                      rel="noopener"
+                      className="mx-l1-card-external"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {externalLabel}
+                    </a>
+                  )}
+                </div>
               );
             })}
           </div>
