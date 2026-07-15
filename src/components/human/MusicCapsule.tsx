@@ -481,10 +481,6 @@ export default function MusicCapsule({
         <span className="mc-close-hint" onClick={onClose}>
           esc
         </span>
-        <div className="mc-archive-head">
-          <span className="mc-ah-label">Private Listening Archive</span>
-          <span className="mc-ah-copy">Room Copy / After Midnight</span>
-        </div>
 
         <div className="mc-player-col">
           <div
