@@ -1,6 +1,6 @@
 # Ameer Al-Butaihi — Personal Website
 
-A personal portfolio built as a pure HTML/CSS/JS site — no frameworks, no build tools. Just carefully written code and a lot of attention to detail.
+A two-sided personal site — "Matrix" (CV/portfolio) and "Human" (photography, music, and everything else) — built with Next.js and backed by Supabase, with a private Studio for managing all content without touching code. Live at [ameerstudio.site](https://ameerstudio.site).
 
 ---
 
@@ -8,41 +8,57 @@ A personal portfolio built as a pure HTML/CSS/JS site — no frameworks, no buil
 
 | Page | Path | Description |
 |---|---|---|
-| Landing | `index.html` | Two-sided split — Matrix (CV) and Human (everything else) |
-| Intro | `intro.html` | First-visit entrance sequence |
-| Human | `human.html` | Photography, posters, patterns, cooking, music |
-| Matrix | `matrix.html` | Full CV — overview, detailed timeline, skill graph |
-| Mind | `mind.html` | Hidden. Desktop only. You'll find it if you're curious enough. |
+| Landing | `/` | Two-sided split — Matrix and Human |
+| Intro | `/intro` | First-visit-only entrance sequence |
+| Matrix | `/matrix` | CV — overview, full timeline, skills, system-view node graph |
+| Human | `/human` | Friend-gated archive: photography, posters, graphics, music, food, 3D |
+| Project | `/project/[slug]` | Auto-generated page per published project, with related content |
+| Studio | `/studio` | Private, owner-only CMS for every content type above |
 
 ---
 
 ## Structure
 
-```
+```text
 /
-├── index.html, intro.html, human.html, matrix.html, mind.html, editor.html
-├── css/          — one stylesheet per page/feature
-├── js/           — shared core + one script per page/feature
-├── images/       — photography, posters, profile
-└── music/        — audio files for the music player
+├── src/app/            — routes (App Router)
+│   └── studio/          — the private CMS: CV, projects, gallery, tracks
+├── src/components/      — human/, matrix/, studio/, world/ (ported cursor/ambient effects)
+├── src/lib/              — Supabase clients, domain types, ported core/effects utilities
+├── src/styles/           — one stylesheet per page/feature
+├── scripts/              — one-off Supabase data migration scripts
+├── supabase/migrations/  — schema
+└── public/               — static assets (CV PDF, profile photo)
 ```
 
 ---
 
-## Technical notes
+## Stack
 
-- `js/core.js` — shared foundation: EventBus, RAF loop, `portal()` circular reveal transition, DOM helpers
-- `js/protect.js` — image protection: right-click disabled, drag blocked, CSS user-select
-- Portal transitions connect every page navigation with a circular reveal animation
-- Ambient canvas particles run on a single shared RAF loop
-- The mind page is restricted to desktop — redirects mobile visitors automatically
+Next.js (App Router) · TypeScript · Tailwind CSS · Supabase (Postgres, Storage, Auth) · self-hosted fonts via `next/font`
+
+Content lives in Supabase, not in the code — the Studio is how new projects, photos, and tracks get published. See `ARCHITECTURE.md` for the full rationale behind these decisions.
 
 ---
 
-## Built with
+## Running locally
 
-Pure HTML · CSS · Vanilla JS · Web Audio API · Canvas API
+```bash
+npm install
+```
 
-No dependencies. No build step. Open `index.html` and it works.
+Create `.env.local` with:
 
----
+```env
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+```
+
+Then:
+
+```bash
+npm run dev
+```
+
+`npm run build && npm run start` for a production build; `npm run lint` for ESLint.
