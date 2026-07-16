@@ -304,6 +304,14 @@
   opacity: 0.88;
   transition: opacity 0.4s;
   will-change: transform;
+  /* Long-pressing this image is the hidden Studio gesture — suppress the
+     native mobile "save/share image" callout that would otherwise compete
+     with it. */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  user-drag: none;
 }
 .profile-node:hover .pn-img {
   opacity: 1;

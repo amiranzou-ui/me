@@ -60,7 +60,7 @@ export default function Home() {
         <div className="profile-node" id="pn-toggle">
           <div className="pn-wrap">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/profile.JPG" alt="Ameer" className="pn-img" />
+            <img src="/images/profile.JPG" alt="Ameer" className="pn-img" draggable={false} />
           </div>
           <div className="pn-ring-wrap" aria-hidden="true">
             <div className="pn-ripple" />
