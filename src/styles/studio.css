@@ -1,0 +1,308 @@
+/*
+ * Ameer Studio — the private creative workspace behind the site, not an
+ * admin panel. Late-evening designer's studio: warm blacks, charcoal,
+ * walnut, brass, ivory; soft amber lamp-glow instead of blue; the Archive
+ * Hall's chapter language and frame-corner motif; restrained motion.
+ *
+ * First pass: the Dashboard/Home screen only (per the creative brief).
+ * This becomes the visual foundation for every other Studio screen once
+ * the atmosphere here is right — not yet applied to CV/Projects/Gallery/
+ * Tracks/Login, which still use the original light theme for now.
+ */
+
+.studio-dark {
+  --studio-void: #0b0805;
+  --studio-charcoal: #18130e;
+  --studio-walnut: #3f2c1c;
+  --studio-brass: #c4a06a;
+  --studio-brass-bright: #ddbb84;
+  --studio-ivory: #ede4d3;
+  --studio-ivory-dim: rgba(237, 228, 211, 0.58);
+  --studio-ivory-faint: rgba(237, 228, 211, 0.32);
+}
+
+/* Full-bleed background, sits behind the shared header (which keeps its
+   current light styling until this design rolls out further). */
+.studio-dark-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 0%, rgba(196, 160, 106, 0.1) 0%, transparent 62%),
+    linear-gradient(180deg, var(--studio-charcoal) 0%, var(--studio-void) 100%);
+}
+
+.studio-dark-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  filter: url(#studio-grain-filter);
+  mix-blend-mode: overlay;
+  opacity: 0.45;
+}
+
+.studio-dark-fc {
+  position: fixed;
+  width: 38px;
+  height: 38px;
+  pointer-events: none;
+  z-index: 3;
+  opacity: 0.4;
+}
+.studio-dark-fc::before {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--studio-brass);
+  transform: rotate(45deg);
+}
+/* top corners sit just below the shared header rather than the true
+   viewport edge, since the header (unconverted this pass) still paints
+   its own opaque background on top of anything behind it */
+.studio-dark-fc-tl {
+  top: 80px;
+  left: 18px;
+  background:
+    linear-gradient(to right, var(--studio-brass), transparent) top left / 100% 1px no-repeat,
+    linear-gradient(to bottom, var(--studio-brass), transparent) top left / 1px 100% no-repeat;
+}
+.studio-dark-fc-tl::before {
+  top: -1.5px;
+  left: -1.5px;
+}
+.studio-dark-fc-tr {
+  top: 80px;
+  right: 18px;
+  background:
+    linear-gradient(to left, var(--studio-brass), transparent) top right / 100% 1px no-repeat,
+    linear-gradient(to bottom, var(--studio-brass), transparent) top right / 1px 100% no-repeat;
+}
+.studio-dark-fc-tr::before {
+  top: -1.5px;
+  right: -1.5px;
+}
+.studio-dark-fc-bl {
+  bottom: 18px;
+  left: 18px;
+  background:
+    linear-gradient(to right, var(--studio-brass), transparent) bottom left / 100% 1px no-repeat,
+    linear-gradient(to top, var(--studio-brass), transparent) bottom left / 1px 100% no-repeat;
+}
+.studio-dark-fc-bl::before {
+  bottom: -1.5px;
+  left: -1.5px;
+}
+.studio-dark-fc-br {
+  bottom: 18px;
+  right: 18px;
+  background:
+    linear-gradient(to left, var(--studio-brass), transparent) bottom right / 100% 1px no-repeat,
+    linear-gradient(to top, var(--studio-brass), transparent) bottom right / 1px 100% no-repeat;
+}
+.studio-dark-fc-br::before {
+  bottom: -1.5px;
+  right: -1.5px;
+}
+
+.studio-dark-content {
+  position: relative;
+  z-index: 4;
+}
+
+@keyframes studio-fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.studio-eyebrow {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--studio-brass);
+  opacity: 0;
+  animation: studio-fade-slide 1s ease forwards 0.1s;
+}
+
+.studio-welcome {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(30px, 3.6vw, 42px);
+  color: var(--studio-ivory);
+  margin-top: 10px;
+  opacity: 0;
+  animation: studio-fade-slide 1s ease forwards 0.25s;
+}
+
+.studio-lede {
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-weight: 300;
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--studio-ivory-dim);
+  max-width: 460px;
+  margin-top: 18px;
+  opacity: 0;
+  animation: studio-fade-slide 1s ease forwards 0.4s;
+}
+
+.studio-chapters {
+  margin-top: 52px;
+  position: relative;
+}
+
+.studio-chapter {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  column-gap: 0;
+  padding: 22px 0;
+  border-bottom: 1px solid rgba(237, 228, 211, 0.08);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  opacity: 0;
+  animation: studio-chapter-in 0.7s cubic-bezier(0.2, 0, 0, 1) forwards;
+  animation-delay: calc(var(--sc-i, 0) * 0.09s + 0.55s);
+  transition: filter 0.4s ease;
+}
+.studio-chapters > .studio-chapter:first-child {
+  border-top: 1px solid rgba(237, 228, 211, 0.08);
+}
+.studio-chapters:has(.studio-chapter:hover) .studio-chapter {
+  filter: brightness(0.4);
+}
+.studio-chapters:has(.studio-chapter:hover) .studio-chapter:hover {
+  filter: brightness(1);
+}
+.studio-chapter::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(196, 160, 106, 0.08) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.studio-chapter:hover::before {
+  opacity: 1;
+}
+
+.studio-ch-num {
+  grid-column: 1;
+  grid-row: 1;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 10px;
+  font-weight: 300;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--studio-ivory-faint);
+  transition: color 0.35s ease;
+  align-self: center;
+}
+.studio-chapter:hover .studio-ch-num {
+  color: var(--studio-brass);
+}
+
+.studio-ch-title {
+  grid-column: 2;
+  grid-row: 1;
+  font-family: var(--font-serif), serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(22px, 2.6vw, 30px);
+  color: var(--studio-ivory-dim);
+  letter-spacing: 0.3px;
+  line-height: 1;
+  transition: color 0.35s ease;
+  align-self: center;
+}
+.studio-chapter:hover .studio-ch-title {
+  color: var(--studio-ivory);
+}
+
+.studio-ch-arrow {
+  grid-column: 3;
+  grid-row: 1;
+  font-family: var(--font-sans), sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--studio-brass-bright);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.3s 0.05s, transform 0.3s 0.05s;
+  align-self: center;
+  padding-left: 24px;
+}
+.studio-chapter:hover .studio-ch-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.studio-ch-desc {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  font-family: var(--font-serif), serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--studio-ivory-dim);
+  line-height: 1.5;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.4s cubic-bezier(0.2, 0, 0, 1), opacity 0.35s ease, padding-top 0.35s ease;
+}
+.studio-chapter:hover .studio-ch-desc {
+  max-height: 40px;
+  opacity: 1;
+  padding-top: 6px;
+}
+
+@keyframes studio-chapter-in {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (max-width: 640px) {
+  .studio-chapter {
+    grid-template-columns: 60px 1fr;
+  }
+  .studio-ch-arrow {
+    display: none;
+  }
+  .studio-ch-desc {
+    grid-column: 2 / 3;
+    max-height: 40px;
+    opacity: 1;
+    padding-top: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studio-eyebrow,
+  .studio-welcome,
+  .studio-lede,
+  .studio-chapter {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

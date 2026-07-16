@@ -5,7 +5,7 @@ import StudioNav from "@/components/studio/StudioNav";
 export default function StudioDashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-cream">
-      <header className="flex items-center justify-between border-b border-tan px-5 py-4 sm:px-8">
+      <header className="relative z-10 flex items-center justify-between border-b border-tan bg-cream px-5 py-4 sm:px-8">
         <Link href="/studio" className="font-serif text-xl italic text-ink">
           Studio
         </Link>
