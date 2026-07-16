@@ -1,5 +1,4 @@
 import "@/styles/landing.css";
-import "@/styles/atmosphere.css";
 import WorldEffects from "@/components/world/WorldEffects";
 import LandingInteractions from "@/components/world/LandingInteractions";
 
@@ -28,17 +27,6 @@ export default function Home() {
         <h1 className="sr-only">Ameer Al-Butaihi — Matrix and Human</h1>
 
         <div className="side" id="left">
-          <div className="atm-wrap atm-matrix" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className="atm-img"
-              src="https://images.unsplash.com/photo-1518773553398-650c184e0bb3?auto=format&fit=crop&w=1920&q=85"
-              alt=""
-              loading="lazy"
-              draggable={false}
-              crossOrigin="anonymous"
-            />
-          </div>
           <div className="matrix-geo" aria-hidden="true" />
           <div className="side-inner">
             <span className="label">I</span>
@@ -121,17 +109,6 @@ export default function Home() {
         </div>
 
         <div className="side" id="right">
-          <div className="atm-wrap atm-human" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className="atm-img"
-              src="https://images.unsplash.com/photo-1575209239550-322a4b125c6d?auto=format&fit=crop&w=1920&q=85"
-              alt=""
-              loading="lazy"
-              draggable={false}
-              crossOrigin="anonymous"
-            />
-          </div>
           <div className="human-warmth" aria-hidden="true" />
           <div className="side-inner">
             <span className="label">II</span>
