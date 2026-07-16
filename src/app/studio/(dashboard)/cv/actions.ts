@@ -19,11 +19,17 @@ export async function saveCvMeta(data: CvMeta) {
       signals: data.signals,
       education: data.education,
       languages: data.languages,
+      profile_asset_id: data.profile_asset_id,
+      currently_label: data.currently_label,
+      currently_value: data.currently_value,
+      matrix_side_desc: data.matrix_side_desc,
+      human_side_desc: data.human_side_desc,
     })
     .eq("id", 1);
 
   if (error) return { error: error.message };
 
   revalidatePath("/matrix");
+  revalidatePath("/");
   return { ok: true };
 }

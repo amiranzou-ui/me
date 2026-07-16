@@ -9,6 +9,11 @@ export type CvMeta = {
   signals: string[];
   education: { degree: string; school: string; date: string }[];
   languages: { lang: string; level: string }[];
+  profile_asset_id: string | null;
+  currently_label: string;
+  currently_value: string;
+  matrix_side_desc: string[];
+  human_side_desc: string[];
 };
 
 export type Project = {

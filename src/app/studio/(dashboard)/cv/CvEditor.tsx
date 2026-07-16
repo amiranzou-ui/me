@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { saveCvMeta } from "./actions";
 import type { CvMeta } from "@/lib/matrix/types";
+import MediaUpload from "@/components/studio/MediaUpload";
 
 const ICON_OPTIONS = ["linkedin", "behance", "instagram", "github"] as const;
 
@@ -10,8 +11,9 @@ const inputCls =
   "border border-tan bg-cream-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent w-full";
 const labelCls = "font-sans text-[11px] uppercase tracking-wider text-brown mb-1.5 block";
 
-export default function CvEditor({ initial }: { initial: CvMeta }) {
+export default function CvEditor({ initial, profileAssetUrl }: { initial: CvMeta; profileAssetUrl: string | null }) {
   const [data, setData] = useState<CvMeta>(initial);
+  const [photoUrl, setPhotoUrl] = useState(profileAssetUrl);
   const [pending, startTransition] = useTransition();
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -47,6 +49,22 @@ export default function CvEditor({ initial }: { initial: CvMeta }) {
       </div>
 
       <section className="flex flex-col gap-4">
+        <div>
+          <label className={labelCls}>Profile photo</label>
+          <div className="flex items-center gap-4">
+            {photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={photoUrl} alt="" className="h-16 w-16 rounded-full object-cover border border-tan" />
+            )}
+            <MediaUpload
+              pathPrefix="cv"
+              onUploaded={(assetId, previewUrl) => {
+                update("profile_asset_id", assetId);
+                setPhotoUrl(previewUrl);
+              }}
+            />
+          </div>
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className={labelCls}>Name</label>
@@ -167,6 +185,56 @@ export default function CvEditor({ initial }: { initial: CvMeta }) {
         >
           + Add link
         </button>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="font-serif text-lg italic text-ink">Landing page</h2>
+        <p className="text-xs text-brown">
+          Feeds the split-screen home page — the profile card&apos;s &quot;currently&quot; line and each side&apos;s
+          tagline.
+        </p>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Currently — label</label>
+            <input
+              className={inputCls}
+              placeholder="Building"
+              value={data.currently_label}
+              onChange={(e) => update("currently_label", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Currently — value</label>
+            <input
+              className={inputCls}
+              placeholder="This website, apparently"
+              value={data.currently_value}
+              onChange={(e) => update("currently_value", e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className={labelCls}>Matrix side tagline</label>
+            <p className="text-xs text-brown mb-1">One line per row.</p>
+            <textarea
+              className={inputCls}
+              rows={3}
+              value={data.matrix_side_desc.join("\n")}
+              onChange={(e) => update("matrix_side_desc", e.target.value.split("\n"))}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Human side tagline</label>
+            <p className="text-xs text-brown mb-1">One line per row.</p>
+            <textarea
+              className={inputCls}
+              rows={3}
+              value={data.human_side_desc.join("\n")}
+              onChange={(e) => update("human_side_desc", e.target.value.split("\n"))}
+            />
+          </div>
+        </div>
       </section>
 
       <section className="flex flex-col gap-4">

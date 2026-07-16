@@ -1,15 +1,26 @@
 import "@/styles/landing.css";
 import WorldEffects from "@/components/world/WorldEffects";
 import LandingInteractions from "@/components/world/LandingInteractions";
+import { createClient } from "@/lib/supabase/server";
+import { mediaUrl } from "@/lib/supabase/media";
+import type { CvMeta } from "@/lib/matrix/types";
+
+export const revalidate = 60;
 
 /**
  * Split-screen landing page — ported from legacy/index.html.
- * Content (name, taglines, social links) is still hardcoded here; that
- * moves to Supabase-backed cv_meta once the Studio exists (Phase 1+).
+ * Name/tag/links/photo and both side taglines are Supabase-backed
+ * (cv_meta), edited from the Studio's CV page — the same source the
+ * Matrix page reads, so there's one place to update either.
  * Deferred from this pass: the GSAP cinematic entry sequence — GSAP isn't
  * part of this stack; see WorldEffects' doc comment.
  */
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("cv_meta").select("*, assets(path)").eq("id", 1).single();
+  const cv = data as CvMeta & { assets: { path: string } | null };
+  const photoUrl = cv.assets ? mediaUrl(cv.assets.path) : "/images/profile.JPG";
+
   return (
     <div className="landing-root">
       <WorldEffects />
@@ -24,7 +35,7 @@ export default function Home() {
       <div id="cursor-distort" aria-hidden="true" />
 
       <main id="container">
-        <h1 className="sr-only">Ameer Al-Butaihi — Matrix and Human</h1>
+        <h1 className="sr-only">{cv.name} — Matrix and Human</h1>
 
         <div className="side" id="left">
           <div className="matrix-geo" aria-hidden="true" />
@@ -32,11 +43,12 @@ export default function Home() {
             <span className="label">I</span>
             <h2 className="side-title">Matrix Side</h2>
             <p className="side-desc">
-              Graphic Designer.
-              <br />
-              Social Media Manager.
-              <br />
-              Visual problem-solver.
+              {cv.matrix_side_desc.map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i < cv.matrix_side_desc.length - 1 && <br />}
+                </span>
+              ))}
             </p>
             <span className="enter">Enter →</span>
           </div>
@@ -48,7 +60,7 @@ export default function Home() {
         <div className="profile-node" id="pn-toggle">
           <div className="pn-wrap">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/profile.JPG" alt="Ameer" className="pn-img" draggable={false} />
+            <img src={photoUrl} alt={cv.name} className="pn-img" draggable={false} />
           </div>
           <div className="pn-ring-wrap" aria-hidden="true">
             <div className="pn-ripple" />
@@ -65,12 +77,12 @@ export default function Home() {
 
           <div className="pnp-top">
             <div>
-              <h2 className="pnp-name">Ameer Al-Butaihi</h2>
-              <p className="pnp-tagline">Graphic Designer · Social Media Manager</p>
+              <h2 className="pnp-name">{cv.name}</h2>
+              <p className="pnp-tagline">{cv.tag}</p>
             </div>
             <div className="pnp-photo-sm">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/profile.JPG" alt="Ameer" />
+              <img src={photoUrl} alt={cv.name} />
             </div>
           </div>
 
@@ -78,31 +90,19 @@ export default function Home() {
 
           <div className="pnp-body">
             <div className="pnp-col">
-              <p className="pnp-col-label">Find me</p>
-              <a
-                href="https://www.linkedin.com/in/abdulameeralbutaihi"
-                target="_blank"
-                rel="noopener"
-                className="pnp-soc"
-              >
-                LinkedIn
-              </a>
-              <a href="https://www.behance.net/amiranzou" target="_blank" rel="noopener" className="pnp-soc">
-                Behance
-              </a>
-              <a href="https://github.com/amiranzou-ui" target="_blank" rel="noopener" className="pnp-soc">
-                GitHub
-              </a>
-              <a href="https://www.instagram.com/ameer.is.off" target="_blank" rel="noopener" className="pnp-soc">
-                Instagram
-              </a>
+              <p className="pnp-col-label">I. Elsewhere</p>
+              {cv.links.map((link) => (
+                <a key={link.label} href={link.url} target="_blank" rel="noopener" className="pnp-soc">
+                  {link.label}
+                </a>
+              ))}
             </div>
 
             <div className="pnp-col">
-              <p className="pnp-col-label">Currently</p>
+              <p className="pnp-col-label">II. Right now</p>
               <div className="pnp-status-item">
-                <span className="pnp-s-key">Building</span>
-                <span className="pnp-s-val">This website, apparently</span>
+                <span className="pnp-s-key">{cv.currently_label}</span>
+                <span className="pnp-s-val">{cv.currently_value}</span>
               </div>
             </div>
           </div>
@@ -114,11 +114,12 @@ export default function Home() {
             <span className="label">II</span>
             <h2 className="side-title">Human Side</h2>
             <p className="side-desc">
-              Live music.
-              <br />
-              Curious mind.
-              <br />
-              Something else entirely.
+              {cv.human_side_desc.map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i < cv.human_side_desc.length - 1 && <br />}
+                </span>
+              ))}
             </p>
             <span className="enter">Feel →</span>
           </div>
