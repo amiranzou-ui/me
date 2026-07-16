@@ -10,8 +10,12 @@ import { portal, dom } from "@/lib/world/core";
  * (legacy/js/secret.js) is intentionally not ported yet — unrelated to
  * the core visual identity, deferred to a later pass.
  */
+const STUDIO_HOLD_MS = 1500;
+
 export default function LandingInteractions() {
   const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const studioHoldTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const studioHoldTriggered = useRef(false);
 
   useEffect(() => {
     const container = dom.qs<HTMLElement>("#container");
@@ -70,17 +74,66 @@ export default function LandingInteractions() {
       pnPanel?.classList.remove("open");
       pnBackdrop?.classList.remove("open");
     };
-    const onToggleClick = () => (pnPanel?.classList.contains("open") ? closePanel() : openPanel());
+    const onToggleClick = () => {
+      // A completed long-press already navigated away — swallow the click
+      // that follows mouseup/touchend so the panel doesn't also toggle.
+      if (studioHoldTriggered.current) {
+        studioHoldTriggered.current = false;
+        return;
+      }
+      if (pnPanel?.classList.contains("open")) {
+        closePanel();
+      } else {
+        openPanel();
+      }
+    };
 
     pnToggle?.addEventListener("click", onToggleClick);
     pnBackdrop?.addEventListener("click", closePanel);
+
+    // ── Studio access: hold the profile photo for ~1.5s ──────────
+    // Deliberately undiscoverable by a quick click (which still just
+    // toggles the panel above) — no visible affordance, matches the
+    // site's "hidden if you're curious enough" character.
+    const startStudioHold = (x: number, y: number) => {
+      if (studioHoldTimer.current) clearTimeout(studioHoldTimer.current);
+      studioHoldTimer.current = setTimeout(() => {
+        studioHoldTriggered.current = true;
+        portal("/studio", "#f0ebe0", x, y);
+      }, STUDIO_HOLD_MS);
+    };
+    const cancelStudioHold = () => {
+      if (studioHoldTimer.current) {
+        clearTimeout(studioHoldTimer.current);
+        studioHoldTimer.current = null;
+      }
+    };
+    const onPointerDown = (e: MouseEvent) => startStudioHold(e.clientX, e.clientY);
+    const onTouchStart = (e: TouchEvent) => {
+      const t = e.touches[0];
+      if (t) startStudioHold(t.clientX, t.clientY);
+    };
+
+    pnToggle?.addEventListener("mousedown", onPointerDown);
+    pnToggle?.addEventListener("mouseup", cancelStudioHold);
+    pnToggle?.addEventListener("mouseleave", cancelStudioHold);
+    pnToggle?.addEventListener("touchstart", onTouchStart, { passive: true });
+    pnToggle?.addEventListener("touchend", cancelStudioHold);
+    pnToggle?.addEventListener("touchcancel", cancelStudioHold);
 
     return () => {
       left.removeEventListener("click", onLeftClick);
       right.removeEventListener("click", onRightClick);
       pnToggle?.removeEventListener("click", onToggleClick);
       pnBackdrop?.removeEventListener("click", closePanel);
+      pnToggle?.removeEventListener("mousedown", onPointerDown);
+      pnToggle?.removeEventListener("mouseup", cancelStudioHold);
+      pnToggle?.removeEventListener("mouseleave", cancelStudioHold);
+      pnToggle?.removeEventListener("touchstart", onTouchStart);
+      pnToggle?.removeEventListener("touchend", cancelStudioHold);
+      pnToggle?.removeEventListener("touchcancel", cancelStudioHold);
       if (collapseTimer.current) clearTimeout(collapseTimer.current);
+      if (studioHoldTimer.current) clearTimeout(studioHoldTimer.current);
     };
   }, []);
 
