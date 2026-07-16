@@ -124,7 +124,7 @@ export default function MatrixApp({ cvMeta, projects, experience, skillsGroups, 
   ]);
 
   return (
-    <div className="matrix-page">
+    <main className="matrix-page">
       <nav className={`mx-nav${level === 3 ? " dark" : ""}`} id="mx-nav">
         <button
           className="mx-nav-back"
@@ -506,7 +506,7 @@ export default function MatrixApp({ cvMeta, projects, experience, skillsGroups, 
           )}
         </div>
       </div>
-    </div>
+    </main>
   );
 }
 

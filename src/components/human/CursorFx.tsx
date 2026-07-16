@@ -12,6 +12,25 @@ const MEM_FRAGS = [
   { text: "stayed on repeat for 11 days", style: { top: "88%", left: "0.5%" }, fi: 5, depth: 1.3, vert: true },
 ];
 
+// Touch-only stand-in for the 120-particle ambient canvas: a handful of
+// CSS-animated motes (compositor transform/opacity only, no per-frame JS).
+// Hidden by default; shown via the @media (pointer: coarse) rule in
+// human.css, same convention as .cursor-dot/.cursor-ring's touch handling.
+// Positions are fixed (not Math.random()) so server/client markup matches —
+// same reasoning as MEM_FRAGS above.
+const TOUCH_MOTES = [
+  { "--tm-x": "8%", "--tm-delay": "0s", "--tm-dur": "16s" },
+  { "--tm-x": "19%", "--tm-delay": "2.4s", "--tm-dur": "21s" },
+  { "--tm-x": "31%", "--tm-delay": "5.1s", "--tm-dur": "17.5s" },
+  { "--tm-x": "44%", "--tm-delay": "1.2s", "--tm-dur": "23s" },
+  { "--tm-x": "58%", "--tm-delay": "7.8s", "--tm-dur": "18.5s" },
+  { "--tm-x": "67%", "--tm-delay": "3.6s", "--tm-dur": "20s" },
+  { "--tm-x": "76%", "--tm-delay": "9.5s", "--tm-dur": "16.8s" },
+  { "--tm-x": "85%", "--tm-delay": "0.8s", "--tm-dur": "22.4s" },
+  { "--tm-x": "92%", "--tm-delay": "6.2s", "--tm-dur": "19s" },
+  { "--tm-x": "13%", "--tm-delay": "11s", "--tm-dur": "24s" },
+];
+
 /**
  * Ported from legacy/js/human.js (cursor dot/ring/glow + 120-particle
  * ambient canvas) and legacy/js/human-memory.js (depth-parallax memory
@@ -53,23 +72,31 @@ export default function CursorFx() {
     document.addEventListener("mousemove", onMove);
 
     // ── Ambient particles ──
+    // Skipped entirely on touch: 120 particles redrawn to a full-viewport
+    // canvas every frame is pure cost with no payoff there (no cursor to
+    // animate around). Touch gets the CSS-only .cursor-touch-mote spans
+    // instead — compositor-driven, zero per-frame JS.
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
     function resize() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
-    resize();
-    window.addEventListener("resize", resize);
+    if (!isTouch) {
+      resize();
+      window.addEventListener("resize", resize);
+    }
 
-    const particles = Array.from({ length: 120 }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      vx: (Math.random() - 0.5) * 0.22,
-      vy: -(Math.random() * 0.28 + 0.08),
-      r: Math.random() * 1.1 + 0.4,
-      a: Math.random() * 0.28 + 0.07,
-    }));
+    const particles = isTouch
+      ? []
+      : Array.from({ length: 120 }, () => ({
+          x: Math.random() * window.innerWidth,
+          y: Math.random() * window.innerHeight,
+          vx: (Math.random() - 0.5) * 0.22,
+          vy: -(Math.random() * 0.28 + 0.08),
+          r: Math.random() * 1.1 + 0.4,
+          a: Math.random() * 0.28 + 0.07,
+        }));
 
     // ── Memory fragment parallax state ──
     let fmx = window.innerWidth / 2;
@@ -92,24 +119,28 @@ export default function CursorFx() {
       if (glowRef.current && !isTouch) {
         glowX += (tGlowX - glowX) * 0.07;
         glowY += (tGlowY - glowY) * 0.07;
-        glowRef.current.style.left = glowX + "px";
-        glowRef.current.style.top = glowY + "px";
+        // transform instead of left/top — Chrome counts left/top position
+        // changes on a 520px element as layout shift (CLS), even though it's
+        // position:fixed and affects no other element's layout.
+        glowRef.current.style.transform = `translate3d(${glowX}px, ${glowY}px, 0) translate(-50%, -50%)`;
       }
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        if (p.y < -4) {
-          p.y = canvas.height + 4;
-          p.x = Math.random() * canvas.width;
+      if (!isTouch) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const p of particles) {
+          p.x += p.vx;
+          p.y += p.vy;
+          if (p.y < -4) {
+            p.y = canvas.height + 4;
+            p.x = Math.random() * canvas.width;
+          }
+          if (p.x < -4) p.x = canvas.width + 4;
+          if (p.x > canvas.width + 4) p.x = -4;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(196,180,154,${p.a})`;
+          ctx.fill();
         }
-        if (p.x < -4) p.x = canvas.width + 4;
-        if (p.x > canvas.width + 4) p.x = -4;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(196,180,154,${p.a})`;
-        ctx.fill();
       }
 
       if (hasPointer && !reducedMotion) {
@@ -142,7 +173,7 @@ export default function CursorFx() {
     return () => {
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mousemove", onMoveFrags);
-      window.removeEventListener("resize", resize);
+      if (!isTouch) window.removeEventListener("resize", resize);
       raf.remove("human-ui");
       interactive.forEach((el) => {
         el.removeEventListener("mouseenter", onEnter);
@@ -157,6 +188,11 @@ export default function CursorFx() {
       <div className="cursor-glow" ref={glowRef} />
       <div className="cursor-dot" ref={dotRef} />
       <div className="cursor-ring" ref={ringRef} />
+      <div className="cursor-touch-motes" aria-hidden="true">
+        {TOUCH_MOTES.map((m, i) => (
+          <span key={i} className="cursor-touch-mote" style={m as React.CSSProperties} />
+        ))}
+      </div>
       {MEM_FRAGS.map((f, i) => (
         <span
           key={i}
@@ -165,6 +201,7 @@ export default function CursorFx() {
           }}
           className={`mem-frag${f.vert ? " vert" : ""}`}
           style={{ ...f.style, "--fi": f.fi } as unknown as React.CSSProperties}
+          aria-hidden="true"
         >
           {f.text}
         </span>

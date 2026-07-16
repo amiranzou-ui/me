@@ -23,7 +23,7 @@ export default function Home() {
       <div id="cursor-aura" aria-hidden="true" />
       <div id="cursor-distort" aria-hidden="true" />
 
-      <div id="container">
+      <main id="container">
         <div className="side" id="left">
           <div className="matrix-geo" aria-hidden="true" />
           <div className="side-inner">
@@ -121,7 +121,7 @@ export default function Home() {
             <span className="enter">Feel →</span>
           </div>
         </div>
-      </div>
+      </main>
 
       <div className="frame-corner fc-tl" />
       <div className="frame-corner fc-tr" />

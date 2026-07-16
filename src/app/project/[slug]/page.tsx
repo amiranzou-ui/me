@@ -109,7 +109,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const externalHref = project.behance_url || project.external_url;
 
   return (
-    <div className="min-h-dvh bg-cream px-6 py-16 md:px-16">
+    <main className="min-h-dvh bg-cream px-6 py-16 md:px-16">
       <div className="mx-auto max-w-2xl">
         <Link href="/matrix" className="font-sans text-xs uppercase tracking-widest text-brown hover:text-accent">
           ← Matrix
@@ -178,6 +178,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           </div>
         )}
       </div>
-    </div>
+    </main>
   );
 }

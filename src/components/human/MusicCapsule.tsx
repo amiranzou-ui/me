@@ -355,6 +355,11 @@ export default function MusicCapsule({
 
   // ── The big RAF loop: spin, tilt, tonearm, visualizer, presence ──
   useEffect(() => {
+    // The dust canvas (46 particles, per-particle shadowBlur) is pure
+    // ambiance with a real per-frame cost. Touch devices skip it entirely
+    // rather than a lighter version — the CSS lamp glow/vignette layers
+    // already carry the atmosphere without it.
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
     let rafId: number;
     let lastFrame = Date.now();
     let lastActivity = Date.now();
@@ -379,15 +384,18 @@ export default function MusicCapsule({
     const barValues = new Float32Array(64).fill(0.03);
 
     // Dust motes drifting through the lamp light — only visible near the
-    // glow, per the "warm lamp + drifting dust" atmosphere brief.
-    const dust = Array.from({ length: 46 }, () => ({
-      x: Math.random() * 380,
-      y: Math.random() * 380,
-      vx: (Math.random() - 0.5) * 0.05,
-      vy: -0.025 - Math.random() * 0.05,
-      r: 0.6 + Math.random() * 1.2,
-      phase: Math.random() * Math.PI * 2,
-    }));
+    // glow, per the "warm lamp + drifting dust" atmosphere brief. Skipped
+    // on touch (see isTouch note above).
+    const dust = isTouch
+      ? []
+      : Array.from({ length: 46 }, () => ({
+          x: Math.random() * 380,
+          y: Math.random() * 380,
+          vx: (Math.random() - 0.5) * 0.05,
+          vy: -0.025 - Math.random() * 0.05,
+          r: 0.6 + Math.random() * 1.2,
+          phase: Math.random() * Math.PI * 2,
+        }));
     const dustLightCx = 158,
       dustLightCy = 148,
       dustLightR = 260;
@@ -516,7 +524,7 @@ export default function MusicCapsule({
         // highlight reads as a fixed light source the grooves rotate under.
         discSheenRef.current.style.transform = `rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg)`;
       }
-      if (dustCanvasRef.current) drawDust(dt, dustCanvasRef.current.getContext("2d")!);
+      if (!isTouch && dustCanvasRef.current) drawDust(dt, dustCanvasRef.current.getContext("2d")!);
 
       if (open) {
         tonearmDriftPhase += dt * (isPlayingRef.current ? 0.0012 : 0.0004);
@@ -658,7 +666,11 @@ export default function MusicCapsule({
             <button className="mc-btn" title="Back 10 seconds" onClick={() => seekBy(-10)}>
               « 10
             </button>
-            <button className={`mc-btn mc-btn-play${isPlaying ? " is-playing" : ""}${isLoading ? " is-loading" : ""}`} onClick={togglePlay} />
+            <button
+              className={`mc-btn mc-btn-play${isPlaying ? " is-playing" : ""}${isLoading ? " is-loading" : ""}`}
+              onClick={togglePlay}
+              aria-label={isPlaying ? "Pause" : "Play"}
+            />
             <button className="mc-btn" title="Forward 10 seconds" onClick={() => seekBy(10)}>
               10 »
             </button>
@@ -704,7 +716,7 @@ export default function MusicCapsule({
             <span className="mc-mood-count">{tracks.length} in archive</span>
           </div>
 
-          <div id="mc-playlist">
+          <div id="mc-playlist" role="region" aria-label="Recordings" tabIndex={0}>
             {filteredTracks.length === 0 ? (
               <div className="mc-empty-state">
                 <span className="mc-empty-line">No recordings in this archive yet.</span>
@@ -719,7 +731,16 @@ export default function MusicCapsule({
                     key={t.id}
                     className={`mc-frag-item mc-pl-item${i === trackIdx ? " active" : ""}`}
                     style={{ "--mc-dot-c": dotColor } as React.CSSProperties}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={i === trackIdx}
                     onClick={() => selectTrack(i)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        selectTrack(i);
+                      }
+                    }}
                   >
                     <span className="mc-frag-dot" />
                     <span className="mc-frag-body">

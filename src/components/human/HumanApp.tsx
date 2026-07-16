@@ -32,7 +32,7 @@ export default function HumanApp({
   }
 
   return (
-    <div className="human-page">
+    <main className="human-page">
       {/* Atmospheric background */}
       <div className="mem-atm-wrap" aria-hidden="true">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,7 +53,7 @@ export default function HumanApp({
       <div className="frame-corner fc-bl" />
       <div className="frame-corner fc-br" />
 
-      <nav id="page-top">
+      <nav id="page-top" aria-label="Page">
         <button
           className="nav-name"
           onClick={(e) => portal("/", "#f0ebe0", e.clientX, e.clientY)}
@@ -95,6 +95,6 @@ export default function HumanApp({
       <HomeLoop revealed={archive.bottomRevealed} />
 
       <MusicCapsule tracks={tracks} open={archive.musicOpen} onClose={() => archive.setMusicOpen(false)} />
-    </div>
+    </main>
   );
 }

@@ -39,7 +39,7 @@ export default function ArchiveHall({
         <span className="ah-year">2026</span>
       </header>
       <div className="ah-rule" />
-      <nav className="ah-chapters">
+      <nav className="ah-chapters" aria-label="Chapters">
         {categories.map((c, i) => {
           // Matches the original's applyAccess(): the lock indicator only
           // ever shows to visitors, never to friends.
