@@ -3,6 +3,7 @@ import WorldEffects from "@/components/world/WorldEffects";
 import LandingInteractions from "@/components/world/LandingInteractions";
 import { createClient } from "@/lib/supabase/server";
 import { mediaUrl } from "@/lib/supabase/media";
+import { SocialIcon } from "@/components/matrix/SocialIcon";
 import type { CvMeta } from "@/lib/matrix/types";
 
 export const revalidate = 60;
@@ -93,6 +94,7 @@ export default async function Home() {
               <p className="pnp-col-label">I. Elsewhere</p>
               {cv.links.map((link) => (
                 <a key={link.label} href={link.url} target="_blank" rel="noopener" className="pnp-soc">
+                  <SocialIcon name={link.icon} />
                   {link.label}
                 </a>
               ))}

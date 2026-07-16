@@ -511,10 +511,19 @@
   letter-spacing: 0.3px;
   color: var(--color-brown-dark);
   text-decoration: none;
-  transition: color 0.25s;
+  transition: color 0.25s, transform 0.25s;
+}
+.pnp-soc svg {
+  flex-shrink: 0;
+  opacity: 0.55;
+  transition: opacity 0.25s;
 }
 .pnp-soc:hover {
+  transform: translateX(3px);
   color: var(--color-accent);
+}
+.pnp-soc:hover svg {
+  opacity: 1;
 }
 
 .pnp-status-item {
@@ -848,6 +857,11 @@
   left: 50%;
   transform: translateX(-50%);
   width: 24px;
+  /* The canvas's drawing-buffer height is set from JS (window.innerHeight)
+     and can go stale on mobile Safari when the address bar collapses
+     without a reliable resize event — pinning the CSS box to 100dvh keeps
+     it visually full-height regardless, even if the buffer itself lags. */
+  height: 100dvh;
   pointer-events: none;
   z-index: 11;
   transition: opacity 0.5s ease;

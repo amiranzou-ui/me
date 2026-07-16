@@ -160,6 +160,11 @@ export function initWorldEffects(): () => void {
     resizeDiv();
     window.addEventListener("resize", resizeDiv, { passive: true });
     addCleanup(() => window.removeEventListener("resize", resizeDiv));
+    // window's "resize" doesn't reliably fire when mobile Safari's address
+    // bar collapses/expands — visualViewport's does, keeping dH (and the
+    // curve it draws) in sync with the actual visible height.
+    window.visualViewport?.addEventListener("resize", resizeDiv);
+    addCleanup(() => window.visualViewport?.removeEventListener("resize", resizeDiv));
 
     const onEnter = () => {
       divCanvas.style.opacity = "0.3";
