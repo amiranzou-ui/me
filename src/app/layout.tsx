@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Cormorant_Garamond, Inter, Special_Elite } from "next/font/google";
 import "./globals.css";
 
@@ -38,7 +39,27 @@ export default function RootLayout({
       lang="en"
       className={`${cormorantGaramond.variable} ${inter.variable} ${specialElite.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {/*
+          First-visit intro redirect — ported from legacy/index.html's inline
+          head script. beforeInteractive runs before hydration/paint, same as
+          the original's synchronous <head> script, avoiding a landing-page
+          flash. Scoped to "/" via a runtime pathname check since
+          beforeInteractive scripts must live in the root layout.
+        */}
+        <Script id="intro-redirect" strategy="beforeInteractive">
+          {`(function () {
+            if (window.location.pathname !== "/") return;
+            var seen = false;
+            try { seen = !!localStorage.getItem("seen_intro"); } catch (e) {}
+            if (!seen) {
+              try { localStorage.setItem("seen_intro", "1"); } catch (e) {}
+              location.replace("/intro");
+            }
+          })();`}
+        </Script>
+        {children}
+      </body>
     </html>
   );
 }

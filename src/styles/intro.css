@@ -1,0 +1,64 @@
+/*
+ * First-visit intro sequence — ported from legacy/intro.html. Reuses
+ * .landing-root (grain overlay) and .frame-corner from landing.css for
+ * the shared decorative chrome; only the staggered fade-in lines and the
+ * Enter link are specific to this page.
+ */
+
+#intro-stage {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.intro-line {
+  font-family: var(--font-serif), serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: clamp(20px, 2.8vw, 30px);
+  letter-spacing: 0.5px;
+  color: var(--color-ink);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 1s ease, transform 1s ease;
+}
+.intro-line.visible { opacity: 1; transform: translateY(0); }
+
+.intro-line-3 {
+  font-size: clamp(14px, 1.8vw, 20px);
+  /* Darker than --color-accent (#c4622d only hits 3.44:1 on cream at this
+     text size) — same hue, darkened to clear 4.5:1 for normal-weight body
+     text per WCAG, unlike the token's other uses at large/bold sizes. */
+  color: #9d4e24;
+  margin-top: 8px;
+}
+
+.intro-enter {
+  margin-top: 48px;
+  font-family: var(--font-serif), serif;
+  font-weight: 300;
+  font-size: 13px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--color-brown);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-tan);
+  padding-bottom: 4px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 1s ease, transform 1s ease, color 0.3s, border-color 0.3s;
+}
+.intro-enter.visible { opacity: 1; transform: translateY(0); }
+.intro-enter:hover { color: var(--color-accent); border-color: var(--color-accent); }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-line, .intro-enter { transition: opacity 0.4s ease; transform: none !important; }
+}

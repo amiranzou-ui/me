@@ -1,4 +1,5 @@
 import "@/styles/landing.css";
+import "@/styles/atmosphere.css";
 import WorldEffects from "@/components/world/WorldEffects";
 import LandingInteractions from "@/components/world/LandingInteractions";
 
@@ -6,8 +7,8 @@ import LandingInteractions from "@/components/world/LandingInteractions";
  * Split-screen landing page — ported from legacy/index.html.
  * Content (name, taglines, social links) is still hardcoded here; that
  * moves to Supabase-backed cv_meta once the Studio exists (Phase 1+).
- * Deferred from this pass: the intro.html first-visit sequence, the
- * atmosphere.css parallax photo layers, and the GSAP cinematic entry.
+ * Deferred from this pass: the GSAP cinematic entry sequence — GSAP isn't
+ * part of this stack; see WorldEffects' doc comment.
  */
 export default function Home() {
   return (
@@ -24,7 +25,20 @@ export default function Home() {
       <div id="cursor-distort" aria-hidden="true" />
 
       <main id="container">
+        <h1 className="sr-only">Ameer Al-Butaihi — Matrix and Human</h1>
+
         <div className="side" id="left">
+          <div className="atm-wrap atm-matrix" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="atm-img"
+              src="https://images.unsplash.com/photo-1518773553398-650c184e0bb3?auto=format&fit=crop&w=1920&q=85"
+              alt=""
+              loading="lazy"
+              draggable={false}
+              crossOrigin="anonymous"
+            />
+          </div>
           <div className="matrix-geo" aria-hidden="true" />
           <div className="side-inner">
             <span className="label">I</span>
@@ -107,6 +121,17 @@ export default function Home() {
         </div>
 
         <div className="side" id="right">
+          <div className="atm-wrap atm-human" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className="atm-img"
+              src="https://images.unsplash.com/photo-1575209239550-322a4b125c6d?auto=format&fit=crop&w=1920&q=85"
+              alt=""
+              loading="lazy"
+              draggable={false}
+              crossOrigin="anonymous"
+            />
+          </div>
           <div className="human-warmth" aria-hidden="true" />
           <div className="side-inner">
             <span className="label">II</span>
@@ -121,15 +146,15 @@ export default function Home() {
             <span className="enter">Feel →</span>
           </div>
         </div>
+
+        <span className="corner corner-bl">Baghdad, IQ</span>
+        <span className="corner corner-br">2026</span>
       </main>
 
       <div className="frame-corner fc-tl" />
       <div className="frame-corner fc-tr" />
       <div className="frame-corner fc-bl" />
       <div className="frame-corner fc-br" />
-
-      <span className="corner corner-bl">Baghdad, IQ</span>
-      <span className="corner corner-br">2026</span>
     </div>
   );
 }
