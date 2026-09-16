@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
         pathname: "/storage/v1/object/public/**",
       },
     ],
+    // 60: masonry/grid thumbnails, 75: Next's default, 80: lightbox/medium view.
+    qualities: [60, 75, 80],
   },
 };
 

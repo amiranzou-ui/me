@@ -1,10 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import type { Category, GalleryItem } from "@/lib/human/types";
 import { mediaUrl } from "@/lib/supabase/media";
 import CategoryIcon from "./CategoryIcon";
 import Cooking from "./Cooking";
+
+/** Grid cell width tracks the masonry `columns` breakpoints in human.css
+ * (3 / 2 / 1 columns) — keeps the optimizer from generating a wider
+ * derivative than the cell will ever display. */
+const GRID_SIZES = "(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw";
+
+type LightboxImage = { path: string; width: number; height: number; alt: string };
 
 /** Scroll-reveal for masonry cells — ported from human.js's IntersectionObserver. */
 function useScrollReveal(containerRef: React.RefObject<HTMLElement | null>, active: boolean) {
@@ -39,11 +47,16 @@ function Masonry({
   id: string;
   items: GalleryItem[];
   active: boolean;
-  onOpenLightbox: (urls: string[], index: number) => void;
+  onOpenLightbox: (images: LightboxImage[], index: number) => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   useScrollReveal(ref, active);
-  const urls = items.map((it) => (it.assets ? mediaUrl(it.assets.path) : ""));
+  const images: LightboxImage[] = items.map((it) => ({
+    path: it.assets?.path ?? "",
+    width: it.assets?.width ?? 1200,
+    height: it.assets?.height ?? 900,
+    alt: it.alt_text ?? "",
+  }));
 
   return (
     <div className={`masonry${active ? " active" : ""}`} id={id} ref={ref} style={{ display: active ? "block" : "none" }}>
@@ -51,8 +64,17 @@ function Masonry({
         <div className="cell" key={item.id}>
           <div className="cell-inner">
             {item.assets && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={urls[i]} alt={item.alt_text ?? ""} loading="lazy" onClick={() => onOpenLightbox(urls, i)} />
+              <Image
+                src={mediaUrl(item.assets.path)}
+                alt={item.alt_text ?? ""}
+                width={item.assets.width ?? 1200}
+                height={item.assets.height ?? 900}
+                sizes={GRID_SIZES}
+                quality={60}
+                loading="lazy"
+                decoding="async"
+                onClick={() => onOpenLightbox(images, i)}
+              />
             )}
             <span className="micro-story">{item.caption}</span>
           </div>
@@ -96,14 +118,27 @@ export default function GalleryContent({
   accessLevel: "friend" | "visitor" | null;
   onSidebarClick: (c: Category) => void;
 }) {
-  const [lightbox, setLightbox] = useState<{ urls: string[]; index: number } | null>(null);
+  const [lightbox, setLightbox] = useState<{ images: LightboxImage[]; index: number } | null>(null);
+
+  // Categories mount lazily on first visit, then stay mounted (same
+  // display:none/block toggle as before) so switching back is instant —
+  // this is what stops every category's images from being requested on
+  // /human's initial load, before the user has even picked one.
+  const [visitedCategories, setVisitedCategories] = useState<Set<string>>(
+    () => new Set(activeCategory ? [activeCategory] : []),
+  );
+  useEffect(() => {
+    if (activeCategory && !visitedCategories.has(activeCategory)) {
+      setVisitedCategories((prev) => new Set(prev).add(activeCategory));
+    }
+  }, [activeCategory, visitedCategories]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (!lightbox) return;
       if (e.key === "Escape") setLightbox(null);
-      if (e.key === "ArrowLeft") setLightbox((lb) => (lb ? { ...lb, index: (lb.index - 1 + lb.urls.length) % lb.urls.length } : lb));
-      if (e.key === "ArrowRight") setLightbox((lb) => (lb ? { ...lb, index: (lb.index + 1) % lb.urls.length } : lb));
+      if (e.key === "ArrowLeft") setLightbox((lb) => (lb ? { ...lb, index: (lb.index - 1 + lb.images.length) % lb.images.length } : lb));
+      if (e.key === "ArrowRight") setLightbox((lb) => (lb ? { ...lb, index: (lb.index + 1) % lb.images.length } : lb));
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
@@ -150,18 +185,20 @@ export default function GalleryContent({
         </div>
 
         {categories
-          .filter((c) => c.kind === "gallery" && c.slug !== "cooking")
+          .filter((c) => c.kind === "gallery" && c.slug !== "cooking" && visitedCategories.has(c.slug))
           .map((c) => (
             <Masonry
               key={c.slug}
               id={c.slug}
               items={itemsByCategory[c.slug] ?? []}
               active={activeCategory === c.slug}
-              onOpenLightbox={(urls, index) => setLightbox({ urls, index })}
+              onOpenLightbox={(images, index) => setLightbox({ images, index })}
             />
           ))}
 
-        <Cooking items={itemsByCategory.cooking ?? []} active={activeCategory === "cooking"} />
+        {visitedCategories.has("cooking") && (
+          <Cooking items={itemsByCategory.cooking ?? []} active={activeCategory === "cooking"} />
+        )}
 
         <ThreeDPlaceholder active={activeCategory === "3d"} />
       </div>
@@ -172,17 +209,24 @@ export default function GalleryContent({
         </button>
         <button
           id="lb-prev"
-          onClick={() => setLightbox((lb) => (lb ? { ...lb, index: (lb.index - 1 + lb.urls.length) % lb.urls.length } : lb))}
+          onClick={() => setLightbox((lb) => (lb ? { ...lb, index: (lb.index - 1 + lb.images.length) % lb.images.length } : lb))}
         >
           ‹
         </button>
         {lightbox && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img id="lb-img" src={lightbox.urls[lightbox.index]} alt="" />
+          <Image
+            id="lb-img"
+            src={mediaUrl(lightbox.images[lightbox.index].path)}
+            alt={lightbox.images[lightbox.index].alt}
+            width={lightbox.images[lightbox.index].width}
+            height={lightbox.images[lightbox.index].height}
+            sizes="88vw"
+            quality={80}
+          />
         )}
         <button
           id="lb-next"
-          onClick={() => setLightbox((lb) => (lb ? { ...lb, index: (lb.index + 1) % lb.urls.length } : lb))}
+          onClick={() => setLightbox((lb) => (lb ? { ...lb, index: (lb.index + 1) % lb.images.length } : lb))}
         >
           ›
         </button>

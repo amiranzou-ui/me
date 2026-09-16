@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { mediaUrl } from "@/lib/supabase/media";
 import { createClient } from "@/lib/supabase/client";
 import MediaUpload from "@/components/studio/MediaUpload";
@@ -181,8 +182,14 @@ function ItemsEditor({
         .map((item) => (
           <div key={item.id} className="flex gap-4 items-start border border-tan p-3">
             {item.assets && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={mediaUrl(item.assets.path)} alt="" className="w-20 h-20 object-cover flex-shrink-0" />
+              <Image
+                src={mediaUrl(item.assets.path)}
+                alt=""
+                width={80}
+                height={80}
+                quality={60}
+                className="w-20 h-20 object-cover flex-shrink-0"
+              />
             )}
             <div className="flex-1 flex flex-col gap-2">
               <input

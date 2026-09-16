@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { mediaUrl } from "@/lib/supabase/media";
 
@@ -155,8 +156,14 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               {related.map((r, i) => (
                 <div key={i} className="flex items-center gap-4 border border-tan p-3">
                   {r.type === "gallery_item" && r.assetPath && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={mediaUrl(r.assetPath)} alt="" className="h-16 w-16 flex-shrink-0 object-cover" />
+                    <Image
+                      src={mediaUrl(r.assetPath)}
+                      alt=""
+                      width={64}
+                      height={64}
+                      quality={60}
+                      className="h-16 w-16 flex-shrink-0 object-cover"
+                    />
                   )}
                   <div className="flex-1">
                     <p className="font-sans text-[10px] uppercase tracking-wider text-brown">

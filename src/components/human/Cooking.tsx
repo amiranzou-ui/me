@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import type { GalleryItem } from "@/lib/human/types";
 import { mediaUrl } from "@/lib/supabase/media";
 
@@ -62,8 +63,16 @@ export default function Cooking({ items, active }: { items: GalleryItem[]; activ
               onClick={() => setExpanded(i)}
             >
               {item.assets && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={mediaUrl(item.assets.path)} alt="" loading="lazy" />
+                <Image
+                  src={mediaUrl(item.assets.path)}
+                  alt=""
+                  width={item.assets.width ?? 1200}
+                  height={item.assets.height ?? 900}
+                  sizes="(max-width: 580px) 100vw, (max-width: 900px) 50vw, 33vw"
+                  quality={60}
+                  loading="lazy"
+                  decoding="async"
+                />
               )}
               <span className="ck-label">{hover}</span>
               <span className="ck-hint" />
@@ -79,8 +88,15 @@ export default function Cooking({ items, active }: { items: GalleryItem[]; activ
       }}>
         <div className="ck-exp-inner">
           {moment?.assets && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img className="ck-exp-img" src={mediaUrl(moment.assets.path)} alt="" />
+            <Image
+              className="ck-exp-img"
+              src={mediaUrl(moment.assets.path)}
+              alt=""
+              width={moment.assets.width ?? 1200}
+              height={moment.assets.height ?? 900}
+              sizes="90vw"
+              quality={80}
+            />
           )}
           <div className="ck-exp-text">
             {(moment?.meta?.text ?? []).map((line, i) => (

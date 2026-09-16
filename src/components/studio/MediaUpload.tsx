@@ -43,6 +43,9 @@ export default function MediaUpload({
       const { error: uploadError } = await supabase.storage.from("media").upload(path, file, {
         contentType: file.type,
         upsert: false,
+        // Paths are timestamped and never overwritten, so it's safe to
+        // cache aggressively — repeat gallery visits reuse the same bytes.
+        cacheControl: "31536000",
       });
       if (uploadError) throw uploadError;
 
