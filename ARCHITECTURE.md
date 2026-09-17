@@ -51,8 +51,8 @@ The fix is architectural: separate content from presentation. The UI stays; the 
 ## Data flow
 
 ```
-Studio (authenticated, single owner)
-   │  writes
+Studio (authenticated, cookie-aware Supabase client)
+   │  writes + on-demand cache invalidation (updateTag)
    ▼
 Supabase Postgres  ──────────────┐
    │  (RLS: public read where     │
@@ -60,19 +60,27 @@ Supabase Postgres  ──────────────┐
    │   write = owner only)        │  (polymorphic links between
    ▼                              │   any two content rows)
 Public Next.js pages              │
- (Server Components, ISR)  ◄──────┘
+ (Server Components, anonymous    │
+  client — no cookies(), so ISR   │
+  actually applies; unstable_cache│
+  wraps each read, tagged per     │
+  table/category)          ◄──────┘
    │  reads published rows
    │  + resolves related content
    ▼
 Visitor's browser
    │
-   └─ Media: <Image>/<audio> requests rewritten through a custom
-      next/image loader → Supabase Storage's image-transform
-      endpoint (thumbnail/WebP on demand) or a signed/public
-      Storage URL for audio streaming
+   └─ Media: <Image> → Next's built-in Image Optimizer (resize +
+      WebP/AVIF; not a custom loader or Supabase's paid transform
+      API) → Supabase Storage's public object URL for the one
+      stored file per asset
 ```
 
-Uploads follow a parallel path: Studio upload → true original stored untouched in `originals/` (never served) → one eager "display" derivative generated at upload time → additional sizes generated on-demand via the transform API and cached at the CDN edge.
+Public pages (`/`, `/human`, `/matrix`, `/project/[slug]`) read through `src/lib/supabase/public.ts` (anonymous client, no `cookies()`) instead of the session-aware client Studio uses. A page that never touches `cookies()`/`headers()` stays eligible for Next's static/ISR rendering; one that does gets forced fully dynamic regardless of `revalidate` — this was previously happening by accident (every public page used the same cookie-aware client Studio needs for `auth.uid()`), silently turning `export const revalidate = 60` into a no-op and putting a live Postgres round-trip behind every hard navigation. Each public data-fetching function (`src/lib/human/data.ts`, `src/lib/matrix/data.ts`) is additionally wrapped in `unstable_cache`, tagged per table (`categories`, `tracks`, `cv-meta`, `projects`) or per category (`gallery:photography`) for gallery items. Studio mutations call `updateTag()` — Next 16's Server-Action-only "read-your-own-writes" primitive, guaranteeing the very next request sees fresh data rather than `revalidateTag`'s default stale-while-revalidate window — for whichever tags they affect, alongside the existing `revalidatePath()` calls.
+
+`/human`'s gallery items are fetched **per category** on demand (`src/app/human/actions.ts`), not all at once on page load. A category's data (and a handful of its first-viewport image derivatives) is requested the moment it's chosen in the ArchiveHall — hovering a chapter warms its data, clicking it additionally warms the first few images — not after the elevator ride finishes. The elevator's own choreography is untouched; this just uses the time it already takes as a budget to prepare the destination, so arrival doesn't also mean waiting for a blank grid to fill in. Categories still mount lazily (once visited, never unmounted) so returning to one is instant with no refetch.
+
+There is no separate `originals/` archive path or Supabase transform-API step — each asset has exactly one stored file (the true original) in the `media` bucket; grid/lightbox/hero derivatives are all generated on demand by Next's Image Optimizer from that same file, differentiated only by requested width/quality, and cached by Next at that layer. HEIC/HEIF uploads (most non-Safari browsers can't render them inline) are converted server-side to a JPEG derivative right after upload (`convertHeicIfNeeded` in the gallery Studio actions); the original HEIC stays in Storage untouched, just no longer the file the public gallery references.
 
 ---
 

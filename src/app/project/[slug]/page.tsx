@@ -2,7 +2,8 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { createClient } from "@/lib/supabase/server";
+import { unstable_cache } from "next/cache";
+import { createPublicClient } from "@/lib/supabase/public";
 import { mediaUrl } from "@/lib/supabase/media";
 
 export const revalidate = 60;
@@ -24,64 +25,76 @@ type RelatedTrack = { type: "track"; label: string | null; title: string; artist
 type RelatedProject = { type: "project"; label: string | null; slug: string; title: string; role: string | null };
 type RelatedEntry = RelatedGalleryItem | RelatedTrack | RelatedProject;
 
-async function getProject(slug: string): Promise<ProjectRow | null> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("projects")
-    .select("id, slug, title, role, description, impact, stack, behance_url, external_url")
-    .eq("slug", slug)
-    .eq("status", "published")
-    .single();
-  return (data as ProjectRow) ?? null;
+function getProject(slug: string): Promise<ProjectRow | null> {
+  return unstable_cache(
+    async () => {
+      const supabase = createPublicClient();
+      const { data } = await supabase
+        .from("projects")
+        .select("id, slug, title, role, description, impact, stack, behance_url, external_url")
+        .eq("slug", slug)
+        .eq("status", "published")
+        .single();
+      return (data as ProjectRow) ?? null;
+    },
+    ["project-detail", slug],
+    { tags: ["projects", `project:${slug}`], revalidate: 60 },
+  )();
 }
 
-async function getRelated(projectId: string): Promise<RelatedEntry[]> {
-  const supabase = await createClient();
-  const { data: relations } = await supabase
-    .from("content_relations")
-    .select("to_type, to_id, relation_label")
-    .eq("from_type", "project")
-    .eq("from_id", projectId)
-    .order("sort_order");
+function getRelated(projectId: string, slug: string): Promise<RelatedEntry[]> {
+  return unstable_cache(
+    async () => {
+      const supabase = createPublicClient();
+      const { data: relations } = await supabase
+        .from("content_relations")
+        .select("to_type, to_id, relation_label")
+        .eq("from_type", "project")
+        .eq("from_id", projectId)
+        .order("sort_order");
 
-  const resolved = await Promise.all(
-    (relations ?? []).map(async (r): Promise<RelatedEntry | null> => {
-      if (r.to_type === "gallery_item") {
-        const { data } = await supabase
-          .from("gallery_items")
-          .select("caption, status, assets(path)")
-          .eq("id", r.to_id)
-          .eq("status", "published")
-          .single();
-        if (!data) return null;
-        const asset = data.assets as unknown as { path: string } | null;
-        return { type: "gallery_item", label: r.relation_label, caption: data.caption, assetPath: asset?.path ?? null };
-      }
-      if (r.to_type === "track") {
-        const { data } = await supabase
-          .from("tracks")
-          .select("title, artist, status")
-          .eq("id", r.to_id)
-          .eq("status", "published")
-          .single();
-        if (!data) return null;
-        return { type: "track", label: r.relation_label, title: data.title, artist: data.artist };
-      }
-      if (r.to_type === "project") {
-        const { data } = await supabase
-          .from("projects")
-          .select("slug, title, role, status")
-          .eq("id", r.to_id)
-          .eq("status", "published")
-          .single();
-        if (!data) return null;
-        return { type: "project", label: r.relation_label, slug: data.slug, title: data.title, role: data.role };
-      }
-      return null;
-    }),
-  );
+      const resolved = await Promise.all(
+        (relations ?? []).map(async (r): Promise<RelatedEntry | null> => {
+          if (r.to_type === "gallery_item") {
+            const { data } = await supabase
+              .from("gallery_items")
+              .select("caption, status, assets(path)")
+              .eq("id", r.to_id)
+              .eq("status", "published")
+              .single();
+            if (!data) return null;
+            const asset = data.assets as unknown as { path: string } | null;
+            return { type: "gallery_item", label: r.relation_label, caption: data.caption, assetPath: asset?.path ?? null };
+          }
+          if (r.to_type === "track") {
+            const { data } = await supabase
+              .from("tracks")
+              .select("title, artist, status")
+              .eq("id", r.to_id)
+              .eq("status", "published")
+              .single();
+            if (!data) return null;
+            return { type: "track", label: r.relation_label, title: data.title, artist: data.artist };
+          }
+          if (r.to_type === "project") {
+            const { data } = await supabase
+              .from("projects")
+              .select("slug, title, role, status")
+              .eq("id", r.to_id)
+              .eq("status", "published")
+              .single();
+            if (!data) return null;
+            return { type: "project", label: r.relation_label, slug: data.slug, title: data.title, role: data.role };
+          }
+          return null;
+        }),
+      );
 
-  return resolved.filter((x): x is RelatedEntry => x !== null);
+      return resolved.filter((x): x is RelatedEntry => x !== null);
+    },
+    ["project-related", projectId],
+    { tags: ["projects", `project:${slug}`], revalidate: 60 },
+  )();
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -106,7 +119,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const project = await getProject(slug);
   if (!project) notFound();
 
-  const related = await getRelated(project.id);
+  const related = await getRelated(project.id, slug);
   const externalHref = project.behance_url || project.external_url;
 
   return (

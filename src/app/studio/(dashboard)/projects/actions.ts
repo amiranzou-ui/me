@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { StudioProject } from "./types";
 
@@ -38,6 +38,8 @@ export async function upsertProject(data: StudioProject): Promise<{ error: strin
 
   revalidatePath("/matrix");
   revalidatePath(`/project/${row.slug}`);
+  updateTag("projects");
+  updateTag(`project:${row.slug}`);
   return { ok: true, id: row.id as string, slug: row.slug as string };
 }
 
@@ -47,5 +49,6 @@ export async function deleteProject(id: string) {
   if (error) return { error: error.message };
 
   revalidatePath("/matrix");
+  updateTag("projects");
   return { ok: true };
 }

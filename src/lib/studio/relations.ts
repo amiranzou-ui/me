@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export type RelatableType = "project" | "gallery_item" | "track";
@@ -98,6 +98,11 @@ export async function addRelation(input: {
   if (error) return { error: error.message };
 
   if (input.revalidatePagePath) revalidatePath(input.revalidatePagePath);
+  // Broad on purpose: relations are polymorphic (project/gallery_item/track
+  // on either end) and low-traffic to mutate, so it's not worth resolving
+  // exactly which cached entry is affected — just clear the project tag,
+  // the one place relations are actually rendered publicly.
+  updateTag("projects");
   return { ok: true, id: data.id as string };
 }
 
@@ -106,5 +111,6 @@ export async function removeRelation(id: string, revalidatePagePath?: string): P
   const { error } = await supabase.from("content_relations").delete().eq("id", id);
   if (error) return { error: error.message };
   if (revalidatePagePath) revalidatePath(revalidatePagePath);
+  updateTag("projects");
   return { ok: true };
 }

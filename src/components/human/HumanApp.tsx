@@ -1,7 +1,7 @@
 "use client";
 
 import { portal } from "@/lib/world/core";
-import type { Category, GalleryItem, Track } from "@/lib/human/types";
+import type { Category, Track } from "@/lib/human/types";
 import { useArchive } from "./useArchive";
 import FriendGate from "./FriendGate";
 import ArchiveHall from "./ArchiveHall";
@@ -14,11 +14,9 @@ import CursorFx from "./CursorFx";
 
 export default function HumanApp({
   categories,
-  itemsByCategory,
   tracks,
 }: {
   categories: Category[];
-  itemsByCategory: Record<string, GalleryItem[]>;
   tracks: Track[];
 }) {
   const archive = useArchive();
@@ -86,7 +84,7 @@ export default function HumanApp({
 
       <GalleryContent
         categories={categories}
-        itemsByCategory={itemsByCategory}
+        itemsByCategory={archive.itemsByCategory}
         activeCategory={archive.activeCategory}
         accessLevel={archive.accessLevel}
         onSidebarClick={archive.handleSidebarClick}

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { createAsset } from "@/app/studio/(dashboard)/gallery/actions";
+import { createAsset, convertHeicIfNeeded } from "@/app/studio/(dashboard)/gallery/actions";
+
+const HEIC_PATTERN = /heic|heif/i;
 
 function readDimensions(file: File): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
@@ -59,9 +61,19 @@ export default function MediaUpload({
       });
       if ("error" in res) throw new Error(res.error);
 
+      let finalPath = path;
+      if (HEIC_PATTERN.test(file.type) || /\.hei[cf]$/i.test(file.name)) {
+        const conv = await convertHeicIfNeeded(res.id!);
+        if ("error" in conv && conv.error) {
+          setError(`Uploaded, but couldn't auto-convert for web display: ${conv.error}`);
+        } else if (conv.converted) {
+          finalPath = conv.path;
+        }
+      }
+
       const {
         data: { publicUrl },
-      } = supabase.storage.from("media").getPublicUrl(path);
+      } = supabase.storage.from("media").getPublicUrl(finalPath);
       onUploaded(res.id!, publicUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");

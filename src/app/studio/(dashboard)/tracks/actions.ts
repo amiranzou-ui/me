@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export async function upsertTrack(data: {
@@ -23,6 +23,7 @@ export async function upsertTrack(data: {
     : await supabase.from("tracks").insert(data);
   if (error) return { error: error.message };
   revalidatePath("/human");
+  updateTag("tracks");
   return { ok: true };
 }
 
@@ -31,6 +32,7 @@ export async function deleteTrack(id: string) {
   const { error } = await supabase.from("tracks").delete().eq("id", id);
   if (error) return { error: error.message };
   revalidatePath("/human");
+  updateTag("tracks");
   return { ok: true };
 }
 
@@ -41,5 +43,6 @@ export async function reorderTracks(items: { id: string; sort_order: number }[])
     if (error) return { error: error.message };
   }
   revalidatePath("/human");
+  updateTag("tracks");
   return { ok: true };
 }

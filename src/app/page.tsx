@@ -1,7 +1,7 @@
 import "@/styles/landing.css";
 import WorldEffects from "@/components/world/WorldEffects";
 import LandingInteractions from "@/components/world/LandingInteractions";
-import { createClient } from "@/lib/supabase/server";
+import { getCvMeta } from "@/lib/matrix/data";
 import { mediaUrl } from "@/lib/supabase/media";
 import { SocialIcon } from "@/components/matrix/SocialIcon";
 import type { CvMeta } from "@/lib/matrix/types";
@@ -17,9 +17,7 @@ export const revalidate = 60;
  * part of this stack; see WorldEffects' doc comment.
  */
 export default async function Home() {
-  const supabase = await createClient();
-  const { data } = await supabase.from("cv_meta").select("*, assets(path)").eq("id", 1).single();
-  const cv = data as CvMeta & { assets: { path: string } | null };
+  const cv = (await getCvMeta()) as CvMeta & { assets: { path: string } | null };
   const photoUrl = cv.assets ? mediaUrl(cv.assets.path) : "/images/profile.JPG";
 
   return (

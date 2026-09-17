@@ -3,14 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import type { Category, GalleryItem } from "@/lib/human/types";
-import { mediaUrl } from "@/lib/supabase/media";
+import { mediaUrl, GALLERY_GRID_SIZES, GALLERY_GRID_QUALITY } from "@/lib/supabase/media";
 import CategoryIcon from "./CategoryIcon";
 import Cooking from "./Cooking";
-
-/** Grid cell width tracks the masonry `columns` breakpoints in human.css
- * (3 / 2 / 1 columns) — keeps the optimizer from generating a wider
- * derivative than the cell will ever display. */
-const GRID_SIZES = "(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw";
 
 type LightboxImage = { path: string; width: number; height: number; alt: string };
 
@@ -69,8 +64,8 @@ function Masonry({
                 alt={item.alt_text ?? ""}
                 width={item.assets.width ?? 1200}
                 height={item.assets.height ?? 900}
-                sizes={GRID_SIZES}
-                quality={60}
+                sizes={GALLERY_GRID_SIZES}
+                quality={GALLERY_GRID_QUALITY}
                 loading="lazy"
                 decoding="async"
                 onClick={() => onOpenLightbox(images, i)}

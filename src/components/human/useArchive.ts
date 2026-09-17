@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { unlockAudio, sndClick, sndElevatorMove, sndDing } from "@/lib/human/audio";
-import { events } from "@/lib/world/core";
-import type { Category } from "@/lib/human/types";
+import { events, log } from "@/lib/world/core";
+import { fetchCategoryItems } from "@/app/human/actions";
+import { preloadGalleryImages } from "@/lib/human/preload";
+import type { Category, GalleryItem } from "@/lib/human/types";
 
 /**
  * Ported from legacy/js/archive.js — the friend gate, archive hall, and
@@ -50,6 +52,51 @@ export function useArchive() {
   const [musicOpen, setMusicOpen] = useState(false);
   const [bottomRevealed, setBottomRevealed] = useState(false);
   const [lockPulse, setLockPulse] = useState<string | null>(null);
+  const [itemsByCategory, setItemsByCategory] = useState<Record<string, GalleryItem[]>>({});
+
+  // Mirrors `itemsByCategory` for synchronous reads inside `ensureCategoryData`
+  // (a stable useCallback can't otherwise see fresh state without becoming
+  // unstable itself). `inFlight` dedupes a hover immediately followed by a
+  // click into a single request instead of two.
+  const itemsRef = useRef(itemsByCategory);
+  useEffect(() => {
+    itemsRef.current = itemsByCategory;
+  }, [itemsByCategory]);
+  const inFlight = useRef<Map<string, Promise<GalleryItem[]>>>(new Map());
+
+  // Bounded by construction — one entry per category that has ever been
+  // visited/hovered, never evicted, never larger than the category count
+  // (today ~6). This is both the "return to an already-visited chapter is
+  // instant" cache and the data source `GalleryContent` renders from.
+  const ensureCategoryData = useCallback((category: Category): Promise<GalleryItem[]> => {
+    // Only "gallery" categories (photography/posters/patterns/cooking) ever
+    // have gallery_items — music (its own tracks fetch) and the 3D
+    // placeholder don't, so skip the pointless request entirely.
+    if (category.kind !== "gallery") return Promise.resolve([]);
+
+    const cached = itemsRef.current[category.slug];
+    if (cached) return Promise.resolve(cached);
+
+    const pending = inFlight.current.get(category.slug);
+    if (pending) return pending;
+
+    const promise = fetchCategoryItems(category.id, category.slug)
+      .then((items) => {
+        setItemsByCategory((prev) => ({ ...prev, [category.slug]: items }));
+        inFlight.current.delete(category.slug);
+        return items;
+      })
+      .catch((err) => {
+        // Fetching/preloading is an optimization, never a dependency — a
+        // failure here must not block the elevator or crash the page. The
+        // chapter just renders an empty grid until a later attempt succeeds.
+        log.error(`Failed to load chapter "${category.slug}":`, err);
+        inFlight.current.delete(category.slug);
+        return [] as GalleryItem[];
+      });
+    inFlight.current.set(category.slug, promise);
+    return promise;
+  }, []);
 
   const currentFloorRef = useRef("00");
   const insideChapterRef = useRef(false);
@@ -211,6 +258,11 @@ export function useArchive() {
   const enterChapter = useCallback((category: Category) => {
     unlockAudio();
     sndClick(0.22);
+    // Destination intent starts the loading lifecycle right here — not when
+    // the elevator finishes. Detached from the `schedule()` timer chain on
+    // purpose: the elevator's choreography (~4-5s) runs exactly as before
+    // regardless of how long this takes or whether it fails.
+    void ensureCategoryData(category).then(preloadGalleryImages);
     trans("visible");
     schedule(() => {
       setArchiveHallVisible(false);
@@ -220,7 +272,7 @@ export function useArchive() {
         startElevator(category);
       }, 80);
     }, 720);
-  }, [schedule, startElevator]);
+  }, [schedule, startElevator, ensureCategoryData]);
 
   const flashLocked = useCallback((slug: string) => {
     setLockPulse(slug);
@@ -239,7 +291,11 @@ export function useArchive() {
     setBgNumeral(category.roman);
     unlockAudio();
     sndClick(0.07);
-  }, []);
+    // Lightweight metadata-only warm-start — a hover that never turns into a
+    // click shouldn't also pay for image preloading (that's reserved for
+    // actual navigation intent in enterChapter).
+    void ensureCategoryData(category);
+  }, [ensureCategoryData]);
 
   const showSectionNotice = useCallback((category: Category) => {
     sndClick(0.09);
@@ -267,6 +323,7 @@ export function useArchive() {
     setMusicOpen,
     bottomRevealed,
     lockPulse,
+    itemsByCategory,
     handleChapterClick,
     handleChapterHover,
     handleSidebarClick,

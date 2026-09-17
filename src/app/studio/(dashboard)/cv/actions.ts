@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { CvMeta } from "@/lib/matrix/types";
 
@@ -31,5 +31,6 @@ export async function saveCvMeta(data: CvMeta) {
 
   revalidatePath("/matrix");
   revalidatePath("/");
+  updateTag("cv-meta");
   return { ok: true };
 }
