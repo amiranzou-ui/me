@@ -11,10 +11,10 @@ import type { CvMeta, Experience, MatrixNode, Project, SkillsGroup } from "@/lib
  */
 
 export const getCvMeta = unstable_cache(
-  async (): Promise<(CvMeta & { assets: { path: string } | null }) | null> => {
+  async (): Promise<(CvMeta & { assets: { path: string; width?: number; height?: number } | null }) | null> => {
     const supabase = createPublicClient();
-    const { data } = await supabase.from("cv_meta").select("*, assets(path)").eq("id", 1).single();
-    return data as (CvMeta & { assets: { path: string } | null }) | null;
+    const { data } = await supabase.from("cv_meta").select("*, assets(path, width, height)").eq("id", 1).single();
+    return data as (CvMeta & { assets: { path: string; width?: number; height?: number } | null }) | null;
   },
   ["matrix-cv-meta"],
   { tags: ["cv-meta"], revalidate: 60 },

@@ -7,7 +7,6 @@ export function mediaUrl(path: string) {
 
 /** Shared between the masonry grid and its image-preload path so a
  * preloaded derivative always matches what the grid actually requests —
- * see `src/lib/human/preload.ts`. Tracks human.css's `.masonry` breakpoints
- * (3 / 2 / 1 columns). */
+ * kept for the Studio's thumbnails. */
 export const GALLERY_GRID_SIZES = "(max-width: 600px) 100vw, (max-width: 900px) 50vw, 33vw";
 export const GALLERY_GRID_QUALITY = 60;

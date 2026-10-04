@@ -1,27 +1,19 @@
 import type { MetadataRoute } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { getWorldContent } from "@/lib/world/content";
+import { buildWorld } from "@/world/stations";
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://ameerstudio.site";
 
+/** Every public station from the registry — the same list that drives the
+ * world's URLs. Reads through the cached public content (no cookies), so
+ * the sitemap is static/ISR like the pages. */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const supabase = await createClient();
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("slug, updated_at")
-    .eq("status", "published");
-
-  const staticRoutes: MetadataRoute.Sitemap = [
-    { url: BASE_URL, changeFrequency: "monthly", priority: 1 },
-    { url: `${BASE_URL}/matrix`, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${BASE_URL}/human`, changeFrequency: "weekly", priority: 0.7 },
-  ];
-
-  const projectRoutes: MetadataRoute.Sitemap = (projects ?? []).map((p) => ({
-    url: `${BASE_URL}/project/${p.slug}`,
-    lastModified: p.updated_at ? new Date(p.updated_at) : undefined,
-    changeFrequency: "monthly",
-    priority: 0.8,
-  }));
-
-  return [...staticRoutes, ...projectRoutes];
+  const world = buildWorld(await getWorldContent());
+  return world.stations
+    .filter((s) => s.access === "public")
+    .map((s) => ({
+      url: `${BASE_URL}${s.path === "/" ? "" : s.path}`,
+      changeFrequency: s.projectSlug || s.categorySlug ? "monthly" : "weekly",
+      priority: s.path === "/" ? 1 : s.projectSlug ? 0.8 : 0.6,
+    }));
 }

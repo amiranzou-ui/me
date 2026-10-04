@@ -72,7 +72,7 @@ export async function convertHeicIfNeeded(
       .eq("id", assetId);
     if (updateError) throw updateError;
 
-    revalidatePath("/human");
+    revalidatePath("/", "layout");
     updateTag("gallery-items");
     return { converted: true, path: newPath };
   } catch (err) {
@@ -96,7 +96,7 @@ export async function upsertGalleryItem(data: {
     ? await supabase.from("gallery_items").update(data).eq("id", data.id)
     : await supabase.from("gallery_items").insert(data);
   if (error) return { error: error.message };
-  revalidatePath("/human");
+  revalidatePath("/", "layout");
   updateTag("gallery-items");
   return { ok: true };
 }
@@ -105,7 +105,7 @@ export async function deleteGalleryItem(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("gallery_items").delete().eq("id", id);
   if (error) return { error: error.message };
-  revalidatePath("/human");
+  revalidatePath("/", "layout");
   updateTag("gallery-items");
   return { ok: true };
 }
@@ -116,7 +116,7 @@ export async function reorderGalleryItems(items: { id: string; sort_order: numbe
     const { error } = await supabase.from("gallery_items").update({ sort_order: item.sort_order }).eq("id", item.id);
     if (error) return { error: error.message };
   }
-  revalidatePath("/human");
+  revalidatePath("/", "layout");
   updateTag("gallery-items");
   return { ok: true };
 }
@@ -136,7 +136,20 @@ export async function upsertCategory(data: {
     ? await supabase.from("categories").update(data).eq("id", data.id)
     : await supabase.from("categories").insert(data);
   if (error) return { error: error.message };
-  revalidatePath("/human");
+  revalidatePath("/", "layout");
   updateTag("categories");
+  return { ok: true };
+}
+
+/** Hanging weight (bigger prints) and the Darkroom's friends-only flag
+ * (migration 0006). Sent alone so a missing column can't break other saves. */
+export async function setItemFlags(id: string, flags: { weight?: number; friends_only?: boolean }) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("gallery_items").update(flags).eq("id", id);
+  if (error) {
+    return { error: /weight|friends_only/.test(error.message) ? "Needs database migration 0006 (supabase/migrations/0006_world.sql)." : error.message };
+  }
+  revalidatePath("/", "layout");
+  updateTag("gallery-items");
   return { ok: true };
 }

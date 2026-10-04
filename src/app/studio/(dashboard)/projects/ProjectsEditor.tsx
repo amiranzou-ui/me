@@ -1,9 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { upsertProject, deleteProject } from "./actions";
+import { useEffect, useState, useTransition } from "react";
+import Image from "next/image";
+import { upsertProject, deleteProject, listProjectMedia, addProjectMedia, updateProjectMedia, removeProjectMedia } from "./actions";
 import RelatePicker from "@/components/studio/RelatePicker";
-import type { StudioProject } from "./types";
+import MediaUpload from "@/components/studio/MediaUpload";
+import { mediaUrl } from "@/lib/supabase/media";
+import type { ProjectMedia, StudioProject } from "./types";
 
 const inputCls =
   "border border-tan bg-cream-alt px-3 py-2 text-sm text-ink outline-none focus:border-accent w-full";
@@ -122,6 +125,7 @@ function ProjectForm({
 }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
   function save() {
     setError(null);
@@ -212,6 +216,63 @@ function ProjectForm({
         </div>
       </div>
 
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div>
+          <label className={labelCls}>Year started</label>
+          <input
+            className={inputCls}
+            type="number"
+            value={data.year_start ?? ""}
+            placeholder="from the job"
+            onChange={(e) => onChange({ ...data, year_start: e.target.value ? Number(e.target.value) : null })}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Year ended</label>
+          <input
+            className={inputCls}
+            type="number"
+            value={data.year_end ?? ""}
+            placeholder="from the job"
+            onChange={(e) => onChange({ ...data, year_end: e.target.value ? Number(e.target.value) : null })}
+          />
+        </div>
+        <div>
+          <label className={labelCls}>Bay size</label>
+          <select className={inputCls} value={data.bay_size ?? "standard"} onChange={(e) => onChange({ ...data, bay_size: e.target.value as StudioProject["bay_size"] })}>
+            <option value="small">Small</option>
+            <option value="standard">Standard</option>
+            <option value="large">Large</option>
+          </select>
+        </div>
+        <div>
+          <label className={labelCls}>Accent (lamp, paper)</label>
+          <input className={inputCls} value={data.accent ?? ""} placeholder="#c4622d" onChange={(e) => onChange({ ...data, accent: e.target.value || null })} />
+        </div>
+      </div>
+      <p className="-mt-2 text-[11px] text-brown">
+        Where the bay stands on the Workshop&apos;s time strip, how wide it is, and its lamp colour. Leave the years empty to take them from the matching job.
+      </p>
+
+      <div>
+        <label className={labelCls}>Cover — the print on the bay&apos;s easel</label>
+        <div className="flex items-center gap-4">
+          {coverPreview && <Image src={coverPreview} alt="" width={96} height={72} quality={60} className="h-[72px] w-24 object-cover" />}
+          <MediaUpload
+            pathPrefix={`projects/${data.slug || "new"}`}
+            onUploaded={(assetId, url) => {
+              setCoverPreview(url);
+              onChange({ ...data, cover_asset_id: assetId });
+            }}
+          />
+          {data.cover_asset_id && (
+            <button className="text-xs uppercase tracking-wider text-brown hover:text-accent" onClick={() => (onChange({ ...data, cover_asset_id: null }), setCoverPreview(null))}>
+              Remove
+            </button>
+          )}
+        </div>
+      </div>
+
       <div>
         <label className={labelCls}>Status</label>
         <select
@@ -254,13 +315,100 @@ function ProjectForm({
         )}
       </div>
 
+      {data.id && <Pinboard projectId={data.id} slug={data.slug} />}
+
       {data.id && (
         <div className="flex flex-col gap-2 pt-4 border-t border-tan">
           <label className={labelCls}>
-            Related content — shown on /project/{data.slug}
+            Related content — brass threads from the bay, and links on /work/{data.slug}
           </label>
-          <RelatePicker fromType="project" fromId={data.id} revalidatePagePath={`/project/${data.slug}`} />
+          <RelatePicker fromType="project" fromId={data.id} revalidatePagePath={`/work/${data.slug}`} />
+          <a href={`/work/${data.slug}`} target="_blank" rel="noopener" className="self-start text-xs uppercase tracking-wider text-brown hover:text-accent">
+            View the bay in the world ↗
+          </a>
         </div>
+      )}
+    </div>
+  );
+}
+
+/** The bay's pinboard: the project's visuals, pinned in order. */
+function Pinboard({ projectId, slug }: { projectId: string; slug: string }) {
+  const [items, setItems] = useState<ProjectMedia[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const reload = async () => {
+    const res = await listProjectMedia(projectId);
+    if ("error" in res) setError(res.error);
+    else {
+      setError(null);
+      setItems(res.items);
+    }
+  };
+  useEffect(() => {
+    let alive = true;
+    void listProjectMedia(projectId).then((res) => {
+      if (!alive) return;
+      if ("error" in res) setError(res.error);
+      else setItems(res.items);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [projectId]);
+  return (
+    <div className="flex flex-col gap-3 border-t border-tan pt-4">
+      <label className={labelCls}>Pinboard — the project&apos;s visuals in its Workshop bay</label>
+      {error && <p className="text-xs text-accent">{error}</p>}
+      <div className="flex flex-wrap gap-3">
+        {(items ?? []).map((m, i) => (
+          <div key={m.id} className="flex w-40 flex-col gap-1 border border-tan p-2">
+            {m.path && <Image src={mediaUrl(m.path)} alt="" width={150} height={100} quality={60} className="h-24 w-full object-cover" />}
+            <input
+              className={inputCls}
+              defaultValue={m.caption ?? ""}
+              placeholder="Caption"
+              onBlur={(e) => void updateProjectMedia(m.id, { caption: e.target.value || null })}
+            />
+            <select className={inputCls} defaultValue={String(m.weight)} onChange={(e) => void updateProjectMedia(m.id, { weight: Number(e.target.value) })}>
+              <option value="1">Small pin</option>
+              <option value="2">Medium</option>
+              <option value="3">Large</option>
+            </select>
+            <div className="flex justify-between text-xs text-brown">
+              <button
+                onClick={async () => {
+                  if (i === 0 || !items) return;
+                  const a = items[i - 1];
+                  await updateProjectMedia(m.id, { sort_order: a.sort_order });
+                  await updateProjectMedia(a.id, { sort_order: m.sort_order });
+                  void reload();
+                }}
+                className="hover:text-accent"
+              >
+                ←
+              </button>
+              <button
+                onClick={async () => {
+                  await removeProjectMedia(m.id);
+                  void reload();
+                }}
+                className="uppercase tracking-wider hover:text-accent"
+              >
+                Unpin
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+      {!error && (
+        <MediaUpload
+          pathPrefix={`projects/${slug}`}
+          onUploaded={async (assetId) => {
+            const res = await addProjectMedia(projectId, assetId, items?.length ?? 0);
+            if ("error" in res) setError(res.error);
+            void reload();
+          }}
+        />
       )}
     </div>
   );

@@ -2,10 +2,13 @@ import Link from "next/link";
 import "@/styles/studio.css";
 
 const chapters = [
-  { num: "I", href: "/studio/cv", title: "CV", desc: "Bio, contact, education, languages, signals." },
-  { num: "II", href: "/studio/projects", title: "Projects", desc: "Create, edit, publish, archive." },
-  { num: "III", href: "/studio/gallery", title: "Gallery", desc: "Categories and photographs for the Human side." },
-  { num: "IV", href: "/studio/tracks", title: "Tracks", desc: "Songs, moods, rooms, fragments." },
+  { num: "I", href: "/studio/cv", title: "CV", desc: "Bio, contact, education, languages, signals, the Roof's Right now." },
+  { num: "II", href: "/studio/projects", title: "Projects", desc: "The Workshop's bays: covers, pinboards, dates, size." },
+  { num: "III", href: "/studio/experience", title: "Experience", desc: "The jobs on the roof beams and the Records Room's tabs." },
+  { num: "IV", href: "/studio/skills", title: "Skills", desc: "The Type Case's drawers." },
+  { num: "V", href: "/studio/thinking", title: "Thinking", desc: "The Plan Room's places and paths." },
+  { num: "VI", href: "/studio/gallery", title: "Gallery", desc: "The tower's floors and their prints." },
+  { num: "VII", href: "/studio/tracks", title: "Tracks", desc: "The Listening Room's records." },
 ];
 
 /**
@@ -38,8 +41,8 @@ export default function StudioHomePage() {
         <p className="studio-eyebrow">Ameer Studio</p>
         <h1 className="studio-welcome">Welcome back.</h1>
         <p className="studio-lede">
-          The workshop behind the site — everything published starts here, quietly, before anyone else sees it.
-          The Mind subsystem arrives in a later phase.
+          The workshop behind the building — everything published starts here, quietly, before anyone else sees it.
+          Every change appears in the world on the next visit: a new project is a new bay, a new photograph a new print.
         </p>
 
         <nav className="studio-chapters">

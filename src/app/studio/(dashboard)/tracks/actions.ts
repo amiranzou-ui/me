@@ -22,7 +22,7 @@ export async function upsertTrack(data: {
     ? await supabase.from("tracks").update(data).eq("id", data.id)
     : await supabase.from("tracks").insert(data);
   if (error) return { error: error.message };
-  revalidatePath("/human");
+  revalidatePath("/", "layout");
   updateTag("tracks");
   return { ok: true };
 }
@@ -31,7 +31,7 @@ export async function deleteTrack(id: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("tracks").delete().eq("id", id);
   if (error) return { error: error.message };
-  revalidatePath("/human");
+  revalidatePath("/", "layout");
   updateTag("tracks");
   return { ok: true };
 }
@@ -42,7 +42,7 @@ export async function reorderTracks(items: { id: string; sort_order: number }[])
     const { error } = await supabase.from("tracks").update({ sort_order: item.sort_order }).eq("id", item.id);
     if (error) return { error: error.message };
   }
-  revalidatePath("/human");
+  revalidatePath("/", "layout");
   updateTag("tracks");
   return { ok: true };
 }

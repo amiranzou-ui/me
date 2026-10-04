@@ -5,7 +5,7 @@ import Image from "next/image";
 import { mediaUrl } from "@/lib/supabase/media";
 import { createClient } from "@/lib/supabase/client";
 import MediaUpload from "@/components/studio/MediaUpload";
-import { upsertGalleryItem, deleteGalleryItem, reorderGalleryItems, upsertCategory } from "./actions";
+import { upsertGalleryItem, deleteGalleryItem, reorderGalleryItems, upsertCategory, setItemFlags } from "./actions";
 import type { Category, GalleryItem } from "@/lib/human/types";
 
 const inputCls =
@@ -38,6 +38,9 @@ export default function GalleryManager({ categories, items }: { categories: Cate
           </button>
           {openCategory === cat.id && (
             <div className="border-t border-tan p-5">
+              <a href={`/archive/${cat.slug}`} target="_blank" rel="noopener" className="mb-4 inline-block text-xs uppercase tracking-wider text-brown hover:text-accent">
+                View floor {cat.roman} in the world ↗
+              </a>
               <CategoryEditor category={cat} />
               {cat.kind === "gallery" && (
                 <ItemsEditor
@@ -208,6 +211,32 @@ function ItemsEditor({
                 <button onClick={() => toggleStatus(item)} className="text-xs uppercase tracking-wider text-brown hover:text-accent">
                   {item.status === "published" ? "Published — click to unpublish" : "Draft — click to publish"}
                 </button>
+                <select
+                  className="border border-tan bg-cream-alt px-2 py-1 text-xs text-brown"
+                  defaultValue={String((item as GalleryItem & { weight?: number }).weight ?? 1)}
+                  onChange={async (e) => {
+                    const res = await setItemFlags(item.id, { weight: Number(e.target.value) });
+                    if ("error" in res && res.error) alert(res.error);
+                  }}
+                  title="How big it hangs in the room"
+                >
+                  <option value="1">Hang small</option>
+                  <option value="2">Hang medium</option>
+                  <option value="3">Hang large</option>
+                </select>
+                {!category.is_locked && (
+                  <label className="flex items-center gap-1 text-xs text-brown" title="Hangs in the Darkroom, seen only by friends">
+                    <input
+                      type="checkbox"
+                      defaultChecked={!!(item as GalleryItem & { friends_only?: boolean }).friends_only}
+                      onChange={async (e) => {
+                        const res = await setItemFlags(item.id, { friends_only: e.target.checked });
+                        if ("error" in res && res.error) alert(res.error);
+                      }}
+                    />
+                    Darkroom
+                  </label>
+                )}
                 <button onClick={() => remove(item)} className="ml-auto text-xs uppercase tracking-wider text-brown hover:text-accent">
                   Delete
                 </button>

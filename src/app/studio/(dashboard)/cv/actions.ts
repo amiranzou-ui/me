@@ -29,8 +29,7 @@ export async function saveCvMeta(data: CvMeta) {
 
   if (error) return { error: error.message };
 
-  revalidatePath("/matrix");
-  revalidatePath("/");
+  revalidatePath("/", "layout");
   updateTag("cv-meta");
   return { ok: true };
 }

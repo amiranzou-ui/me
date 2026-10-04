@@ -6,13 +6,13 @@ import Link from "next/link";
 const links = [
   { href: "/studio/cv", label: "CV" },
   { href: "/studio/projects", label: "Projects" },
+  { href: "/studio/experience", label: "Experience" },
+  { href: "/studio/skills", label: "Skills" },
+  { href: "/studio/thinking", label: "Thinking" },
   { href: "/studio/gallery", label: "Gallery" },
   { href: "/studio/tracks", label: "Tracks" },
 ];
-const external = [
-  { href: "/matrix", label: "Matrix ↗" },
-  { href: "/human", label: "Human ↗" },
-];
+const external = [{ href: "/", label: "The building ↗" }];
 
 const linkCls = "transition-colors hover:text-accent";
 
@@ -27,7 +27,7 @@ export default function StudioNav({ signOutAction }: { signOutAction: () => Prom
 
   return (
     <div className="relative">
-      <nav className="hidden items-center gap-6 font-sans text-[11px] uppercase tracking-wider text-brown sm:flex">
+      <nav className="hidden items-center gap-5 font-sans text-[11px] uppercase tracking-wider text-brown lg:flex">
         {links.map((l) => (
           <Link key={l.href} href={l.href} className={linkCls}>
             {l.label}
@@ -49,7 +49,7 @@ export default function StudioNav({ signOutAction }: { signOutAction: () => Prom
         onClick={() => setOpen((o) => !o)}
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open}
-        className="flex flex-col gap-1.5 p-1 sm:hidden"
+        className="flex flex-col gap-1.5 p-1 lg:hidden"
       >
         <span className={`block h-px w-5 bg-ink transition-transform ${open ? "translate-y-[3px] rotate-45" : ""}`} />
         <span className={`block h-px w-5 bg-ink transition-opacity ${open ? "opacity-0" : ""}`} />
@@ -59,7 +59,7 @@ export default function StudioNav({ signOutAction }: { signOutAction: () => Prom
       </button>
 
       {open && (
-        <nav className="absolute right-0 top-full z-20 mt-3 flex w-48 flex-col gap-4 border border-tan bg-cream p-5 font-sans text-xs uppercase tracking-wider text-brown shadow-lg sm:hidden">
+        <nav className="absolute right-0 top-full z-20 mt-3 flex w-48 flex-col gap-4 border border-tan bg-cream p-5 font-sans text-xs uppercase tracking-wider text-brown shadow-lg lg:hidden">
           {links.map((l) => (
             <Link key={l.href} href={l.href} className={linkCls} onClick={() => setOpen(false)}>
               {l.label}

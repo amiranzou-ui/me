@@ -128,3 +128,38 @@ Each phase leaves the site fully deployable on a Vercel preview URL. `ameerstudi
 - **The Studio is a product, not a CRUD scaffold** — because it's used weekly for years, its own feel matters as much as the public site's. A generic table-and-form admin panel would work functionally but fail the actual goal (effortless, enjoyable publishing).
 - **Archive-but-don't-serve original media** — "keep the original" and "don't serve 27MB PNGs to visitors" both matter; storing untouched originals in a private path and serving generated derivatives satisfies both without contradiction.
 - **Plain CSS over Framer Motion for the Phase 6 touch replacement** — `framer-motion` was never actually added as a dependency across Phases 1-5 (the Studio's motion needs turned out simple enough for CSS transitions); introducing it for the first time just for a few ambient touch-device dots wasn't worth a new dependency. The touch motes use `@keyframes` transform/opacity animation instead — compositor-driven, same practical effect (no per-frame JS cost), and consistent with how every other animation in this codebase is already built.
+
+---
+
+## Phase 8 — The world (October 2026)
+
+The flat pages are replaced by one continuous 3D building (see the AmeerStudio 3D World Design Document). The backend, the Studio and the content model stay; the presentation layer is new. Decisions below are binding in the same way as the ones above.
+
+### Shape
+
+```
+app/(world)/layout.tsx ── getWorldContent() (tag-cached Supabase reads)
+        │
+        └─ <WorldShell>  (client; mounted once per visit)
+             ├─ <WorldCanvas>  one persistent R3F canvas, frameloop="demand"
+             │    ├─ CameraRig    routes between stations (walks + elevator rides)
+             │    ├─ LightRig     3 regimes + a fixed pool of 4 point lights + pointer light
+             │    ├─ Dust         one GPU particle field, only inside light
+             │    └─ ZoneStreamer current + neighbouring zones mounted, others released
+             ├─ HUD · Sheets · Map · Go to… · Mirror (a11y) · Arrival
+             └─ <main> the station's HTML document (server-rendered by [[...path]])
+```
+
+- **The station registry (`src/world/stations.ts`) is the single source of truth.** Built from content by a pure function on both server and client; it defines every URL, camera pose, rail, interactive object, map rectangle and zone. Routes (`generateStaticParams`), metadata, the sitemap, the map, quick navigation, the accessibility mirror and zone loading all read it. A new project, node or category therefore creates its station, URL, bay/room and map entry with no code change.
+- **The URL decides where you are.** Navigation is `router.push` within the `(world)` layout, so the canvas never remounts; the camera plans the physical route (`src/world/route.ts`). The old hard-reload `portal()` survives only as the iris when leaving the building.
+- **Geometry is pure data (`src/world/layout.ts`).** Bays are placed on the time strip from project/experience years; prints are hung by a salon-hang generator (24 per roll, overflow onto partitions); posters along the stair; cooking prints taped around the kitchen. The registry and the zones both import it, so cameras and objects can't drift apart.
+- **Everything interactive goes through `src/world/actions.ts`.** 3D clicks, mirror buttons, map rooms and quick-nav results resolve to the same `Action`, so the world, the keyboard and the HTML can't disagree.
+- **One frame loop, one audio graph.** All animation runs in R3F's loop (render on demand plus a single ambient ticker at 30/20 fps, off under reduced motion and in hidden tabs). The old core.ts loop, CursorFx, the music capsule loop and world-effects.ts are gone. Audio is one `AudioContext` (procedural beds by region, placed events, positional music with a real analyser).
+- **Lights are pooled.** Lamps register as data; the rig moves a constant set of point lights to the nearest lamps, so loading a room never changes the light count (no shader recompiles).
+- **Kit, not giant models.** Rooms are composed from a shared kit (slabs with world-scaled UVs, prints, lamps, labels in the site's own faces) and a shared material library. `<ModelSlot name>` swaps a kit piece for an optimised Blender GLB when `scripts/assets/build-models.mjs` has produced one.
+- **HTML first.** Each station's document is server-rendered and interactive before the 3D chunk loads (~215 KB gz initial JS; the 3D engine ~285 KB gz arrives after). "Read as page" unmounts the canvas entirely. Devices without WebGL2, or low memory, start in page mode.
+- **The friend word moved to the server** (`src/app/actions/friend.ts`, httpOnly cookie). Locked floors' items are fetched only after it passes; migration 0007 makes that private at the database level too. It is still a soft gate by design.
+
+### Kept / changed / removed
+
+The full ledger is in the design document (§29). In short: the split, divider, profile node, intro, archive hall, elevator, floors, roman numerals, turntable, node graph, frame corners, dust, procedural sound, memory fragments, friend gate and long-press Studio entry all evolve into the building; the portal wipe, lightbox, frame corners and grain remain as UI; the hardcoded Matrix stats, the simulated visualizer, the Unsplash background and the Mind tables are removed.
